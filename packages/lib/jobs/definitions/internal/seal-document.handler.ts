@@ -23,7 +23,7 @@ import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-
 import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE, type TDocumentAuditLog } from '../../../types/document-audit-logs';
-import { isTspEnvelope } from '../../../types/signature-level';
+import { isPadesPipelineEnvelope } from '../../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../../types/webhook-payload';
 import { prefixedId } from '../../../universal/id';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
@@ -166,7 +166,7 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
 
     const finalEnvelopeStatus = isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED;
 
-    if (isTspEnvelope(envelope)) {
+    if (isPadesPipelineEnvelope(envelope)) {
       if (isResealing) {
         throw new AppError(AppErrorCode.NOT_SETUP, {
           message: 'Re-sealing TSP envelopes is not supported — recipient signatures cannot be regenerated externally.',

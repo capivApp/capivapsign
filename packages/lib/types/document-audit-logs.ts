@@ -62,6 +62,10 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_RECIPIENT_CSC_SIGN_REQUESTED', // Recipient clicked Sign; CSC session created with captured per-item hashes.
   'DOCUMENT_RECIPIENT_CSC_AUTHORIZED', // Credential-scope OAuth complete; SAD attached to the CSC session.
   'DOCUMENT_RECIPIENT_CSC_SIGNED', // TSP returned signatures and they were embedded into the recipient's PDF bytes.
+
+  // ICP-Brasil (local desktop agent) signing events.
+  'DOCUMENT_RECIPIENT_ICP_SIGN_REQUESTED', // Desktop prepared signing; ICP session created with captured per-item hashes.
+  'DOCUMENT_RECIPIENT_ICP_SIGNED', // Desktop agent returned signatures and they were embedded into the recipient's PDF bytes.
 ]);
 
 export const ZDocumentAuditLogEmailTypeSchema = z.enum([
@@ -817,6 +821,34 @@ export const ZDocumentAuditLogEventDocumentRecipientCscSignedSchema = z.object({
   }),
 });
 
+/**
+ * Event: Recipient initiated ICP-Brasil signing — ICP session created with per-item hashes.
+ */
+export const ZDocumentAuditLogEventDocumentRecipientIcpSignRequestedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_ICP_SIGN_REQUESTED),
+  data: ZBaseRecipientDataSchema.extend({
+    sessionId: z.string(),
+    certType: z.string(),
+    signerCpfCnpj: z.string().nullable(),
+    numSignatures: z.number(),
+  }),
+});
+
+/**
+ * Event: Desktop agent returned signatures and they were embedded into the recipient's PDF bytes.
+ */
+export const ZDocumentAuditLogEventDocumentRecipientIcpSignedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_ICP_SIGNED),
+  data: ZBaseRecipientDataSchema.extend({
+    sessionId: z.string(),
+    certType: z.string(),
+    signerCpfCnpj: z.string().nullable(),
+    numItemsSigned: z.number(),
+    signatureAlgorithm: z.string(),
+    digestAlgorithm: z.string(),
+  }),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -871,6 +903,8 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentRecipientCscSignRequestedSchema,
     ZDocumentAuditLogEventDocumentRecipientCscAuthorizedSchema,
     ZDocumentAuditLogEventDocumentRecipientCscSignedSchema,
+    ZDocumentAuditLogEventDocumentRecipientIcpSignRequestedSchema,
+    ZDocumentAuditLogEventDocumentRecipientIcpSignedSchema,
   ]),
 );
 

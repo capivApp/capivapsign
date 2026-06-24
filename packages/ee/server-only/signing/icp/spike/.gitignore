@@ -1,0 +1,8 @@
+node_modules/
+package-lock.json
+# generated test material (see gen-fixtures.sh)
+*.pem
+*.der
+*.p12
+input.pdf
+*.out.pdf

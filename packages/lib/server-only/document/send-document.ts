@@ -30,7 +30,7 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
-import { isTspEnvelope } from '../../types/signature-level';
+import { isPadesPipelineEnvelope } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.server';
@@ -128,9 +128,9 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
 
   let signingOrder = envelope.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
-  if (isTspEnvelope(envelope) && signingOrder === DocumentSigningOrder.PARALLEL && envelope.documentMeta) {
+  if (isPadesPipelineEnvelope(envelope) && signingOrder === DocumentSigningOrder.PARALLEL && envelope.documentMeta) {
     console.warn(
-      `[CSC] Coercing signingOrder=PARALLEL → SEQUENTIAL for ${envelope.signatureLevel} envelope ${envelope.id} at send time. The schema-layer guard should have caught this earlier.`,
+      `[PAdES] Coercing signingOrder=PARALLEL → SEQUENTIAL for ${envelope.signatureLevel} envelope ${envelope.id} at send time. The schema-layer guard should have caught this earlier.`,
     );
 
     await prisma.documentMeta.update({
@@ -246,7 +246,7 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     }
   }
 
-  if (isTspEnvelope(envelope) && envelope.status === DocumentStatus.DRAFT) {
+  if (isPadesPipelineEnvelope(envelope) && envelope.status === DocumentStatus.DRAFT) {
     await materializeTspAnchorsForEnvelope({
       envelopeId: envelope.id,
     });

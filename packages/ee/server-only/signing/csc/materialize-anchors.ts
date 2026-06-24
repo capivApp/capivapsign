@@ -1,5 +1,5 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { isTspEnvelope } from '@documenso/lib/types/signature-level';
+import { isPadesPipelineEnvelope } from '@documenso/lib/types/signature-level';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { prisma } from '@documenso/prisma';
@@ -57,7 +57,7 @@ export const materializeTspAnchorsForEnvelope = async ({
     });
   }
 
-  if (!isTspEnvelope(envelope)) {
+  if (!isPadesPipelineEnvelope(envelope)) {
     return;
   }
 

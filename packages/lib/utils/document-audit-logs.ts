@@ -650,6 +650,16 @@ export const formatDocumentAuditLogAction = (i18n: I18n, auditLog: TDocumentAudi
       you: msg`Your remote signature was applied`,
       user: msg`${user}'s remote signature was applied`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_ICP_SIGN_REQUESTED }, () => ({
+      anonymous: msg`Recipient initiated ICP-Brasil signing`,
+      you: msg`You initiated ICP-Brasil signing`,
+      user: msg`${user} initiated ICP-Brasil signing`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_ICP_SIGNED }, () => ({
+      anonymous: msg`Recipient's ICP-Brasil signature was applied`,
+      you: msg`Your ICP-Brasil signature was applied`,
+      user: msg`${user}'s ICP-Brasil signature was applied`,
+    }))
     .exhaustive();
 
   let selectedDescription = description.anonymous;

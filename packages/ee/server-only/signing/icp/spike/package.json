@@ -1,0 +1,14 @@
+{
+  "name": "@documenso/icp-spike",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Fase 0 viability spike for ICP-Brasil PAdES-LTA signing. Standalone — not part of the build.",
+  "scripts": {
+    "setup": "bash gen-fixtures.sh",
+    "spike": "node spike.mjs"
+  },
+  "dependencies": {
+    "@libpdf/core": "^0.4.0"
+  }
+}

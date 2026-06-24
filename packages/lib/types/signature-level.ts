@@ -13,7 +13,7 @@ import { z } from 'zod';
  * Stored as free-form TEXT on `Envelope.signatureLevel` so the legal-tier
  * taxonomy can expand without a DB enum migration. Validation lives here.
  */
-export const ZSignatureLevelSchema = z.enum(['SES', 'AES', 'QES']);
+export const ZSignatureLevelSchema = z.enum(['SES', 'AES', 'QES', 'ICP']);
 
 export const SignatureLevel = ZSignatureLevelSchema.enum;
 
@@ -31,3 +31,30 @@ export type TSignatureLevel = z.infer<typeof ZSignatureLevelSchema>;
  */
 export const isTspEnvelope = (envelope: { signatureLevel: string }): boolean =>
   envelope.signatureLevel === SignatureLevel.AES || envelope.signatureLevel === SignatureLevel.QES;
+
+/**
+ * Whether an envelope is signed via the ICP-Brasil flow (`ICP`): recipient-held
+ * A1/A3 certificates, with the digest signed by the local desktop agent rather
+ * than a cloud TSP. Shares the server-side PAdES pipeline with the TSP flow but
+ * sources the signature from {@link isLocalAgentEnvelope a local agent}.
+ */
+export const isIcpEnvelope = (envelope: { signatureLevel: string }): boolean =>
+  envelope.signatureLevel === SignatureLevel.ICP;
+
+/**
+ * Whether the envelope's signature is produced by a local agent on the
+ * signer's machine (today: the ICP-Brasil desktop app holding the private key)
+ * instead of a server-reachable cloud service. Such envelopes pre-allocate
+ * signature anchors at send time and run the capture→embed→seal pipeline, but
+ * the "sign the hash" step happens off-server.
+ */
+export const isLocalAgentEnvelope = (envelope: { signatureLevel: string }): boolean => isIcpEnvelope(envelope);
+
+/**
+ * Whether the envelope uses the shared PAdES (anchors → capture → embed →
+ * B-LTA) pipeline at all — true for both the cloud-TSP tiers and the local
+ * ICP-Brasil tier. Send-time anchor materialisation and the seal handler key
+ * off this superset.
+ */
+export const isPadesPipelineEnvelope = (envelope: { signatureLevel: string }): boolean =>
+  isTspEnvelope(envelope) || isLocalAgentEnvelope(envelope);

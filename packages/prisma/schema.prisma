@@ -72,6 +72,7 @@ model User {
   webhooks           Webhook[]
   siteSettings       SiteSettings[]
   passkeys           Passkey[]
+  desktopSessions    DesktopSession[]
   avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
   @@index([email])
@@ -657,6 +658,9 @@ model Recipient {
   cscCredential CscCredential?
   cscSession    CscSession?
 
+  icpSession   IcpSignSession?
+  icpEvidences IcpSignatureEvidence[]
+
   @@index([token])
   @@index([email])
   @@index([envelopeId])
@@ -788,6 +792,83 @@ model CscSession {
 
   recipientId Int       @unique
   recipient   Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+}
+
+/// Pairing of the ICP-Brasil desktop app with a user account. The desktop logs
+/// in once and receives a device token; only its SHA-512 hash is persisted
+/// (same scheme as ApiToken). Revocable via `revokedAt`.
+model DesktopSession {
+  id                String    @id @default(cuid())
+  userId            Int
+  deviceName        String
+  deviceFingerprint String
+  /// SHA-512 of the device token. The plaintext token lives only in the OS
+  /// keyring on the desktop; the server stores the hash for lookup.
+  tokenHash         String    @unique
+  lastSeenAt        DateTime?
+  createdAt         DateTime  @default(now())
+  expiresAt         DateTime?
+  revokedAt         DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// Transient prep->sign state for an ICP recipient (mirror of CscSession).
+/// Created at `prepare`, consumed at `complete`.
+/// @zod.import(["import { ZIcpSignSessionItemsSchema } from '@documenso/lib/types/icp-sign-session';", "import { ZIcpCertChainSchema } from '@documenso/lib/types/icp-sign-session';"])
+model IcpSignSession {
+  id String @id @default(cuid())
+
+  /// Denormalised envelope id for ergonomic lookups. No FK — cleanup flows
+  /// through the Recipient cascade.
+  envelopeId String
+
+  /// Pinned at prep time so the captured signedAttrs digest matches the bytes
+  /// the desktop agent signs.
+  signingTime DateTime
+
+  /// `[{ envelopeItemId, documentDataId, hashB64, ordinal }]` per envelope item.
+  itemsJson Json /// [IcpSignSessionItems] @zod.custom.use(ZIcpSignSessionItemsSchema)
+
+  /// Leaf-first DER cert chain (base64) submitted by the desktop at prep time.
+  /// The embed pass at complete time must use the exact same leaf (it is hashed
+  /// into the ESS signingCertificate attribute).
+  certChainJson Json /// [IcpCertChain] @zod.custom.use(ZIcpCertChainSchema)
+
+  /// 'A1' (software .p12) or 'A3' (token / Windows store).
+  certType String
+
+  createdAt DateTime @default(now())
+
+  recipientId Int       @unique
+  recipient   Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+}
+
+/// Persisted per-signature evidence (audit / queryable index). The legally
+/// authoritative LTV data lives in the PDF's DSS; this is a consultable trail.
+model IcpSignatureEvidence {
+  id                 String   @id @default(cuid())
+  envelopeId         String
+  recipientId        Int
+  envelopeItemId     String
+  certType           String
+  signerCommonName   String
+  signerCpfCnpj      String?
+  certSerial         String
+  issuerDn           String
+  certNotAfter       DateTime
+  digestAlgorithm    String
+  signatureAlgorithm String
+  signingTime        DateTime
+  tsaUrl             String?
+  padesLevel         String /// 'B-T' at sign; 'B-LTA' after seal.
+  createdAt          DateTime @default(now())
+
+  recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
 }
 
 model DocumentShareLink {

@@ -1,0 +1,20 @@
+Windows Registry Editor Version 5.00
+
+; Registers the `documenso-icp://` deep link so the Documenso web page can launch
+; the local signing agent. EDIT the path below to where IcpAgent.exe is installed,
+; then double-click this file (per-user; no admin needed).
+;
+; The web page triggers e.g.:
+;   documenso-icp://sign?baseUrl=https%3A%2F%2Fapp.documenso.com&token=<RECIPIENT_TOKEN>&source=windows-my
+; Windows passes the full URI as %1 to the agent, which prompts for cert/PIN,
+; signs, and calls back into Documenso via /complete.
+;
+; SECURITY: also set ICP_ALLOWED_ORIGIN (system env) to your Documenso origin so
+; the agent refuses to talk to any other host.
+
+[HKEY_CURRENT_USER\Software\Classes\documenso-icp]
+@="URL:Documenso ICP-Brasil Signing"
+"URL Protocol"=""
+
+[HKEY_CURRENT_USER\Software\Classes\documenso-icp\shell\open\command]
+@="\"C:\\Program Files\\IcpAgent\\IcpAgent.exe\" \"%1\""
