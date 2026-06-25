@@ -3,11 +3,11 @@ import { i18n, type MessageDescriptor } from '@lingui/core';
 
 export const appMetaTags = (title?: MessageDescriptor) => {
   const description =
-    'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.';
+    'CapivaSign — assinatura eletrônica e digital com certificado ICP-Brasil (A1/A3, PAdES). Um fork open source do Documenso, com uma experiência de assinatura rápida, simples e segura.';
 
   return [
     {
-      title: title ? `${i18n._(title)} - Documenso` : 'Documenso',
+      title: title ? `${i18n._(title)} - CapivaSign` : 'CapivaSign',
     },
     {
       name: 'description',
@@ -16,11 +16,11 @@ export const appMetaTags = (title?: MessageDescriptor) => {
     {
       name: 'keywords',
       content:
-        'Documenso, open source, DocuSign alternative, document signing, open signing infrastructure, open-source community, fast signing, beautiful signing, smart templates',
+        'CapivaSign, ICP-Brasil, assinatura digital, certificado digital, A1, A3, PAdES, assinatura eletrônica, Documenso, open source',
     },
     {
       name: 'author',
-      content: 'Documenso, Inc.',
+      content: 'CapivaSign',
     },
     {
       name: 'robots',
@@ -28,7 +28,7 @@ export const appMetaTags = (title?: MessageDescriptor) => {
     },
     {
       property: 'og:title',
-      content: 'Documenso - The Open Source DocuSign Alternative',
+      content: 'CapivaSign - Assinatura digital ICP-Brasil',
     },
     {
       property: 'og:description',

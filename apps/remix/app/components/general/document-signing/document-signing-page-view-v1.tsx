@@ -48,6 +48,7 @@ import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
 import { DocumentSigningRecipientProvider } from './document-signing-recipient-provider';
+import { IcpSignPanel } from './icp-sign-panel';
 
 type DocumentSigningBranding = {
   brandingEnabled: boolean;
@@ -368,20 +369,28 @@ export const DocumentSigningPageViewV1 = ({
                 <hr className="mt-4 mb-8 border-border" />
               </div>
 
-              <div className="-mx-2 hidden px-2 group-data-[expanded]/document-widget:block md:block">
-                <DocumentSigningForm
-                  document={document}
-                  recipient={recipient}
-                  fields={fields}
-                  isRecipientsTurn={isRecipientsTurn}
-                  allRecipients={allRecipients}
-                  setSelectedSignerId={setSelectedSignerId}
-                  completeDocument={completeDocument}
-                  isSubmitting={isSubmitting}
-                  fieldsValidated={fieldsValidated}
-                  nextRecipient={nextRecipient}
-                />
-              </div>
+              {/* ICP envelopes sign ONLY through the local agent — the normal
+                  signing form is hidden so completion requires the ICP cert. */}
+              {document.signatureLevel === 'ICP' ? (
+                <div className="-mx-2 px-2">
+                  <IcpSignPanel />
+                </div>
+              ) : (
+                <div className="-mx-2 hidden px-2 group-data-[expanded]/document-widget:block md:block">
+                  <DocumentSigningForm
+                    document={document}
+                    recipient={recipient}
+                    fields={fields}
+                    isRecipientsTurn={isRecipientsTurn}
+                    allRecipients={allRecipients}
+                    setSelectedSignerId={setSelectedSignerId}
+                    completeDocument={completeDocument}
+                    isSubmitting={isSubmitting}
+                    fieldsValidated={fieldsValidated}
+                    nextRecipient={nextRecipient}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

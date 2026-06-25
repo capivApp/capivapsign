@@ -175,11 +175,11 @@ export const EnvelopeEditor = () => {
   const currentStepData = envelopeEditorSteps.find((step) => step.id === searchParamsStep) || envelopeEditorSteps[0];
 
   return (
-    <div className="h-screen w-screen bg-envelope-editor-background">
+    <div className="h-[98dvh] w-[99dvw] bg-envelope-editor-background">
       <EnvelopeEditorHeader />
 
       {/* Main Content Area */}
-      <div className="flex h-[calc(100vh-4rem)] w-screen">
+      <div className="flex h-[calc(98dvh-4rem)]">
         {/* Left Section - Step Navigation */}
         <div
           className={cn('flex w-80 flex-shrink-0 flex-col overflow-y-auto border-border border-r bg-background py-4', {
@@ -270,7 +270,7 @@ export const EnvelopeEditor = () => {
                   className={cn(
                     `cursor-pointer rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'border border-green-200 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10'
+                        ? 'border border-primary/30 bg-primary/5 dark:border-primary/30 dark:bg-primary/10'
                         : 'border border-gray-200 hover:bg-gray-50 dark:border-gray-400/20 dark:hover:bg-gray-400/10'
                     }`,
                     {
@@ -283,20 +283,18 @@ export const EnvelopeEditor = () => {
                     <div
                       className={`rounded border p-2 ${
                         isActive
-                          ? 'border-green-200 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10'
+                          ? 'border-primary/30 bg-primary/5 dark:border-primary/30 dark:bg-primary/10'
                           : 'border-gray-100 bg-gray-100 dark:border-gray-400/20 dark:bg-gray-400/10'
                       }`}
                     >
-                      <Icon className={`h-4 w-4 ${isActive ? 'text-green-600' : 'text-gray-600'}`} />
+                      <Icon className={`h-4 w-4 ${isActive ? 'text-primary' : 'text-gray-600'}`} />
                     </div>
 
                     {!minimizeLeftSidebar && (
                       <div>
                         <div
                           className={`font-medium text-sm ${
-                            isActive
-                              ? 'text-green-900 dark:text-green-400'
-                              : 'text-foreground dark:text-muted-foreground'
+                            isActive ? 'text-primary dark:text-primary' : 'text-foreground dark:text-muted-foreground'
                           }`}
                         >
                           {t(step.title)}

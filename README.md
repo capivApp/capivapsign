@@ -1,3 +1,27 @@
+# CapivaSign
+
+**CapivaSign** is a fork of [**Documenso**](https://github.com/documenso/documenso),
+the open-source DocuSign alternative, extended with **ICP-Brasil digital
+signatures** (A1/A3 certificates, PAdES-LTA, RFC 3161 timestamping) via a local
+signing agent.
+
+> ### Credits & license
+>
+> CapivaSign would not exist without **Documenso** and its contributors — the
+> entire document workflow, signing pipeline, and the PAdES/CSC foundation that
+> our ICP-Brasil support builds on are their work. Huge thanks to the Documenso
+> team. ❤️
+>
+> This project is distributed under the **GNU Affero General Public License
+> v3.0 (AGPL-3.0)**, the same license as upstream Documenso (see
+> [`LICENSE`](./LICENSE)). In keeping with the AGPL we keep this notice and the
+> upstream attribution, publish our source, and license our modifications under
+> the same terms. "Documenso" is a trademark of its respective owners;
+> "CapivaSign" and its branding are used by this fork and are not endorsed by
+> Documenso.
+
+---
+
 <img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
 <p align="center" style="margin-top: 20px">

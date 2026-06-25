@@ -76,7 +76,8 @@ export const resolveCscSealTimeTsa = (): { urls: string[] } => {
   if (envUrls.length === 0) {
     throw new AppError(AppErrorCode.CSC_PROVIDER_NO_TSA, {
       message:
-        'CSC seal-time archival timestamps require NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY. This should have been caught by the boot-time guard in buildCscTransport — the env var is required at seal time even when the TSP advertises signatures/timestamp.',
+        'PAdES sealing (CSC/TSP and ICP-Brasil) requires an RFC 3161 timestamp authority for the B-LTA archival timestamp. ' +
+        'Set NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY to a TSA URL — e.g. http://timestamp.digicert.com (free) — and restart.',
     });
   }
 

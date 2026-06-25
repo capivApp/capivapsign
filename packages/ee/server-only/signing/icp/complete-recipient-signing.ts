@@ -165,6 +165,16 @@ export const completeIcpRecipientSigning = async (
       data: { signingStatus: SigningStatus.SIGNED, signedAt: new Date() },
     });
 
+    // Mark the recipient's fields as inserted. ICP recipients sign with their
+    // certificate (the stamp is rendered into the PDF at prepare), never through
+    // the interactive field-insertion UI — so the fields stay `inserted: false`.
+    // The seal job rejects any required field left uninserted
+    // (`fieldsContainUnsignedRequiredField`), so flip them here.
+    await tx.field.updateMany({
+      where: { recipientId: recipient.id, envelopeId: envelope.id },
+      data: { inserted: true },
+    });
+
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_ICP_SIGNED,
@@ -250,7 +260,12 @@ export const completeIcpRecipientSigning = async (
 
     await jobs.triggerJob({
       name: 'send.signing.requested.email',
-      payload: { userId: envelope.userId, documentId: legacyDocumentId, recipientId: nextRecipient.id, requestMetadata },
+      payload: {
+        userId: envelope.userId,
+        documentId: legacyDocumentId,
+        recipientId: nextRecipient.id,
+        requestMetadata,
+      },
     });
   }
 

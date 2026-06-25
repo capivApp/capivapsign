@@ -37,6 +37,14 @@ export type FinalizeTspEnvelopeCompletionOptions = {
     user: Pick<User, 'name' | 'email'>;
   };
   envelopeCompletedAuditLog: CreateDocumentAuditLogDataResponse;
+  /**
+   * Certificate / audit-log sidecar pages to append per envelope item, keyed by
+   * `envelopeItem.id`. Appended via incremental update BEFORE the archival
+   * `/DocTimeStamp`, so recipient signatures stay cryptographically valid and
+   * the final timestamp covers the appended pages. The seal handler renders
+   * these (it owns the certificate payload + the playwright/Konva choice).
+   */
+  sidecarDocsByItemId?: Map<string, PDF[]>;
   requestMetadata?: RequestMetadata;
 };
 
@@ -59,7 +67,24 @@ export const finalizeTspEnvelopeCompletion = async (opts: FinalizeTspEnvelopeCom
 
   for (const envelopeItem of envelope.envelopeItems) {
     const pdfBytes = await getFileServerSide(envelopeItem.documentData);
-    const pdfDoc = await PDF.load(pdfBytes);
+    let pdfDoc = await PDF.load(pdfBytes);
+
+    // Append the certificate / audit-log pages (if any) BEFORE archival. Done
+    // as an incremental update so the existing recipient signatures' `/ByteRange`
+    // stays byte-identical (validated: the signed prefix is preserved). The
+    // archival `/DocTimeStamp` added below then covers the appended pages too.
+    const sidecarDocs = opts.sidecarDocsByItemId?.get(envelopeItem.id) ?? [];
+
+    if (sidecarDocs.length > 0) {
+      for (const sidecar of sidecarDocs) {
+        await pdfDoc.copyPagesFrom(
+          sidecar,
+          Array.from({ length: sidecar.getPageCount() }, (_, index) => index),
+        );
+      }
+
+      pdfDoc = await PDF.load(await pdfDoc.save({ incremental: true }));
+    }
 
     // PAdES B-LTA in one call. Internally:
     //   1. Gather LTV (certs/OCSP/CRL) for every existing signed field and
@@ -69,6 +94,16 @@ export const finalizeTspEnvelopeCompletion = async (opts: FinalizeTspEnvelopeCom
     // All three are append-only incremental updates — every prior recipient
     // signature's `/ByteRange` stays valid.
     const archived = await pdfDoc.addArchivalData({ timestampAuthority });
+
+    // Surface (don't swallow) any LTV/timestamp warnings. A failed TSA round-trip
+    // can leave a structurally-present but unusable `/DocTimeStamp`, so making it
+    // loud is the difference between "valid B-LTA" and a silently broken seal.
+    if (archived.warnings.length > 0) {
+      console.warn(
+        `[seal] addArchivalData warnings for envelope item ${envelopeItem.id} (${envelope.id}):`,
+        archived.warnings,
+      );
+    }
 
     const { documentData: uploaded } = await putPdfFileServerSide(
       {

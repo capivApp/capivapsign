@@ -37,12 +37,39 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
 
+/**
+ * On-canvas verification mark (the per-page CapivaSign stamp the sender can drag).
+ *
+ * Mirrors the server renderer (`render-page-brand-footer.ts`): a 250×50 card, in
+ * PDF points, placed by preset or freely (CUSTOM). It is shown on every page,
+ * defaults to the footer, and CANNOT be removed — dragging it just switches the
+ * position to CUSTOM and stores the new top-left percentage on the document meta.
+ */
+const MARK_POSITIONS = ['NONE', 'FOOTER', 'HEADER', 'LEFT', 'RIGHT', 'CUSTOM'] as const;
+type MarkPosition = (typeof MARK_POSITIONS)[number];
+
+const MARK_WIDTH_PT = 250;
+const MARK_HEIGHT_PT = 50;
+const MARK_MARGIN_PT = 12;
+
+const clampPercent = (value: number) => Math.max(0, Math.min(100, value));
+
 export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
-  const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, getRecipientColorKey, updateEnvelope } = useCurrentEnvelopeEditor();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
 
   const interactiveTransformer = useRef<Transformer | null>(null);
+  const verificationMarkRef = useRef<Konva.Group | null>(null);
+
+  const stampPosition = useMemo<MarkPosition>(() => {
+    const raw = envelope.documentMeta?.pageStampPosition ?? 'FOOTER';
+
+    return (MARK_POSITIONS as readonly string[]).includes(raw) ? (raw as MarkPosition) : 'FOOTER';
+  }, [envelope.documentMeta?.pageStampPosition]);
+
+  const stampX = envelope.documentMeta?.pageStampX ?? null;
+  const stampY = envelope.documentMeta?.pageStampY ?? null;
 
   const [selectedKonvaFieldGroups, setSelectedKonvaFieldGroups] = useState<Konva.Group[]>([]);
 
@@ -308,6 +335,8 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     currentStage.on('transformstart', () => setIsFieldChanging(true));
     currentStage.on('transformend', () => setIsFieldChanging(false));
 
+    renderVerificationMark();
+
     currentPageLayer.batchDraw();
   };
 
@@ -524,6 +553,9 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     // Rerender the transformer
     interactiveTransformer.current?.forceUpdate();
 
+    // Keep the verification mark above the freshly (re)rendered fields.
+    verificationMarkRef.current?.moveToTop();
+
     pageLayer.current.batchDraw();
   }, [localPageFields, selectedKonvaFieldGroups, overlappingFieldFormIds, isFieldChanging]);
 
@@ -656,6 +688,156 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       field.destroy();
     }
   };
+
+  /**
+   * Top-left position + size for the verification mark, in UNSCALED page units
+   * (PDF points) — the Konva stage already applies `scale`, exactly like the
+   * fields. CUSTOM uses the stored percentages; presets mirror the server.
+   */
+  const resolveMarkBox = () => {
+    const width = MARK_WIDTH_PT;
+    const height = MARK_HEIGHT_PT;
+    const margin = MARK_MARGIN_PT;
+    const pageWidth = unscaledViewport.width;
+    const pageHeight = unscaledViewport.height;
+    const centerX = (pageWidth - width) / 2;
+
+    if (stampPosition === 'CUSTOM' && stampX !== null && stampY !== null) {
+      return {
+        x: Math.min((stampX / 100) * pageWidth, pageWidth - width),
+        y: Math.min((stampY / 100) * pageHeight, pageHeight - height),
+        width,
+        height,
+      };
+    }
+
+    if (stampPosition === 'HEADER') {
+      return { x: centerX, y: margin, width, height };
+    }
+
+    if (stampPosition === 'LEFT') {
+      return { x: margin, y: (pageHeight - height) / 2, width, height };
+    }
+
+    if (stampPosition === 'RIGHT') {
+      return { x: pageWidth - width - margin, y: (pageHeight - height) / 2, width, height };
+    }
+
+    // FOOTER (default).
+    return { x: centerX, y: pageHeight - height - margin, width, height };
+  };
+
+  const persistMarkPosition = (group: Konva.Group) => {
+    updateEnvelope({
+      meta: {
+        pageStampPosition: 'CUSTOM',
+        pageStampX: clampPercent((group.x() / unscaledViewport.width) * 100),
+        pageStampY: clampPercent((group.y() / unscaledViewport.height) * 100),
+      },
+    });
+  };
+
+  /**
+   * Draw the non-removable, draggable verification mark. Rebuilt on every call so
+   * it stays on top of the freshly rendered fields. Coordinates are in unscaled
+   * page units; the stage's scale converts them to screen pixels.
+   */
+  const renderVerificationMark = () => {
+    if (!pageLayer.current) {
+      return;
+    }
+
+    verificationMarkRef.current?.destroy();
+    verificationMarkRef.current = null;
+
+    if (stampPosition === 'NONE') {
+      return;
+    }
+
+    const { x, y, width, height } = resolveMarkBox();
+
+    const group = new Konva.Group({
+      name: 'verification-mark',
+      x,
+      y,
+      draggable: true,
+      // Konva passes absolute (scaled) coordinates here; clamp in scaled space.
+      dragBoundFunc: (pos) => ({
+        x: Math.max(0, Math.min(pos.x, (unscaledViewport.width - width) * scale)),
+        y: Math.max(0, Math.min(pos.y, (unscaledViewport.height - height) * scale)),
+      }),
+    });
+
+    const pad = 6;
+    const logoSize = height - pad * 2;
+
+    group.add(
+      new Konva.Rect({
+        width,
+        height,
+        fill: '#ffffff',
+        stroke: 'hsl(243, 75%, 59%)',
+        strokeWidth: 1,
+        cornerRadius: 4,
+      }),
+      new Konva.Rect({
+        x: pad,
+        y: pad,
+        width: logoSize,
+        height: logoSize,
+        fill: 'hsl(243, 75%, 59%)',
+        cornerRadius: 3,
+      }),
+      new Konva.Text({
+        x: pad + logoSize + pad,
+        y: pad + 2,
+        width: width - logoSize - pad * 3,
+        text: t`Verification mark`,
+        fontSize: 9,
+        fontStyle: 'bold',
+        fill: '#334155',
+      }),
+      new Konva.Text({
+        x: pad + logoSize + pad,
+        y: height - pad - 9,
+        width: width - logoSize - pad * 3,
+        text: t`Drag to position`,
+        fontSize: 8,
+        fill: 'hsl(243, 75%, 59%)',
+      }),
+    );
+
+    group.on('mouseenter', () => {
+      const container = stage.current?.container();
+
+      if (container) {
+        container.style.cursor = 'move';
+      }
+    });
+
+    group.on('mouseleave', () => {
+      const container = stage.current?.container();
+
+      if (container) {
+        container.style.cursor = 'default';
+      }
+    });
+
+    group.on('dragend', () => persistMarkPosition(group));
+
+    pageLayer.current.add(group);
+    group.moveToTop();
+    verificationMarkRef.current = group;
+    pageLayer.current.batchDraw();
+  };
+
+  /**
+   * Reposition / rebuild the mark whenever its config or the page scale changes.
+   */
+  useEffect(() => {
+    renderVerificationMark();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stampPosition, stampX, stampY, scale, currentEnvelopeItem?.id]);
 
   if (!currentEnvelopeItem) {
     return null;

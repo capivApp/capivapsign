@@ -29,11 +29,12 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    --primary: 95.08 71.08% 67.45%;
-    --primary-foreground: 95.08 71.08% 10%;
+    /* CapivaSign brand palette (from capivapp): indigo primary, pink secondary. */
+    --primary: 243 75% 59%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 330 81% 60%;
+    --secondary-foreground: 210 40% 98%;
 
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
@@ -41,7 +42,7 @@
     --destructive: 0 100% 50%;
     --destructive-foreground: 210 40% 98%;
 
-    --ring: 95.08 71.08% 67.45%;
+    --ring: 243 75% 59%;
 
     --radius: 0.5rem;
 
@@ -164,19 +165,20 @@
 
     --field-border: 214.3 31.8% 91.4%;
 
-    --primary: 95.08 71.08% 67.45%;
-    --primary-foreground: 95.08 71.08% 10%;
+    /* CapivaSign brand palette (dark): indigo primary, pink secondary. */
+    --primary: 243 75% 66%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 0 0% 23.4%;
-    --secondary-foreground: 95.08 71.08% 67.45%;
+    --secondary: 330 70% 55%;
+    --secondary-foreground: 210 40% 98%;
 
     --accent: 0 0% 27.9%;
-    --accent-foreground: 95.08 71.08% 67.45%;
+    --accent-foreground: 243 75% 80%;
 
     --destructive: 0 87% 62%;
     --destructive-foreground: 0 87% 19%;
 
-    --ring: 95.08 71.08% 67.45%;
+    --ring: 243 75% 66%;
 
     --radius: 0.5rem;
 

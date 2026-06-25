@@ -28,6 +28,9 @@ export const ZDocumentMetaSchema = DocumentMetaSchema.pick({
   typedSignatureEnabled: true,
   uploadSignatureEnabled: true,
   drawSignatureEnabled: true,
+  pageStampPosition: true,
+  pageStampX: true,
+  pageStampY: true,
   language: true,
   emailSettings: true,
 });
@@ -106,6 +109,16 @@ export const ZDocumentMetaUploadSignatureEnabledSchema = z
   .describe('Whether to allow recipients to sign using an uploaded signature.');
 
 /**
+ * Position of the per-page verification mark (logo + link + hash + QR).
+ * `NONE` disables it. Applied at send time, before signatures.
+ */
+export const ZPageStampPositionSchema = z
+  .enum(['NONE', 'FOOTER', 'HEADER', 'LEFT', 'RIGHT', 'CUSTOM'])
+  .describe('Position of the per-page verification mark. CUSTOM uses pageStampX/Y.');
+
+export type TPageStampPosition = z.infer<typeof ZPageStampPositionSchema>;
+
+/**
  * Note: Any updates to this will cause public API changes. You will need to update
  * all corresponding areas where this is used (some places that use this needs to pass
  * it through to another function).
@@ -123,6 +136,9 @@ export const ZDocumentMetaCreateSchema = z.object({
   typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
   uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
   drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+  pageStampPosition: ZPageStampPositionSchema.optional(),
+  pageStampX: z.number().min(0).max(100).nullish(),
+  pageStampY: z.number().min(0).max(100).nullish(),
   emailId: z.string().nullish(),
   emailReplyTo: zEmail().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.nullish(),

@@ -1,6 +1,5 @@
-import { PDF, type TimestampAuthority } from '@libpdf/core';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { PDF, type TimestampAuthority } from '@libpdf/core';
 
 import type { LibpdfSignerAlgo } from '../csc/algorithm-resolver';
 import { CscCaptureSigner } from '../csc/signers/capture-signer';
@@ -21,6 +20,19 @@ import type { IcpCertificateInfo } from './icp-cert-policy';
  */
 
 const DEFAULT_DIGEST = 'SHA-256' as const;
+
+/**
+ * Bytes reserved for the signature `/Contents` placeholder. libpdf defaults to
+ * 12 KB, which overflows for ICP-Brasil: the CMS carries the full ICP chain
+ * (leaf + ACs + AC Raiz) AND the B-T signature timestamp token (the TSA's own
+ * cert chain), pushing past 14 KB → `PLACEHOLDER_TOO_SMALL`.
+ *
+ * CRITICAL: the capture and embed passes MUST pass the SAME value. The
+ * placeholder size shifts the `/ByteRange` offsets, so a mismatch would make the
+ * capture-derived signedAttrs digest disagree with the embedded one — an invalid
+ * signature. 32 KB leaves generous headroom for multi-AC chains + TSA tokens.
+ */
+const ICP_SIGNATURE_ESTIMATED_SIZE = 32768;
 
 /**
  * Derive libpdf's signer algorithm tuple from the parsed leaf certificate.
@@ -76,6 +88,7 @@ export const captureItemDigest = async (opts: CaptureItemDigestOptions): Promise
     signingTime: opts.signingTime,
     level: 'B-B',
     digestAlgorithm: opts.algo.digestAlgorithm,
+    estimatedSize: ICP_SIGNATURE_ESTIMATED_SIZE,
   });
 
   if (captureSigner.capturedDigest === null) {
@@ -122,6 +135,7 @@ export const embedItemSignature = async (opts: EmbedItemSignatureOptions): Promi
     level: 'B-T',
     timestampAuthority: opts.timestampAuthority,
     digestAlgorithm: opts.algo.digestAlgorithm,
+    estimatedSize: ICP_SIGNATURE_ESTIMATED_SIZE,
   });
 
   return result.bytes;

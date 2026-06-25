@@ -61,19 +61,50 @@ export const renderRecipientOverlay = async ({
     });
   }
 
-  const stamp = page.getStampAnnotations().find((annotation) => annotation.stampName === stampName);
-
-  if (!stamp) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: `TSP stamp ${stampName} not found on page ${pageNumber}.`,
-    });
-  }
-
   const overlayBytes = await insertFieldInPDFV2({
     pageWidth: page.width,
     pageHeight: page.height,
     fields,
   });
+
+  await injectOverlayIntoStamp({ pdfDoc, stampName, pageNumber, overlayBytes });
+};
+
+export type InjectOverlayIntoStampOptions = {
+  pdfDoc: PDF;
+  stampName: string;
+  pageNumber: number;
+  /** A page-sized single-page overlay PDF whose contents become the stamp's appearance. */
+  overlayBytes: Uint8Array;
+};
+
+/**
+ * Inject a pre-rendered page-sized overlay PDF into the named `/Stamp`
+ * annotation's normal appearance (`/AP /N`), preserving the page content stream
+ * (and therefore the `/ByteRange` of any existing signatures). Shared by the
+ * TSP field overlay and the ICP signature stamp.
+ */
+export const injectOverlayIntoStamp = async ({
+  pdfDoc,
+  stampName,
+  pageNumber,
+  overlayBytes,
+}: InjectOverlayIntoStampOptions): Promise<void> => {
+  const page = pdfDoc.getPage(pageNumber - 1);
+
+  if (!page) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `Page ${pageNumber} not found on PDF.`,
+    });
+  }
+
+  const stamp = page.getStampAnnotations().find((annotation) => annotation.stampName === stampName);
+
+  if (!stamp) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `Stamp ${stampName} not found on page ${pageNumber}.`,
+    });
+  }
 
   const overlayDoc = await PDF.load(overlayBytes);
   const embedded = await pdfDoc.embedPage(overlayDoc, 0);

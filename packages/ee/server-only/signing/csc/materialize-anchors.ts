@@ -1,4 +1,8 @@
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { stampBrandMarkOnAllPages } from '@documenso/lib/server-only/pdf/render-page-brand-footer';
+import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
+import { ZPageStampPositionSchema } from '@documenso/lib/types/document-meta';
 import { isPadesPipelineEnvelope } from '@documenso/lib/types/signature-level';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
@@ -35,6 +39,7 @@ export const materializeTspAnchorsForEnvelope = async ({
       id: envelopeId,
     },
     include: {
+      documentMeta: true,
       recipients: true,
       envelopeItems: {
         include: {
@@ -65,6 +70,11 @@ export const materializeTspAnchorsForEnvelope = async ({
     return;
   }
 
+  // Resolve the per-page verification mark config once for the whole envelope:
+  // position (from document settings) + the team's white-label logo if branded.
+  const stampPosition = ZPageStampPositionSchema.catch('FOOTER').parse(envelope.documentMeta?.pageStampPosition);
+  const brandLogoBytes = stampPosition === 'NONE' ? undefined : await resolveBrandingLogoBytes(envelope.teamId);
+
   for (const envelopeItem of envelope.envelopeItems) {
     const expectedAnchorNames = envelope.recipients.map((recipient) =>
       buildTspAnchorName(recipient.id, envelopeItem.id),
@@ -93,15 +103,22 @@ export const materializeTspAnchorsForEnvelope = async ({
       continue;
     }
 
-    // Bake operator AcroForm, annotations and OCG layers into static graphics
-    // so the materialised PDF is a deterministic surface. `skipSignatures`
-    // preserves any operator-placed signature widgets and (on re-materialise)
-    // the TSP anchors created previously.
-    pdfDoc.flattenAll({
-      form: {
-        skipSignatures: true,
-      },
-    });
+    // Bake the operator AcroForm + annotations into static graphics so the
+    // materialised PDF is a deterministic surface. `skipSignatures` preserves
+    // operator-placed signature widgets and (on re-materialise) prior TSP
+    // anchors.
+    //
+    // We deliberately do NOT use `flattenAll()` here: it also flattens OCG
+    // layers, which forces OFF/hidden layers visible — that reveals "Draft" /
+    // watermark layers present in some source PDFs (e.g. report generators).
+    // Flattening only the form + annotations leaves hidden layers hidden.
+    const operatorForm = pdfDoc.getForm();
+
+    if (operatorForm) {
+      operatorForm.flatten({ skipSignatures: true });
+    }
+
+    pdfDoc.flattenAnnotations();
 
     const form = pdfDoc.getOrCreateForm();
 
@@ -162,6 +179,20 @@ export const materializeTspAnchorsForEnvelope = async ({
       }
     }
 
+    // Stamp the per-page verification mark (logo + link + hash + QR) BEFORE
+    // saving, so it's part of the bytes recipients sign. Skipped when disabled
+    // (position NONE) or when the envelope has no QR token to verify against.
+    if (stampPosition !== 'NONE' && envelope.qrToken) {
+      await stampBrandMarkOnAllPages(pdfDoc, {
+        position: stampPosition,
+        verifyUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${envelope.qrToken}`,
+        documentBytes: bytes,
+        logoBytes: brandLogoBytes,
+        customX: envelope.documentMeta?.pageStampX ?? undefined,
+        customY: envelope.documentMeta?.pageStampY ?? undefined,
+      });
+    }
+
     const newBytes = await pdfDoc.save({ useXRefStream: true });
 
     // CRITICAL: persist via `putPdfFileServerSide` (raw). The normalised path
@@ -188,6 +219,25 @@ export const materializeTspAnchorsForEnvelope = async ({
       },
     });
   }
+};
+
+/**
+ * Resolve the team's white-label logo bytes for the verification mark, or
+ * `undefined` to fall back to the bundled CapivaSign icon. Best-effort — any
+ * failure (missing/disabled branding, unreadable file) silently falls back.
+ */
+const resolveBrandingLogoBytes = async (teamId: number | null): Promise<Uint8Array | undefined> => {
+  if (teamId === null) {
+    return undefined;
+  }
+
+  const settings = await getTeamSettings({ teamId }).catch(() => null);
+
+  if (!settings?.brandingEnabled || !settings.brandingLogo) {
+    return undefined;
+  }
+
+  return getFileServerSide(JSON.parse(settings.brandingLogo)).catch(() => undefined);
 };
 
 /**

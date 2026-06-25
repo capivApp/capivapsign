@@ -377,6 +377,14 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
          * SIGNATURE FIELD.
          */
         .with({ type: FieldType.SIGNATURE }, (field) => {
+          // ICP envelopes are signed exclusively through the local desktop agent
+          // (the ICP certificate signs the document). The in-page draw/type/
+          // upload dialog must not run — it would mark the field signed via the
+          // SES path and let the document complete without the ICP signature.
+          if (envelope.signatureLevel === 'ICP') {
+            return;
+          }
+
           void handleSignatureFieldClick({
             field,
             fullName: fullName.current,

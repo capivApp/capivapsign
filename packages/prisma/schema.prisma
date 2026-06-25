@@ -572,6 +572,12 @@ model DocumentMeta {
   uploadSignatureEnabled Boolean @default(true)
   drawSignatureEnabled   Boolean @default(true)
 
+  /// Per-page verification mark: NONE | FOOTER | HEADER | LEFT | RIGHT | CUSTOM.
+  pageStampPosition String @default("FOOTER")
+  /// CUSTOM placement — percentages (0–100) of the page from the top-left.
+  pageStampX        Float?
+  pageStampY        Float?
+
   language           String                     @default("en")
   distributionMethod DocumentDistributionMethod @default(EMAIL)
 

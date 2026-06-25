@@ -14,7 +14,9 @@ import {
   type TDocumentMetaDateFormat,
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaTimezoneSchema,
+  ZPageStampPositionSchema,
 } from '@documenso/lib/types/document-meta';
+import { ZSignatureLevelSchema } from '@documenso/lib/types/signature-level';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import { canAccessTeamDocument, DocumentSignatureType, extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
@@ -55,6 +57,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@documenso/ui/primitives/input';
 import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -82,6 +85,7 @@ export const ZAddSettingsFormSchema = z.object({
   templateType: z.nativeEnum(TemplateType).optional(),
   externalId: z.string().optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
+  signatureLevel: ZSignatureLevelSchema.optional(),
   globalAccessAuth: z
     .array(z.union([ZDocumentAccessAuthTypesSchema, z.literal('-1')]))
     .transform((val) => (val.length === 1 && val[0] === '-1' ? [] : val))
@@ -110,6 +114,9 @@ export const ZAddSettingsFormSchema = z.object({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
+    pageStampPosition: ZPageStampPositionSchema,
+    pageStampX: z.coerce.number().min(0).max(100).nullish(),
+    pageStampY: z.coerce.number().min(0).max(100).nullish(),
     envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
     reminderSettings: ZEnvelopeReminderSettings.nullish(),
   }),
@@ -185,6 +192,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
       templateType: envelope.templateType || TemplateType.PRIVATE,
       externalId: envelope.externalId || '',
       visibility: envelope.visibility || '',
+      signatureLevel: ZSignatureLevelSchema.catch('SES').parse(envelope.signatureLevel),
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
       globalActionAuth: documentAuthOption?.globalActionAuth || [],
       meta: {
@@ -200,6 +208,9 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
         emailReplyTo: envelope.documentMeta.emailReplyTo ?? undefined,
         emailSettings: ZDocumentEmailSettingsSchema.parse(envelope.documentMeta.emailSettings),
         signatureTypes: extractTeamSignatureSettings(envelope.documentMeta),
+        pageStampPosition: ZPageStampPositionSchema.catch('FOOTER').parse(envelope.documentMeta?.pageStampPosition),
+        pageStampX: envelope.documentMeta?.pageStampX ?? 35,
+        pageStampY: envelope.documentMeta?.pageStampY ?? 90,
         envelopeExpirationPeriod: envelope.documentMeta?.envelopeExpirationPeriod ?? null,
         reminderSettings: envelope.documentMeta?.reminderSettings ?? null,
       },
@@ -243,6 +254,9 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
       redirectUrl,
       language,
       signatureTypes,
+      pageStampPosition,
+      pageStampX,
+      pageStampY,
       distributionMethod,
       emailId,
       emailSettings,
@@ -261,6 +275,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
           templateType: envelope.type === EnvelopeType.TEMPLATE ? data.templateType : undefined,
           externalId: data.externalId || null,
           visibility: data.visibility,
+          signatureLevel: data.signatureLevel,
           globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
           globalActionAuth: data.globalActionAuth ?? [],
         },
@@ -278,6 +293,9 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+          pageStampPosition,
+          pageStampX: pageStampPosition === 'CUSTOM' ? (pageStampX ?? 35) : null,
+          pageStampY: pageStampPosition === 'CUSTOM' ? (pageStampY ?? 90) : null,
           envelopeExpirationPeriod,
           reminderSettings,
         },
@@ -464,6 +482,109 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                           )}
                         />
                       )}
+
+                      <FormField
+                        control={form.control}
+                        name="signatureLevel"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border p-3">
+                            <div className="space-y-0.5 pr-4">
+                              <FormLabel className="flex flex-row items-center">
+                                <Trans>Assinatura Qualificada (ICP-Brasil)</Trans>
+                              </FormLabel>
+                              <p className="text-muted-foreground text-xs">
+                                <Trans>
+                                  Exige que cada signatário assine com certificado digital ICP-Brasil (A1/A3) via o
+                                  agente local. Força ordem sequencial.
+                                </Trans>
+                              </p>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value === 'ICP'}
+                                onCheckedChange={(checked) => field.onChange(checked ? 'ICP' : 'SES')}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="meta.pageStampPosition"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex flex-row items-center">
+                              <Trans>Marca de verificação nas páginas</Trans>
+                            </FormLabel>
+                            <p className="text-muted-foreground text-xs">
+                              <Trans>
+                                Carimba em cada página o logo, o link de verificação, o hash do arquivo e um QR Code.
+                              </Trans>
+                            </p>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <FormControl>
+                                <SelectTrigger className="bg-background">
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="NONE">{t`Nenhuma`}</SelectItem>
+                                <SelectItem value="FOOTER">{t`Rodapé`}</SelectItem>
+                                <SelectItem value="HEADER">{t`Topo`}</SelectItem>
+                                <SelectItem value="LEFT">{t`Lateral esquerda`}</SelectItem>
+                                <SelectItem value="RIGHT">{t`Lateral direita`}</SelectItem>
+                                <SelectItem value="CUSTOM">{t`Personalizada (X/Y)`}</SelectItem>
+                              </SelectContent>
+                            </Select>
+
+                            {field.value === 'CUSTOM' && (
+                              <div className="mt-2 grid grid-cols-2 gap-2">
+                                <FormField
+                                  control={form.control}
+                                  name="meta.pageStampX"
+                                  render={({ field: xField }) => (
+                                    <FormItem>
+                                      <FormLabel className="text-xs">{t`X (% da esquerda)`}</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          min={0}
+                                          max={100}
+                                          {...xField}
+                                          value={xField.value ?? ''}
+                                          className="bg-background"
+                                        />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={form.control}
+                                  name="meta.pageStampY"
+                                  render={({ field: yField }) => (
+                                    <FormItem>
+                                      <FormLabel className="text-xs">{t`Y (% do topo)`}</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          min={0}
+                                          max={100}
+                                          {...yField}
+                                          value={yField.value ?? ''}
+                                          className="bg-background"
+                                        />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
+                                />
+                              </div>
+                            )}
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                       {settings.allowConfigureDateFormat && (
                         <FormField

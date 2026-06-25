@@ -1,4 +1,5 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { buildIcpStampOverlay } from '@documenso/lib/server-only/pdf/render-icp-stamp';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TIcpCertType, TIcpSignSessionItems } from '@documenso/lib/types/icp-sign-session';
 import { isIcpEnvelope } from '@documenso/lib/types/signature-level';
@@ -8,12 +9,15 @@ import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.s
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { PDF } from '@libpdf/core';
+import { FieldType, RecipientRole } from '@prisma/client';
+import { DateTime } from 'luxon';
 
-import { buildTspAnchorName } from '../csc/pdf-names';
+import { buildTspAnchorName, buildTspStampName } from '../csc/pdf-names';
+import { injectOverlayIntoStamp } from '../csc/render-overlay';
+import type { TIcpPrepareResponse } from './desktop-protocol';
 import { captureItemDigest, deriveSignerAlgo } from './digest-signing';
 import { assertSignableIcpCertificate, parseIcpCertificate } from './icp-cert-policy';
 import { upsertIcpSignSession } from './sign-session';
-import type { TIcpPrepareResponse } from './desktop-protocol';
 
 /**
  * ICP-Brasil prep-phase orchestrator — the digest-capture half of the
@@ -45,7 +49,14 @@ export const prepareIcpRecipientSigning = async (
 ): Promise<TIcpPrepareResponse> => {
   const { recipientToken, certChainB64, certType, requestMetadata } = opts;
 
-  const recipient = await prisma.recipient.findFirst({ where: { token: recipientToken } }).catch(() => null);
+  const recipient = await prisma.recipient
+    .findFirst({
+      where: { token: recipientToken },
+      // Fields + signatures are needed to render the ICP signature stamp into
+      // the materialised stamp annotation at the field's position.
+      include: { fields: { include: { signature: true } } },
+    })
+    .catch(() => null);
 
   if (!recipient) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -55,7 +66,7 @@ export const prepareIcpRecipientSigning = async (
 
   const envelope = await prisma.envelope.findUniqueOrThrow({
     where: { id: recipient.envelopeId },
-    include: { envelopeItems: { include: { documentData: true } } },
+    include: { envelopeItems: { include: { documentData: true } }, documentMeta: true },
   });
 
   if (!isIcpEnvelope(envelope)) {
@@ -81,6 +92,51 @@ export const prepareIcpRecipientSigning = async (
     // persisted copy guarantees the capture digest matches the embed input.
     const bytes = await getFileServerSide(envelopeItem.documentData);
     const pdfDoc = await PDF.load(bytes);
+
+    // Render the recipient's signature stamp at their field positions BEFORE
+    // pinning the bytes, so it is part of what gets captured + signed. ICP
+    // recipients don't draw — the SIGNATURE field is auto-filled with a typed
+    // signature of the certificate's holder name, rendered through the same
+    // pipeline the SES/TSP overlays use (so the stamp lands at the field rect).
+    const signatureFieldsOnItem = recipient.fields.filter(
+      (field) => field.envelopeItemId === envelopeItem.id && field.type === FieldType.SIGNATURE,
+    );
+    const pagesWithFields = new Set(signatureFieldsOnItem.map((field) => field.page));
+    const dateText = DateTime.fromJSDate(signingTime).toFormat(
+      `${envelope.documentMeta?.dateFormat ?? 'dd/MM/yyyy HH:mm'}`,
+    );
+
+    for (const pageNumber of pagesWithFields) {
+      const page = pdfDoc.getPage(pageNumber - 1);
+
+      if (!page) {
+        continue;
+      }
+
+      const overlayBytes = await buildIcpStampOverlay({
+        pageWidth: page.width,
+        pageHeight: page.height,
+        fields: signatureFieldsOnItem
+          .filter((field) => field.page === pageNumber)
+          .map((field) => ({
+            positionX: Number(field.positionX),
+            positionY: Number(field.positionY),
+            width: Number(field.width),
+            height: Number(field.height),
+          })),
+        signerName: certInfo.commonName,
+        roleLabel: ICP_ROLE_LABEL[recipient.role],
+        dateText,
+      });
+
+      await injectOverlayIntoStamp({
+        pdfDoc,
+        stampName: buildTspStampName(recipient.id, envelopeItem.id, pageNumber),
+        pageNumber,
+        overlayBytes,
+      });
+    }
+
     const pinnedBytes = await pdfDoc.save({ incremental: true });
 
     const fileName = envelope.title.endsWith('.pdf') ? envelope.title : `${envelope.title || 'envelope'}.pdf`;
@@ -146,4 +202,13 @@ export const prepareIcpRecipientSigning = async (
       signAlgo: algo.signatureAlgorithm,
     },
   };
+};
+
+/** Portuguese recipient-role label shown on the ICP signature stamp. */
+const ICP_ROLE_LABEL: Record<RecipientRole, string> = {
+  [RecipientRole.SIGNER]: 'Signatário',
+  [RecipientRole.APPROVER]: 'Aprovador',
+  [RecipientRole.CC]: 'Cópia',
+  [RecipientRole.VIEWER]: 'Visualizador',
+  [RecipientRole.ASSISTANT]: 'Assistente',
 };

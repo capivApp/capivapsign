@@ -18,13 +18,16 @@ call "%ROOT%\build.bat"
 if errorlevel 1 (echo build failed & exit /b 1)
 
 REM 2) Trimmed runtime with just the modules the agent uses.
-set MODULES=java.base,java.naming,java.net.http,java.desktop,jdk.crypto.cryptoki,jdk.crypto.mscapi
+set MODULES=java.base,java.naming,java.net.http,java.desktop,jdk.httpserver,jdk.crypto.cryptoki,jdk.crypto.mscapi
 if exist "%ROOT%\build\runtime" rmdir /s /q "%ROOT%\build\runtime"
 jlink --add-modules %MODULES% --strip-debug --no-header-files --no-man-pages --compress=2 --output "%ROOT%\build\runtime"
 if errorlevel 1 (echo jlink failed & exit /b 1)
 
 REM 3) Package an app-image .exe around the jar + runtime.
 if exist "%ROOT%\dist" rmdir /s /q "%ROOT%\dist"
+REM --win-console is REQUIRED: without it jpackage builds a windowed (GUI)
+REM launcher that is NOT attached to the console, so stdout/stderr vanish and
+REM the agent appears to print nothing. This is a console tool — keep it.
 jpackage ^
   --type app-image ^
   --name IcpAgent ^
@@ -32,6 +35,7 @@ jpackage ^
   --main-jar icp-helper.jar ^
   --main-class com.documenso.icp.Main ^
   --runtime-image "%ROOT%\build\runtime" ^
+  --win-console ^
   --dest "%ROOT%\dist"
 if errorlevel 1 (echo jpackage failed & exit /b 1)
 

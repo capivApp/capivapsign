@@ -180,9 +180,62 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
         });
       }
 
+      // Render the certificate / audit-log pages and hand them to the finalizer,
+      // which appends them (incremental, preserving recipient signatures) before
+      // the archival timestamp. Mirrors the SES sidecar generation below.
+      const sidecarDocsByItemId = new Map<string, PDF[]>();
+      const padesNeedsCertificate = settings.includeSigningCertificate;
+      const padesNeedsAuditLog = settings.includeAuditLog;
+      const padesUsePlaywrightPdf = NEXT_PRIVATE_USE_PLAYWRIGHT_PDF();
+
+      if (padesNeedsCertificate || padesNeedsAuditLog) {
+        for (const envelopeItem of envelope.envelopeItems) {
+          const itemPdfDoc = await PDF.load(await getFileServerSide(envelopeItem.documentData));
+          const { width: pageWidth, height: pageHeight } = getLastPageDimensions(itemPdfDoc);
+
+          const certificatePayload = {
+            envelope: { ...envelope, status: finalEnvelopeStatus },
+            recipients: envelope.recipients,
+            fields,
+            language: envelope.documentMeta.language,
+            envelopeOwner: { email: envelope.user.email, name: envelope.user.name || '' },
+            envelopeItems: envelopeItems.map((item) => item.title),
+            pageWidth,
+            pageHeight,
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            additionalAuditLogs: [{ ...envelopeCompletedAuditLog, id: '', createdAt: new Date() } as TDocumentAuditLog],
+          };
+
+          const docs: PDF[] = [];
+
+          if (padesNeedsCertificate) {
+            docs.push(
+              padesUsePlaywrightPdf
+                ? await getCertificatePdf({ documentId, language: envelope.documentMeta.language }).then((b) =>
+                    PDF.load(b),
+                  )
+                : await generateCertificatePdf(certificatePayload),
+            );
+          }
+
+          if (padesNeedsAuditLog) {
+            docs.push(
+              padesUsePlaywrightPdf
+                ? await getAuditLogsPdf({ documentId, language: envelope.documentMeta.language }).then((b) =>
+                    PDF.load(b),
+                  )
+                : await generateAuditLogPdf(certificatePayload),
+            );
+          }
+
+          sidecarDocsByItemId.set(envelopeItem.id, docs);
+        }
+      }
+
       await finalizeTspEnvelopeCompletion({
         envelope,
         envelopeCompletedAuditLog,
+        sidecarDocsByItemId,
         requestMetadata,
       });
 

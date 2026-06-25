@@ -57,6 +57,11 @@ windows\build.bat               # Windows equivalent
 windows\package-windows.bat     # Windows: self-contained IcpAgent.exe (jlink+jpackage, bundles a JRE)
 ```
 
+> The packaged exe is built with `--win-console` so stdout/stderr show in cmd —
+> a windowed jpackage launcher silently swallows console output. To inspect the
+> agent without rebuilding, run the bundled JRE on the jar directly:
+> `dist\IcpAgent\runtime\bin\java.exe -jar dist\IcpAgent\app\icp-helper.jar list --source windows-my`
+
 ```bash
 # list certs
 java -jar build/icp-helper.jar list --source p12 --p12 cert.p12 --password test

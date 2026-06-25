@@ -5,7 +5,7 @@ import { SigningStatus } from '@prisma/client';
 import Konva from 'konva';
 import 'konva/skia-backend';
 import fs from 'node:fs';
-import path from 'node:path';
+import { createRequire } from 'node:module';
 import { DateTime } from 'luxon';
 import type { Canvas } from 'skia-canvas';
 import { Image as SkiaImage } from 'skia-canvas';
@@ -50,6 +50,7 @@ type GenerateCertificateOptions = {
   qrToken: string | null;
   hidePoweredBy: boolean;
   i18n: I18n;
+  dateFormat: string;
   envelopeOwner: {
     name: string;
     email: string;
@@ -194,6 +195,7 @@ type RenderColumnOptions = {
   recipient: CertificateRecipient;
   width: number;
   i18n: I18n;
+  dateFormat: string;
   envelopeOwner: {
     name: string;
     email: string;
@@ -407,7 +409,8 @@ const renderColumnTwo = (options: RenderColumnOptions) => {
 };
 
 const renderColumnThree = (options: RenderColumnOptions) => {
-  const { recipient, width, i18n, envelopeOwner } = options;
+  const { recipient, width, i18n, dateFormat, envelopeOwner } = options;
+  const recipientEventDateFormat = `${dateFormat} (ZZZZ)`;
 
   const column = new Konva.Group();
 
@@ -424,11 +427,11 @@ const renderColumnThree = (options: RenderColumnOptions) => {
       value: recipient.logs.emailed
         ? DateTime.fromJSDate(recipient.logs.emailed.createdAt)
             .setLocale(APP_I18N_OPTIONS.defaultLocale)
-            .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+            .toFormat(recipientEventDateFormat)
         : recipient.logs.sent
           ? DateTime.fromJSDate(recipient.logs.sent.createdAt)
               .setLocale(APP_I18N_OPTIONS.defaultLocale)
-              .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+              .toFormat(recipientEventDateFormat)
           : i18n._(msg`Unknown`),
     },
     {
@@ -436,7 +439,7 @@ const renderColumnThree = (options: RenderColumnOptions) => {
       value: recipient.logs.opened
         ? DateTime.fromJSDate(recipient.logs.opened.createdAt)
             .setLocale(APP_I18N_OPTIONS.defaultLocale)
-            .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+            .toFormat(recipientEventDateFormat)
         : i18n._(msg`Unknown`),
     },
   ];
@@ -446,7 +449,7 @@ const renderColumnThree = (options: RenderColumnOptions) => {
       label: i18n._(msg`Rejected`),
       value: DateTime.fromJSDate(recipient.logs.rejected.createdAt)
         .setLocale(APP_I18N_OPTIONS.defaultLocale)
-        .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)'),
+        .toFormat(recipientEventDateFormat),
       labelFill: textRejectedRed,
       valueFill: textRejectedRed,
     });
@@ -456,7 +459,7 @@ const renderColumnThree = (options: RenderColumnOptions) => {
       value: recipient.logs.completed
         ? DateTime.fromJSDate(recipient.logs.completed.createdAt)
             .setLocale(APP_I18N_OPTIONS.defaultLocale)
-            .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+            .toFormat(recipientEventDateFormat)
         : i18n._(msg`Unknown`),
     });
   }
@@ -492,6 +495,7 @@ type RenderRowOptions = {
   recipient: CertificateRecipient;
   columnWidths: ColumnWidths;
   i18n: I18n;
+  dateFormat: string;
   envelopeOwner: {
     name: string;
     email: string;
@@ -499,7 +503,7 @@ type RenderRowOptions = {
 };
 
 const renderRow = (options: RenderRowOptions) => {
-  const { recipient, columnWidths, i18n, envelopeOwner } = options;
+  const { recipient, columnWidths, i18n, dateFormat, envelopeOwner } = options;
 
   const rowGroup = new Konva.Group();
 
@@ -519,6 +523,7 @@ const renderRow = (options: RenderRowOptions) => {
     recipient,
     width: columnWidths[0],
     i18n,
+    dateFormat,
     envelopeOwner,
   });
   columnGroup.setAttrs({
@@ -531,6 +536,7 @@ const renderRow = (options: RenderRowOptions) => {
     recipient,
     width: columnWidths[1],
     i18n,
+    dateFormat,
     envelopeOwner,
   });
   columnTwoGroup.setAttrs({
@@ -544,6 +550,7 @@ const renderRow = (options: RenderRowOptions) => {
     recipient,
     width: columnWidths[2],
     i18n,
+    dateFormat,
     envelopeOwner,
   });
   columnThreeGroup.setAttrs({
@@ -578,17 +585,22 @@ const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n:
     height: brandingHeight,
   });
 
-  const logoPath = path.join(process.cwd(), 'public/static/logo.png');
+  // CapivaSign brand logo, resolved from the @documenso/assets package so it
+  // works regardless of the process cwd (dev runs from apps/remix).
+  const logoPath = createRequire(import.meta.url).resolve('@documenso/assets/logo.png');
   const logo = fs.readFileSync(logoPath);
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const img = new SkiaImage(logo) as unknown as HTMLImageElement;
 
+  // Logo rendered ~3x the text height for legibility, vertically centred on it.
+  const logoHeight = brandingHeight * 3;
   const documensoImage = new Konva.Image({
     image: img,
-    height: brandingHeight,
-    width: brandingHeight * (img.width / img.height),
+    height: logoHeight,
+    width: logoHeight * (img.width / img.height),
     x: text.width() + 16,
+    y: (brandingHeight - logoHeight) / 2,
   });
 
   const qrSize = qrToken ? 72 : 0;
@@ -627,6 +639,7 @@ const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n:
 type GroupRowsIntoPagesOptions = {
   recipients: CertificateRecipient[];
   maxHeight: number;
+  dateFormat: string;
   i18n: I18n;
   columnWidths: ColumnWidths;
   envelopeOwner: {
@@ -636,7 +649,7 @@ type GroupRowsIntoPagesOptions = {
 };
 
 const groupRowsIntoPages = (options: GroupRowsIntoPagesOptions) => {
-  const { recipients, maxHeight, i18n, columnWidths, envelopeOwner } = options;
+  const { recipients, maxHeight, i18n, dateFormat, columnWidths, envelopeOwner } = options;
 
   const rowHeader = renderRowHeader({ columnWidths, i18n });
   const rowHeaderHeight = rowHeader.getClientRect().height;
@@ -648,7 +661,7 @@ const groupRowsIntoPages = (options: GroupRowsIntoPagesOptions) => {
 
   // Group rows into pages.
   for (const recipient of recipients) {
-    const row = renderRow({ recipient, columnWidths, i18n, envelopeOwner });
+    const row = renderRow({ recipient, columnWidths, i18n, dateFormat, envelopeOwner });
 
     const rowHeight = row.getClientRect().height;
 
@@ -719,6 +732,7 @@ export async function renderCertificate({
   qrToken,
   hidePoweredBy,
   i18n,
+  dateFormat,
   envelopeOwner,
   pageWidth,
   pageHeight,
@@ -747,6 +761,7 @@ export async function renderCertificate({
     maxHeight: maxTableHeight,
     columnWidths,
     i18n,
+    dateFormat,
     envelopeOwner,
   });
 

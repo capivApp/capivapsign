@@ -28,7 +28,14 @@ final class DocumensoClient {
   DocumensoClient(String baseUrl, String bearerToken) {
     this.baseUrl = baseUrl.replaceAll("/+$", "");
     this.bearerToken = bearerToken;
-    this.http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
+    // Force HTTP/1.1. The default (HTTP_2) attempts an h2c upgrade over plain
+    // `http://`, which Node servers (Hono/@hono/node-server) don't support — the
+    // TCP connects but the exchange hangs until the request timeout. The browser
+    // and curl/Postman work precisely because they speak HTTP/1.1.
+    this.http = HttpClient.newBuilder()
+        .version(HttpClient.Version.HTTP_1_1)
+        .connectTimeout(Duration.ofSeconds(20))
+        .build();
   }
 
   Map<String, Object> prepare(String recipientToken, List<Object> certChainB64, String certType) throws Exception {

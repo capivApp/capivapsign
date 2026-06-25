@@ -3,7 +3,7 @@ import type { SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
-import type { TDocumentMetaDateFormat } from '@documenso/lib/types/document-meta';
+import type { TDocumentMetaDateFormat, TPageStampPosition } from '@documenso/lib/types/document-meta';
 import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import {
   type TEmbedCreateEnvelopeAuthoring,
@@ -226,6 +226,9 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
         drawSignatureEnabled: envelope.documentMeta.drawSignatureEnabled ?? undefined,
         dateFormat: (envelope.documentMeta.dateFormat as TDocumentMetaDateFormat) ?? undefined,
         language: envelope.documentMeta.language as SupportedLanguageCodes,
+        pageStampPosition: (envelope.documentMeta.pageStampPosition as TPageStampPosition) ?? undefined,
+        pageStampX: envelope.documentMeta.pageStampX ?? undefined,
+        pageStampY: envelope.documentMeta.pageStampY ?? undefined,
       },
     };
 
@@ -331,6 +334,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       type,
       status: DocumentStatus.DRAFT,
       source: 'DOCUMENT',
+      signatureLevel: 'SES',
       visibility: teamSettings.documentVisibility,
       templateType: 'PRIVATE',
       completedAt: null,

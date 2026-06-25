@@ -3,7 +3,7 @@ import type { SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getEditorEnvelopeById } from '@documenso/lib/server-only/envelope/get-editor-envelope-by-id';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
-import type { TDocumentMetaDateFormat } from '@documenso/lib/types/document-meta';
+import type { TDocumentMetaDateFormat, TPageStampPosition } from '@documenso/lib/types/document-meta';
 import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import {
   type TEmbedEditEnvelopeAuthoring,
@@ -241,6 +241,9 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
         drawSignatureEnabled: envelope.documentMeta.drawSignatureEnabled, //
         dateFormat: (envelope.documentMeta.dateFormat as TDocumentMetaDateFormat) ?? undefined,
         language: envelope.documentMeta.language as SupportedLanguageCodes,
+        pageStampPosition: (envelope.documentMeta.pageStampPosition as TPageStampPosition) ?? undefined,
+        pageStampX: envelope.documentMeta.pageStampX ?? undefined,
+        pageStampY: envelope.documentMeta.pageStampY ?? undefined,
       },
     };
 

@@ -40,6 +40,7 @@ import { EnvelopeSignerHeader } from '../envelope-signing/envelope-signer-header
 import { DocumentSigningMobileWidget } from './document-signing-mobile-widget';
 import { DocumentSigningRejectDialog } from './document-signing-reject-dialog';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
+import { IcpSignPanel } from './icp-sign-panel';
 
 export const DocumentSigningPageViewV2 = () => {
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
@@ -80,7 +81,7 @@ export const DocumentSigningPageViewV2 = () => {
   }, [recipientFieldsRemaining, selectedAssistantRecipientFields, currentEnvelopeItem]);
 
   return (
-    <div className="min-h-screen w-screen bg-gray-50 dark:bg-background">
+    <div className="h-[98dvh] w-[99dvh] bg-gray-50 dark:bg-background">
       <SignFieldEmailDialog.Root />
       <SignFieldTextDialog.Root />
       <SignFieldNumberDialog.Root />
@@ -93,7 +94,7 @@ export const DocumentSigningPageViewV2 = () => {
       <EnvelopeSignerHeader />
 
       {/* Main Content Area */}
-      <div className="flex h-[calc(100vh-4rem)] w-screen">
+      <div className="flex h-[calc(98dvh-4rem)] w-screen">
         {/* Left Section - Step Navigation */}
         <div
           className={cn(
@@ -156,7 +157,10 @@ export const DocumentSigningPageViewV2 = () => {
               </div>
 
               <div className="embed--DocumentWidgetContent mt-6 space-y-3">
-                <EnvelopeSignerForm />
+                {/* ICP envelopes sign ONLY through the local agent — the normal
+                    draw/type/upload + complete flow is hidden so the document
+                    cannot be completed without the ICP certificate signature. */}
+                {envelope.signatureLevel === 'ICP' ? <IcpSignPanel /> : <EnvelopeSignerForm />}
               </div>
             </div>
 

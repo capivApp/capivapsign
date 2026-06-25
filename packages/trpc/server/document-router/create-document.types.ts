@@ -11,6 +11,7 @@ import {
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZSignatureLevelSchema } from '@documenso/lib/types/signature-level';
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
@@ -34,6 +35,9 @@ export const ZCreateDocumentPayloadSchema = z.object({
   title: ZDocumentTitleSchema,
   externalId: ZDocumentExternalIdSchema.optional(),
   visibility: ZDocumentVisibilitySchema.optional(),
+  signatureLevel: ZSignatureLevelSchema.optional().describe(
+    "The cryptographic signature tier. 'ICP' routes signing through the recipient's local ICP-Brasil agent.",
+  ),
   globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
   globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
   formValues: ZDocumentFormValuesSchema.optional(),

@@ -1,6 +1,7 @@
 import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentMetaUpdateSchema } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeLiteSchema } from '@documenso/lib/types/envelope';
+import { ZSignatureLevelSchema } from '@documenso/lib/types/signature-level';
 import { TemplateType } from '@prisma/client';
 import { z } from 'zod';
 
@@ -23,6 +24,7 @@ export const ZUpdateEnvelopeRequestSchema = z.object({
       title: ZDocumentTitleSchema.optional(),
       externalId: ZDocumentExternalIdSchema.nullish(),
       visibility: ZDocumentVisibilitySchema.optional(),
+      signatureLevel: ZSignatureLevelSchema.optional(),
       globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
       globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
       folderId: z.string().nullish(),

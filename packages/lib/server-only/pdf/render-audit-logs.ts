@@ -236,18 +236,22 @@ const renderOverviewCard = (options: RenderOverviewCardOptions) => {
     y: overviewCard.getClientRect().height + rowVerticalSpacing,
   });
 
+  // Use the document's configured date format (e.g. dd-MM-yyyy) instead of a
+  // hardcoded ISO layout, keeping the timezone suffix for clarity.
+  const overviewDateFormat = `${envelope.documentMeta.dateFormat ?? 'yyyy-MM-dd hh:mm a'} (ZZZZ)`;
+
   const createdAtLabel = renderOverviewCardLabels({
     label: i18n._(msg`Created At`),
     text: DateTime.fromJSDate(envelope.createdAt)
       .setLocale(APP_I18N_OPTIONS.defaultLocale)
-      .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)'),
+      .toFormat(overviewDateFormat),
     width: columnWidth,
   });
   const lastUpdatedLabel = renderOverviewCardLabels({
     label: i18n._(msg`Last Updated`),
     text: DateTime.fromJSDate(envelope.updatedAt)
       .setLocale(APP_I18N_OPTIONS.defaultLocale)
-      .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)'),
+      .toFormat(overviewDateFormat),
     width: columnWidth,
     groupX: columnWidth + columnSpacing,
   });

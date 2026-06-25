@@ -33,49 +33,67 @@ final class CliAgent {
   private CliAgent() {}
 
   static void run(String[] args) throws Exception {
+    // Deep link (no console) -> always use the GUI for cert/secret prompts.
     if (args[0].startsWith("documenso-icp://")) {
-      runSign(parseUri(args[0]));
+      runSign(parseUri(args[0]), Ui.create(true));
       return;
     }
 
     String command = args[0];
+
+    // Local HTTP server mode — no flags; requests arrive over :3231.
+    if ("serve".equals(command)) {
+      ServeMode.start();
+      return;
+    }
+
     Map<String, String> opts = parseFlags(args, 1);
+    Ui ui = Ui.create(opts.containsKey("gui"));
 
     switch (command) {
-      case "sign" -> runSign(opts);
-      case "list" -> runList(opts);
-      default -> throw new IllegalArgumentException("Unknown command '" + command + "'. Use: sign | list");
+      case "sign" -> runSign(opts, ui);
+      case "list" -> runList(opts, ui);
+      default -> throw new IllegalArgumentException("Unknown command '" + command + "'. Use: sign | list | serve");
     }
   }
 
   // ---- commands ------------------------------------------------------------
 
-  private static void runList(Map<String, String> opts) throws Exception {
-    try (CertSource source = openSource(opts)) {
+  private static void runList(Map<String, String> opts, Ui ui) throws Exception {
+    try (CertSource source = openSource(opts, ui)) {
       List<Map<String, Object>> certs = source.list();
       System.err.println("Certificates (" + certs.size() + "):");
       for (int i = 0; i < certs.size(); i++) {
         Map<String, Object> c = certs.get(i);
-        System.err.printf("  [%d] %s — CPF/CNPJ %s — %s — exp %s%n",
+        System.err.printf("  [%d] %s - CPF/CNPJ %s - %s - exp %s%n",
             i + 1, c.get("commonName"), c.get("cpfCnpj"), c.get("type"), c.get("notAfter"));
       }
       System.out.println(Json.write(Map.of("ok", true, "certs", certs)));
     }
   }
 
+  private static void runSign(Map<String, String> opts, Ui ui) throws Exception {
+    System.out.println(Json.write(performSign(opts, ui)));
+  }
+
+  /**
+   * The full remote signing flow (select cert -> prepare -> sign each digest ->
+   * complete). Returns `{ok:true, outcome}`. Reused by both the CLI/deep-link
+   * entrypoint and the local HTTP server ({@link ServeMode}).
+   */
   @SuppressWarnings("unchecked")
-  private static void runSign(Map<String, String> opts) throws Exception {
+  static Map<String, Object> performSign(Map<String, String> opts, Ui ui) throws Exception {
     String baseUrl = requireOpt(opts, "base-url");
     String recipientToken = requireOpt(opts, "token");
     assertAllowedOrigin(baseUrl);
 
-    try (CertSource source = openSource(opts)) {
+    try (CertSource source = openSource(opts, ui)) {
       List<Map<String, Object>> certs = source.list();
       if (certs.isEmpty()) {
         throw new IllegalStateException("No signing certificates found for the selected source.");
       }
 
-      Map<String, Object> chosen = selectCert(certs, opts.get("alias"));
+      Map<String, Object> chosen = selectCert(certs, opts.get("alias"), ui);
       String alias = String.valueOf(chosen.get("alias"));
       List<Object> certChainB64 = (List<Object>) chosen.get("certChainB64");
       String certType = String.valueOf(chosen.get("type"));
@@ -85,11 +103,18 @@ final class CliAgent {
 
       DocumensoClient client = new DocumensoClient(baseUrl, opts.get("bearer"));
 
+      System.err.println("→ POST " + baseUrl + "/api/icp/sign/prepare");
       Map<String, Object> prepared = client.prepare(recipientToken, certChainB64, certType);
       String sessionId = String.valueOf(prepared.get("sessionId"));
       List<Object> items = (List<Object>) prepared.get("items");
       Map<String, Object> policy = (Map<String, Object>) prepared.get("policy");
       String digestAlgo = policy == null ? "SHA-256" : String.valueOf(policy.get("digestAlgo"));
+      System.err.println("← prepare ok: session=" + sessionId + " items="
+          + (items == null ? 0 : items.size()) + " algo=" + digestAlgo);
+
+      if (items == null || items.isEmpty()) {
+        throw new IllegalStateException("Server returned no items to sign (session " + sessionId + ").");
+      }
 
       List<Object> signedItems = new ArrayList<>();
       for (Object itemObj : items) {
@@ -102,24 +127,49 @@ final class CliAgent {
         out.put("signatureB64", signed.get("signatureB64"));
         signedItems.add(out);
       }
+      System.err.println("→ POST " + baseUrl + "/api/icp/sign/complete (" + signedItems.size() + " signatures)");
 
       Map<String, Object> result = client.complete(sessionId, signedItems);
       System.err.println("Outcome: " + result.get("outcome"));
-      System.out.println(Json.write(Map.of("ok", true, "outcome", result.getOrDefault("outcome", "signed"))));
+
+      Map<String, Object> response = new LinkedHashMap<>();
+      response.put("ok", Boolean.TRUE);
+      response.put("outcome", result.getOrDefault("outcome", "signed"));
+      return response;
     }
+  }
+
+  /** Build the internal flag map for a sign request originating from the HTTP server. */
+  static Map<String, String> optsFromRequest(String baseUrl, String token, String source) {
+    Map<String, String> opts = new LinkedHashMap<>();
+    opts.put("base-url", baseUrl);
+    opts.put("token", token);
+    opts.put("source", source == null || source.isBlank() ? "windows-my" : source);
+    return opts;
   }
 
   // ---- cert source construction (reuses the NDJSON factory) ----------------
 
-  private static CertSource openSource(Map<String, String> opts) throws Exception {
+  private static CertSource openSource(Map<String, String> opts, Ui ui) throws Exception {
     String kind = requireOpt(opts, "source").toLowerCase();
     Map<String, Object> descriptor = new LinkedHashMap<>();
+
+    // The Windows certificate store (SunMSCAPI) only exists on Windows. On
+    // Linux/macOS, transparently fall back to picking an A1 .p12 file — so the
+    // single "installed certificate" button keeps working and no separate web
+    // upload is needed.
+    boolean isWindowsStore = kind.equals("windows-my") || kind.equals("windows") || kind.equals("mscapi");
+    if (isWindowsStore && !System.getProperty("os.name", "").toLowerCase().contains("win")) {
+      kind = "p12";
+    }
 
     switch (kind) {
       case "p12", "a1" -> {
         descriptor.put("type", "P12");
-        descriptor.put("path", requireOpt(opts, "p12"));
-        descriptor.put("password", opts.containsKey("password") ? opts.get("password") : Prompt.secret("P12 password: "));
+        // A1 by file: use the --p12 path if given, else let the user pick it
+        // (file dialog in GUI mode) — supports the deep-link flow with no path.
+        descriptor.put("path", opts.containsKey("p12") ? opts.get("p12") : ui.pickFile("Selecione o certificado .p12/.pfx"));
+        descriptor.put("password", opts.containsKey("password") ? opts.get("password") : ui.secret("Senha do certificado (.p12):"));
       }
       case "pkcs11", "a3", "token" -> {
         descriptor.put("type", "PKCS11");
@@ -127,7 +177,7 @@ final class CliAgent {
         if (opts.containsKey("slot")) {
           descriptor.put("slot", opts.get("slot"));
         }
-        descriptor.put("pin", opts.containsKey("pin") ? opts.get("pin") : Prompt.secret("Token PIN: "));
+        descriptor.put("pin", opts.containsKey("pin") ? opts.get("pin") : ui.secret("PIN do token:"));
       }
       case "windows-my", "windows", "mscapi" -> descriptor.put("type", "WINDOWS_MY");
       default -> throw new IllegalArgumentException("Unknown --source '" + kind + "'. Use: p12 | pkcs11 | windows-my");
@@ -136,7 +186,7 @@ final class CliAgent {
     return CertSourceFactory.from(descriptor);
   }
 
-  private static Map<String, Object> selectCert(List<Map<String, Object>> certs, String alias) throws Exception {
+  private static Map<String, Object> selectCert(List<Map<String, Object>> certs, String alias, Ui ui) throws Exception {
     if (alias != null && !alias.isBlank()) {
       return certs.stream()
           .filter((c) -> alias.equals(c.get("alias")))
@@ -144,16 +194,7 @@ final class CliAgent {
           .orElseThrow(() -> new IllegalArgumentException("No certificate with alias '" + alias + "'."));
     }
 
-    if (certs.size() == 1) {
-      return certs.get(0);
-    }
-
-    System.err.println("Select a certificate:");
-    for (int i = 0; i < certs.size(); i++) {
-      Map<String, Object> c = certs.get(i);
-      System.err.printf("  [%d] %s — CPF/CNPJ %s — %s%n", i + 1, c.get("commonName"), c.get("cpfCnpj"), c.get("type"));
-    }
-    return certs.get(Prompt.selectIndex("Certificate", certs.size()));
+    return certs.get(ui.chooseCertificate(certs));
   }
 
   // ---- argument / URI parsing ---------------------------------------------

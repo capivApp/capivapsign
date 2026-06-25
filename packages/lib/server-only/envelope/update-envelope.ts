@@ -10,6 +10,7 @@ import { isDeepEqual } from 'remeda';
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
+import type { TSignatureLevel } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
@@ -17,6 +18,7 @@ import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
 import { recomputeNextReminderForEnvelope } from '../recipient/update-recipient-next-reminder';
 import { assertCompatibleDictateNextSigner } from '../signature-level/assert-compatible-dictate-next-signer';
 import { assertCompatibleSigningOrder } from '../signature-level/assert-compatible-signing-order';
+import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { assertEnvelopeMutable } from './assert-envelope-mutable';
 import { getEnvelopeWhereInput } from './get-envelope-by-id';
@@ -30,6 +32,7 @@ export type UpdateEnvelopeOptions = {
     folderId?: string | null;
     externalId?: string | null;
     visibility?: DocumentVisibility;
+    signatureLevel?: TSignatureLevel;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
     publicTitle?: string;
@@ -326,6 +329,8 @@ export const updateEnvelope = async ({
         title: data.title,
         externalId: data.externalId,
         visibility: data.visibility,
+        signatureLevel:
+          data.signatureLevel !== undefined ? resolveSignatureLevel({ requested: data.signatureLevel }) : undefined,
         templateType: data.templateType,
         publicDescription: data.publicDescription,
         publicTitle: data.publicTitle,

@@ -15,8 +15,13 @@ JAR="build/icp-helper.jar"
 rm -rf build
 mkdir -p "$OUT_DIR"
 
+# Target Java 17 (LTS) bytecode so the jar runs on a JRE 17+ even when built
+# with a newer JDK. Building with JDK 21 but emitting class file v65 (Java 21)
+# breaks `java -jar` on Java 17 with UnsupportedClassVersionError.
+JAVA_RELEASE="${JAVA_RELEASE:-17}"
+
 find "$SRC_DIR" -name '*.java' > build/sources.txt
-javac -d "$OUT_DIR" @build/sources.txt
+javac --release "$JAVA_RELEASE" -d "$OUT_DIR" @build/sources.txt
 
 jar --create --file "$JAR" --main-class com.documenso.icp.Main -C "$OUT_DIR" .
 echo "Built $JAR"

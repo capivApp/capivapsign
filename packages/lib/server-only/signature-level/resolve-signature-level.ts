@@ -69,6 +69,14 @@ export const resolveSignatureLevel = ({
     return instanceDefault;
   }
 
+  // ICP-Brasil signs via the recipient's local desktop agent, not the cloud
+  // TSP, so it is independent of the instance's CSC mode — allow it through on
+  // any instance. (CSC-mode cert-capability checks live at the TSP boundary;
+  // ICP's checks live in the icp/ pipeline.)
+  if (requested === SignatureLevel.ICP) {
+    return SignatureLevel.ICP;
+  }
+
   const isCompatible = isCscInstance ? requested !== SignatureLevel.SES : requested === SignatureLevel.SES;
 
   if (isCompatible) {

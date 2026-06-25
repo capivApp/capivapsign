@@ -155,7 +155,11 @@ export const EnvelopeDownloadDialog = ({
             <Trans>Download Files</Trans>
           </DialogTitle>
           <DialogDescription>
-            <Trans>Select the files you would like to download.</Trans>
+            <Trans>
+              Selecione os arquivos para baixar. A cópia <strong>Assinada</strong> é o PDF certificado (PAdES) com o
+              certificado digital embutido — os certificados ICP-Brasil dos signatários, ou o certificado padrão do
+              sistema quando nenhuma assinatura usou certificado próprio.
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 

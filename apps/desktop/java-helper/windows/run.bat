@@ -1,6 +1,7 @@
 @echo off
 REM Convenience launcher for the ICP agent jar on Windows (requires a JRE on PATH).
 REM
+REM   run.bat serve   (recommended: waits on http://localhost:3231 for sign requests from the web)
 REM   run.bat list  --source windows-my
 REM   run.bat sign  --base-url https://app.documenso.com --token <TOKEN> --source windows-my
 REM   run.bat sign  --base-url https://app.documenso.com --token <TOKEN> --source p12 --p12 C:\cert.p12

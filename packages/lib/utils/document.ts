@@ -60,6 +60,11 @@ export const extractDerivedDocumentMeta = (
     uploadSignatureEnabled: meta.uploadSignatureEnabled ?? settings.uploadSignatureEnabled,
     drawSignatureEnabled: meta.drawSignatureEnabled ?? settings.drawSignatureEnabled,
 
+    // Per-page verification mark position.
+    pageStampPosition: meta.pageStampPosition ?? 'FOOTER',
+    pageStampX: meta.pageStampX ?? null,
+    pageStampY: meta.pageStampY ?? null,
+
     // Email settings.
     emailId: meta.emailId ?? settings.emailId,
     emailReplyTo: meta.emailReplyTo ?? settings.emailReplyTo,

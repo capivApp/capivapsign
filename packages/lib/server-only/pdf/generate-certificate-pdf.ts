@@ -139,6 +139,7 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
     envelopeId: envelope.id,
     qrToken: envelope.qrToken,
     hidePoweredBy: organisationClaim.flags.hidePoweredBy ?? false,
+    dateFormat: envelope.documentMeta.dateFormat ?? 'yyyy-MM-dd hh:mm a',
     pageWidth,
     pageHeight,
     i18n,
