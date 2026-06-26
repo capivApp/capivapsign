@@ -66,7 +66,8 @@ const loadLogo = async (logoBytes?: Uint8Array): Promise<SkiaImage> => {
   const raw = logoBytes
     ? Buffer.from(logoBytes)
     : fs.readFileSync(createRequire(import.meta.url).resolve('@documenso/assets/logo.png'));
-  const png = await sharp(raw).resize(320, 130, { fit: 'inside' }).png().toBuffer();
+  // 3× resolution (was 320×130) so the enlarged header logo stays crisp.
+  const png = await sharp(raw).resize(960, 390, { fit: 'inside' }).png().toBuffer();
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return new SkiaImage(png) as unknown as SkiaImage;
 };
@@ -93,7 +94,12 @@ export const buildIcpAuditPagePdf = async (options: BuildIcpAuditPageOptions): P
 
   // ---- Header: logo (left) + identifier / date / provider (right) ----------
   const logoRatio = logo.width && logo.height ? logo.width / logo.height : 3;
-  const logoH = 34;
+  // 3× the original 34px header mark, per branding request. The white-label logo
+  // (options.logoBytes) is already honoured by loadLogo; this only scales it up.
+  const logoH = 102;
+  // Title and the content columns hang off the logo's bottom so the taller logo
+  // never overlaps them.
+  const headerBottom = margin + logoH;
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   layer.add(
     new Konva.Image({
@@ -128,7 +134,7 @@ export const buildIcpAuditPagePdf = async (options: BuildIcpAuditPageOptions): P
   layer.add(
     new Konva.Text({
       x: margin,
-      y: margin + 70,
+      y: headerBottom + 18,
       width: contentWidth,
       align: 'center',
       text: 'Relatório de auditoria e validação de assinaturas eletrônicas',
@@ -140,7 +146,7 @@ export const buildIcpAuditPagePdf = async (options: BuildIcpAuditPageOptions): P
   );
 
   // ---- Left column: QR + hash ----------------------------------------------
-  const colTop = margin + 130;
+  const colTop = headerBottom + 78;
   const qrSize = 168;
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   layer.add(
