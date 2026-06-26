@@ -109,14 +109,19 @@ export type EmbedItemSignatureOptions = {
   signingTime: Date;
   /** Raw signature bytes produced by the desktop agent over the captured digest. */
   signature: Uint8Array;
-  /** RFC3161 TSA for the B-T signature timestamp. */
-  timestampAuthority: TimestampAuthority;
+  /**
+   * RFC3161 TSA for the B-T signature timestamp. Omit to embed a plain B-B
+   * signature (certificate only, no timestamp) — used when timestamping is
+   * disabled (no TSA available).
+   */
+  timestampAuthority?: TimestampAuthority;
 };
 
 /**
  * Embed pass: re-run `pdf.sign` over the same bytes with {@link CscFifoSigner},
- * feeding the desktop-produced signature back into `anchorName` at PAdES B-T
- * (per-signature timestamp). Returns the signed PDF bytes.
+ * feeding the desktop-produced signature back into `anchorName`. Produces PAdES
+ * B-T (per-signature timestamp) when a TSA is supplied, or B-B (no timestamp)
+ * when it isn't. Returns the signed PDF bytes.
  */
 export const embedItemSignature = async (opts: EmbedItemSignatureOptions): Promise<Uint8Array> => {
   const pdfDoc = await PDF.load(opts.pdfBytes);
@@ -132,8 +137,8 @@ export const embedItemSignature = async (opts: EmbedItemSignatureOptions): Promi
     signer: fifoSigner,
     fieldName: opts.anchorName,
     signingTime: opts.signingTime,
-    level: 'B-T',
-    timestampAuthority: opts.timestampAuthority,
+    level: opts.timestampAuthority ? 'B-T' : 'B-B',
+    ...(opts.timestampAuthority ? { timestampAuthority: opts.timestampAuthority } : {}),
     digestAlgorithm: opts.algo.digestAlgorithm,
     estimatedSize: ICP_SIGNATURE_ESTIMATED_SIZE,
   });

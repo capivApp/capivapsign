@@ -1,7 +1,7 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { FileSignatureIcon, Loader2Icon, RefreshCwIcon, UploadIcon } from 'lucide-react';
+import { FileSignatureIcon, Loader2Icon, RefreshCwIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router';
 
@@ -90,6 +90,7 @@ export const IcpSignPanel = () => {
       <div className="mt-4 flex flex-col gap-2">
         <Button
           type="button"
+          variant="secondary"
           className="w-full"
           onClick={() => void startSigning('windows-my')}
           disabled={!recipientToken || status === 'working'}
@@ -100,17 +101,6 @@ export const IcpSignPanel = () => {
             <FileSignatureIcon className="mr-2 h-4 w-4" />
           )}
           <Trans>Certificado instalado (A3 token / A1)</Trans>
-        </Button>
-
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-full"
-          onClick={() => void startSigning('p12')}
-          disabled={!recipientToken || status === 'working'}
-        >
-          <UploadIcon className="mr-2 h-4 w-4" />
-          <Trans>Arquivo .p12 / .pfx com senha (A1)</Trans>
         </Button>
 
         <Button type="button" variant="outline" className="w-full" onClick={() => window.location.reload()}>
@@ -127,7 +117,7 @@ export const IcpSignPanel = () => {
         <Trans>
           O agente CapivaSign precisa estar em execução (porta 3231) ou com o protocolo documenso-icp:// registrado. Sua
           chave privada nunca sai da sua máquina.
-        </Trans>{' '}
+        </Trans>
         <span className="text-muted-foreground/70">{t`Origem: ${baseUrl}`}</span>
       </p>
     </div>

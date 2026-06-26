@@ -1,4 +1,8 @@
+import { createHash } from 'node:crypto';
+
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { buildIcpAuditPagePdf } from '@documenso/lib/server-only/pdf/render-icp-audit-page';
 import { buildIcpStampOverlay } from '@documenso/lib/server-only/pdf/render-icp-stamp';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TIcpCertType, TIcpSignSessionItems } from '@documenso/lib/types/icp-sign-session';
@@ -66,7 +70,14 @@ export const prepareIcpRecipientSigning = async (
 
   const envelope = await prisma.envelope.findUniqueOrThrow({
     where: { id: recipient.envelopeId },
-    include: { envelopeItems: { include: { documentData: true } }, documentMeta: true },
+    include: {
+      envelopeItems: { include: { documentData: true } },
+      documentMeta: true,
+      // For baking the certificate page into the signed content (see below).
+      recipients: true,
+      fields: { include: { signature: true } },
+      user: true,
+    },
   });
 
   if (!isIcpEnvelope(envelope)) {
@@ -74,6 +85,13 @@ export const prepareIcpRecipientSigning = async (
       message: 'prepareIcpRecipientSigning called for a non-ICP envelope.',
     });
   }
+
+  // Single-signer documents bake the certificate page into the signed content
+  // here (pre-digest), so the signature covers it and the ITI validator sees no
+  // post-signature visual modification. Multi-signer documents can't share an
+  // embedded page without flagging earlier signatures, so they keep the
+  // seal-time sidecar (see `isSingleSignerIcpEnvelope`).
+  const bakeCertificatePage = isSingleSignerIcpEnvelope(envelope);
 
   const leafDer = new Uint8Array(Buffer.from(certChainB64[0], 'base64'));
   const certInfo = parseIcpCertificate(leafDer);
@@ -106,35 +124,85 @@ export const prepareIcpRecipientSigning = async (
       `${envelope.documentMeta?.dateFormat ?? 'dd/MM/yyyy HH:mm'}`,
     );
 
-    for (const pageNumber of pagesWithFields) {
-      const page = pdfDoc.getPage(pageNumber - 1);
+    // Multi-signer: do NOT inject the signature stamp ("marcação"). Any visual
+    // change at this signer's prepare is an incremental update AFTER earlier
+    // signatures and would flag them in the ITI validator ("muda o buffer").
+    // Multi-signer documents only ever embed the certificate into the anchor;
+    // their (static) audit page is allocated once at materialise. Single-signer
+    // documents have a single signature, so the stamp + full audit page are
+    // baked here, before that signature.
+    if (bakeCertificatePage) {
+      for (const pageNumber of pagesWithFields) {
+        const page = pdfDoc.getPage(pageNumber - 1);
 
-      if (!page) {
-        continue;
+        if (!page) {
+          continue;
+        }
+
+        const overlayBytes = await buildIcpStampOverlay({
+          pageWidth: page.width,
+          pageHeight: page.height,
+          fields: signatureFieldsOnItem
+            .filter((field) => field.page === pageNumber)
+            .map((field) => ({
+              positionX: Number(field.positionX),
+              positionY: Number(field.positionY),
+              width: Number(field.width),
+              height: Number(field.height),
+            })),
+          signerName: certInfo.commonName,
+          roleLabel: ICP_ROLE_LABEL[recipient.role],
+          dateText,
+        });
+
+        await injectOverlayIntoStamp({
+          pdfDoc,
+          stampName: buildTspStampName(recipient.id, envelopeItem.id, pageNumber),
+          pageNumber,
+          overlayBytes,
+        });
       }
+    }
 
-      const overlayBytes = await buildIcpStampOverlay({
-        pageWidth: page.width,
-        pageHeight: page.height,
-        fields: signatureFieldsOnItem
-          .filter((field) => field.page === pageNumber)
-          .map((field) => ({
-            positionX: Number(field.positionX),
-            positionY: Number(field.positionY),
-            width: Number(field.width),
-            height: Number(field.height),
-          })),
-        signerName: certInfo.commonName,
-        roleLabel: ICP_ROLE_LABEL[recipient.role],
-        dateText,
+    // Bake the certificate page into the signed content (single-signer only).
+    // Rendered with the pinned signing time + this signer's certificate name +
+    // request IP/UA, so it's complete even though the completion audit log
+    // doesn't exist yet. The signature then covers it → ITI sees no
+    // post-signature visual change, and the seal skips the sidecar.
+    const documentMeta = envelope.documentMeta;
+
+    if (bakeCertificatePage && documentMeta) {
+      const lastPage = pdfDoc.getPage(pdfDoc.getPageCount() - 1);
+      const dateFmt = documentMeta.dateFormat ?? 'dd/MM/yyyy HH:mm';
+
+      const auditPdfBytes = await buildIcpAuditPagePdf({
+        pageWidth: lastPage?.width ?? 595,
+        pageHeight: lastPage?.height ?? 842,
+        identifier: envelope.qrToken ?? envelope.id,
+        generatedAtText: `Data/Hora ${DateTime.now().toFormat(`${dateFmt} (ZZZZ)`)}`,
+        verifyUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${envelope.qrToken ?? ''}`,
+        documentHashHex: createHash('sha256').update(Buffer.from(bytes)).digest('hex'),
+        brandName: 'CapivaSign',
+        signers: [
+          {
+            name: recipient.name || recipient.email,
+            email: recipient.email,
+            cpfCnpj: certInfo.cpfCnpj,
+            roleLabel: ICP_ROLE_LABEL[recipient.role],
+            status: 'signed',
+            signedAt: DateTime.fromJSDate(signingTime).toFormat(dateFmt),
+            certIssuer: certInfo.issuerDn,
+            ipAddress: requestMetadata?.ipAddress ?? null,
+            device: requestMetadata?.userAgent ?? null,
+          },
+        ],
       });
 
-      await injectOverlayIntoStamp({
-        pdfDoc,
-        stampName: buildTspStampName(recipient.id, envelopeItem.id, pageNumber),
-        pageNumber,
-        overlayBytes,
-      });
+      const auditDoc = await PDF.load(auditPdfBytes);
+      await pdfDoc.copyPagesFrom(
+        auditDoc,
+        Array.from({ length: auditDoc.getPageCount() }, (_, index) => index),
+      );
     }
 
     const pinnedBytes = await pdfDoc.save({ incremental: true });
@@ -203,6 +271,14 @@ export const prepareIcpRecipientSigning = async (
     },
   };
 };
+
+/**
+ * Whether the envelope has exactly one signing recipient (non-CC). Only then can
+ * the certificate page be baked into the signed content without flagging another
+ * signer's signature as modified.
+ */
+const isSingleSignerIcpEnvelope = (envelope: { recipients: { role: RecipientRole }[] }): boolean =>
+  envelope.recipients.filter((recipient) => recipient.role !== RecipientRole.CC).length === 1;
 
 /** Portuguese recipient-role label shown on the ICP signature stamp. */
 const ICP_ROLE_LABEL: Record<RecipientRole, string> = {

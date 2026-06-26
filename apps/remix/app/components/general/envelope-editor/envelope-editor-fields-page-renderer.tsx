@@ -8,6 +8,11 @@ import {
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import {
+  pageStampOverrideKey,
+  type TPageStampOverrides,
+  ZPageStampOverridesSchema,
+} from '@documenso/lib/types/page-stamp';
+import {
   convertPixelToPercentage,
   MIN_FIELD_HEIGHT_PX,
   MIN_FIELD_WIDTH_PX,
@@ -82,6 +87,18 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   );
 
   const { scale, pageNumber } = pageData;
+
+  // Per-page verification-mark overrides. Each page is positioned independently:
+  // a page the sender dragged has its own `{x,y}`; the rest fall back to the
+  // document-wide `pageStampPosition` preset.
+  const stampOverrides = useMemo<TPageStampOverrides>(() => {
+    const parsed = ZPageStampOverridesSchema.safeParse(envelope.documentMeta?.pageStampOverrides);
+
+    return parsed.success ? parsed.data : {};
+  }, [envelope.documentMeta?.pageStampOverrides]);
+
+  const pageStampKey = currentEnvelopeItem ? pageStampOverrideKey(currentEnvelopeItem.id, pageNumber) : null;
+  const pageOverride = pageStampKey ? (stampOverrides[pageStampKey] ?? null) : null;
 
   const localPageFields = useMemo(
     () =>
@@ -702,6 +719,16 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     const pageHeight = unscaledViewport.height;
     const centerX = (pageWidth - width) / 2;
 
+    // This page was dragged individually — use its own stored position.
+    if (pageOverride) {
+      return {
+        x: Math.min((pageOverride.x / 100) * pageWidth, pageWidth - width),
+        y: Math.min((pageOverride.y / 100) * pageHeight, pageHeight - height),
+        width,
+        height,
+      };
+    }
+
     if (stampPosition === 'CUSTOM' && stampX !== null && stampY !== null) {
       return {
         x: Math.min((stampX / 100) * pageWidth, pageWidth - width),
@@ -728,11 +755,21 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   };
 
   const persistMarkPosition = (group: Konva.Group) => {
+    if (!pageStampKey) {
+      return;
+    }
+
+    // Store the dropped position as an override for THIS page only, so dragging
+    // on one page never moves the mark on the others.
     updateEnvelope({
       meta: {
-        pageStampPosition: 'CUSTOM',
-        pageStampX: clampPercent((group.x() / unscaledViewport.width) * 100),
-        pageStampY: clampPercent((group.y() / unscaledViewport.height) * 100),
+        pageStampOverrides: {
+          ...stampOverrides,
+          [pageStampKey]: {
+            x: clampPercent((group.x() / unscaledViewport.width) * 100),
+            y: clampPercent((group.y() / unscaledViewport.height) * 100),
+          },
+        },
       },
     });
   };
@@ -837,7 +874,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   useEffect(() => {
     renderVerificationMark();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stampPosition, stampX, stampY, scale, currentEnvelopeItem?.id]);
+  }, [stampPosition, stampX, stampY, pageOverride?.x, pageOverride?.y, scale, currentEnvelopeItem?.id]);
 
   if (!currentEnvelopeItem) {
     return null;

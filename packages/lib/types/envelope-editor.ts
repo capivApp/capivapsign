@@ -290,6 +290,7 @@ export const ZEditorEnvelopeSchema = EnvelopeSchema.pick({
     pageStampPosition: true,
     pageStampX: true,
     pageStampY: true,
+    pageStampOverrides: true,
   }),
   recipients: ZEnvelopeRecipientLiteSchema.array(),
   fields: ZEnvelopeFieldSchema.array(),

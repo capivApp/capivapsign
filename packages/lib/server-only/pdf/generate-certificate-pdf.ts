@@ -1,3 +1,4 @@
+import { prisma } from '@documenso/prisma';
 import { PDF } from '@libpdf/core';
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
@@ -8,6 +9,7 @@ import { match } from 'ts-pattern';
 
 import { ZSupportedLanguageCodeSchema } from '../../constants/i18n';
 import type { TDocumentAuditLogBaseSchema } from '../../types/document-audit-logs';
+import { isIcpEnvelope } from '../../types/signature-level';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { getTranslations } from '../../utils/i18n';
 import { getDocumentCertificateAuditLogs } from '../document/get-document-certificate-audit-logs';
@@ -36,6 +38,19 @@ export type GenerateCertificatePdfOptions = {
   language?: string;
   pageWidth: number;
   pageHeight: number;
+  /**
+   * Sign-time context for the ICP-Brasil flow. When the certificate page is
+   * baked into the signed content at `prepare` (so the signature covers it),
+   * the recipient's `DOCUMENT_RECIPIENT_COMPLETED` audit log doesn't exist yet
+   * and there's no `Signature` row — so the signer name, signing time and IP/UA
+   * are supplied directly here and synthesised onto the page.
+   */
+  icpSignContext?: {
+    signedAt: Date;
+    signerNamesByRecipientId: Record<number, string>;
+    ipAddress?: string | null;
+    userAgent?: string | null;
+  };
 };
 
 export const generateCertificatePdf = async (options: GenerateCertificatePdfOptions) => {
@@ -51,6 +66,28 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
     getTranslations(documentLanguage),
   ]);
 
+  // ICP-Brasil recipients sign with their certificate and never draw/type a
+  // signature, so the `Signature` row is empty and the certificate page would
+  // show a blank box. Map each ICP signer's certificate common name so we can
+  // render it as the signature, mirroring the in-document ICP stamp.
+  const icpSignerNameByRecipientId = new Map<number, string>();
+
+  if (isIcpEnvelope(envelope)) {
+    const evidence = await prisma.icpSignatureEvidence.findMany({
+      where: { envelopeId: envelope.id },
+      select: { recipientId: true, signerCommonName: true },
+    });
+
+    for (const item of evidence) {
+      icpSignerNameByRecipientId.set(item.recipientId, item.signerCommonName);
+    }
+  }
+
+  // Sign-time overrides (the page is baked at `prepare`, before evidence exists).
+  for (const [recipientId, name] of Object.entries(options.icpSignContext?.signerNamesByRecipientId ?? {})) {
+    icpSignerNameByRecipientId.set(Number(recipientId), name);
+  }
+
   i18n.loadAndActivate({
     locale: documentLanguage,
     messages,
@@ -60,9 +97,26 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
     recipients: recipients.map((recipient) => {
       const recipientId = recipient.id;
 
-      const signatureField = fields.find(
+      let signatureField = fields.find(
         (field) => field.recipientId === recipient.id && field.type === FieldType.SIGNATURE,
       );
+
+      // For an ICP signer with no drawn/typed signature, synthesise a typed
+      // signature from their certificate common name so the certificate page
+      // shows who signed instead of an empty box.
+      const icpSignerName = icpSignerNameByRecipientId.get(recipient.id);
+
+      if (
+        signatureField &&
+        icpSignerName &&
+        !signatureField.signature?.signatureImageAsBase64 &&
+        !signatureField.signature?.typedSignature
+      ) {
+        signatureField = {
+          ...signatureField,
+          signature: { signatureImageAsBase64: null, typedSignature: icpSignerName },
+        };
+      }
 
       const emailSent: TDocumentAuditLogBaseSchema | undefined = auditLogs['EMAIL_SENT'].find(
         (log) => log.type === 'EMAIL_SENT' && log.data.recipientId === recipientId,
@@ -76,9 +130,20 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
         (log) => log.type === 'DOCUMENT_OPENED' && log.data.recipientId === recipientId,
       );
 
-      const documentRecipientCompleted: TDocumentAuditLogBaseSchema | undefined = auditLogs[
+      let documentRecipientCompleted: TDocumentAuditLogBaseSchema | undefined = auditLogs[
         'DOCUMENT_RECIPIENT_COMPLETED'
       ].find((log) => log.type === 'DOCUMENT_RECIPIENT_COMPLETED' && log.data.recipientId === recipientId);
+
+      // Bake-time: no completed log yet. Synthesise the signing event so the
+      // page shows Signed time + IP/Device for the ICP signer being baked.
+      if (!documentRecipientCompleted && options.icpSignContext && icpSignerNameByRecipientId.has(recipientId)) {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        documentRecipientCompleted = {
+          createdAt: options.icpSignContext.signedAt,
+          ipAddress: options.icpSignContext.ipAddress ?? null,
+          userAgent: options.icpSignContext.userAgent ?? null,
+        } as TDocumentAuditLogBaseSchema;
+      }
 
       const documentRecipientRejected: TDocumentAuditLogBaseSchema | undefined = auditLogs[
         'DOCUMENT_RECIPIENT_REJECTED'

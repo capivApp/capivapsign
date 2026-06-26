@@ -41,9 +41,12 @@ final class CliAgent {
 
     String command = args[0];
 
-    // Local HTTP server mode — no flags; requests arrive over :3231.
+    // Local HTTP server mode — requests arrive over :3231. `--no-gui` (a.k.a.
+    // `--tray`) drops the foreground "waiting" window and runs in the system
+    // tray: this is the auto-start-on-logon shape installed by windows/installer.iss.
     if ("serve".equals(command)) {
-      ServeMode.start();
+      Map<String, String> serveOpts = parseFlags(args, 1);
+      ServeMode.start(serveOpts.containsKey("no-gui") || serveOpts.containsKey("tray"));
       return;
     }
 

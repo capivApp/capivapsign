@@ -1,6 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
 import { sendPendingEmail } from '@documenso/lib/server-only/document/send-pending-email';
+import { getIsSigningTimestampEnabled } from '@documenso/lib/server-only/site-settings/get-is-signing-timestamp-enabled';
 import { triggerWebhook } from '@documenso/lib/server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '@documenso/lib/types/webhook-payload';
@@ -66,7 +67,12 @@ export const completeIcpRecipientSigning = async (
   const chain = session.certChain.map((b64) => new Uint8Array(Buffer.from(b64, 'base64')));
   const certInfo = parseIcpCertificate(chain[0]);
   const algo = deriveSignerAlgo(certInfo);
-  const timestampAuthority = resolveIcpTimestampAuthority();
+
+  // Timestamping is admin-toggleable: when off, no TSA is contacted and the
+  // signature is embedded at B-B (certificate only). See `getIsSigningTimestampEnabled`.
+  const timestampEnabled = await getIsSigningTimestampEnabled();
+  const timestampAuthority = timestampEnabled ? resolveIcpTimestampAuthority() : undefined;
+  const padesLevel = timestampEnabled ? 'B-T' : 'B-B';
 
   const envelope = await prisma.envelope.findUniqueOrThrow({
     where: { id: session.envelopeId },
@@ -212,7 +218,7 @@ export const completeIcpRecipientSigning = async (
           digestAlgorithm: algo.digestAlgorithm,
           signatureAlgorithm: algo.signatureAlgorithm,
           signingTime: session.signingTime,
-          padesLevel: 'B-T',
+          padesLevel,
         },
       });
     }

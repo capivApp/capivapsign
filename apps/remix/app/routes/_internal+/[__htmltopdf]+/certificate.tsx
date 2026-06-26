@@ -6,9 +6,11 @@ import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt'
 import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import { isIcpEnvelope } from '@documenso/lib/types/signature-level';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { getTranslations } from '@documenso/lib/utils/i18n';
+import { prisma } from '@documenso/prisma';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@documenso/ui/primitives/table';
 import { msg } from '@lingui/core/macro';
@@ -68,7 +70,24 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const messages = await getTranslations(documentLanguage);
 
+  // ICP-Brasil signers sign with their certificate (no drawn/typed signature),
+  // so map each signer's certificate common name to render it in place of the
+  // otherwise-empty signature cell.
+  const icpSignerNames: Record<number, string> = {};
+
+  if (isIcpEnvelope(envelope)) {
+    const evidence = await prisma.icpSignatureEvidence.findMany({
+      where: { envelopeId: envelope.id },
+      select: { recipientId: true, signerCommonName: true },
+    });
+
+    for (const item of evidence) {
+      icpSignerNames[item.recipientId] = item.signerCommonName;
+    }
+  }
+
   return {
+    icpSignerNames,
     document: {
       id: mapSecondaryIdToDocumentId(envelope.secondaryId),
       title: envelope.title,
@@ -102,7 +121,7 @@ export async function loader({ request }: Route.LoaderArgs) {
  * Update: Maybe <Trans> tags work now after RR7 migration.
  */
 export default function SigningCertificate({ loaderData }: Route.ComponentProps) {
-  const { document, documentLanguage, hidePoweredBy, auditLogs, messages } = loaderData;
+  const { document, documentLanguage, hidePoweredBy, auditLogs, messages, icpSignerNames } = loaderData;
 
   const { i18n, _ } = useLingui();
 
@@ -223,6 +242,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
               {document.recipients.map((recipient, i) => {
                 const logs = getRecipientAuditLogs(recipient.id);
                 const signature = getRecipientSignatureField(recipient.id);
+                const icpSignerName = icpSignerNames[recipient.id];
 
                 return (
                   <TableRow key={i} className="print:break-inside-avoid">
@@ -261,6 +281,11 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                                 {signature.signature?.typedSignature}
                               </p>
                             )}
+
+                            {/* ICP signer: certificate-only signature, render the cert common name. */}
+                            {!signature.signature?.signatureImageAsBase64 &&
+                              !signature.signature?.typedSignature &&
+                              icpSignerName && <p className="text-center font-signature text-sm">{icpSignerName}</p>}
                           </div>
 
                           <p className="mt-2 text-muted-foreground text-sm print:text-xs">

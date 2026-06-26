@@ -10,6 +10,7 @@ import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client
 import { z } from 'zod';
 
 import { ZDocumentEmailSettingsSchema } from './document-email';
+import { pageStampOverrideKey, type TPageStampOverrides, ZPageStampOverridesSchema } from './page-stamp';
 
 /**
  * The full document response schema.
@@ -31,6 +32,7 @@ export const ZDocumentMetaSchema = DocumentMetaSchema.pick({
   pageStampPosition: true,
   pageStampX: true,
   pageStampY: true,
+  pageStampOverrides: true,
   language: true,
   emailSettings: true,
 });
@@ -118,6 +120,12 @@ export const ZPageStampPositionSchema = z
 
 export type TPageStampPosition = z.infer<typeof ZPageStampPositionSchema>;
 
+export type { TPageStampOverrides };
+// Re-exported from a standalone module to avoid a circular import: the generated
+// `DocumentMetaSchema` imports `ZPageStampOverridesSchema`, and this file imports
+// that generated schema. See `./page-stamp`.
+export { pageStampOverrideKey, ZPageStampOverridesSchema };
+
 /**
  * Note: Any updates to this will cause public API changes. You will need to update
  * all corresponding areas where this is used (some places that use this needs to pass
@@ -139,6 +147,7 @@ export const ZDocumentMetaCreateSchema = z.object({
   pageStampPosition: ZPageStampPositionSchema.optional(),
   pageStampX: z.number().min(0).max(100).nullish(),
   pageStampY: z.number().min(0).max(100).nullish(),
+  pageStampOverrides: ZPageStampOverridesSchema.nullish(),
   emailId: z.string().nullish(),
   emailReplyTo: zEmail().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.nullish(),

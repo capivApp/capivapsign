@@ -64,6 +64,7 @@ export const extractDerivedDocumentMeta = (
     pageStampPosition: meta.pageStampPosition ?? 'FOOTER',
     pageStampX: meta.pageStampX ?? null,
     pageStampY: meta.pageStampY ?? null,
+    pageStampOverrides: meta.pageStampOverrides ?? null,
 
     // Email settings.
     emailId: meta.emailId ?? settings.emailId,

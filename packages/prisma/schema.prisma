@@ -557,7 +557,7 @@ enum DocumentDistributionMethod {
   NONE
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';", "import { ZEnvelopeReminderSettings as ZEnvelopeReminderSettingsSchema } from '@documenso/lib/constants/envelope-reminder';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';", "import { ZEnvelopeReminderSettings as ZEnvelopeReminderSettingsSchema } from '@documenso/lib/constants/envelope-reminder';", "import { ZPageStampOverridesSchema } from '@documenso/lib/types/page-stamp';"])
 model DocumentMeta {
   id                     String               @id @default(cuid())
   subject                String?
@@ -577,6 +577,10 @@ model DocumentMeta {
   /// CUSTOM placement — percentages (0–100) of the page from the top-left.
   pageStampX        Float?
   pageStampY        Float?
+  /// Per-page position overrides for the mark, keyed by `"{envelopeItemId}:{page}"`
+  /// → `{ x, y }` (top-left %). Set when the sender drags the mark on a specific
+  /// page; pages without an entry fall back to `pageStampPosition`.
+  pageStampOverrides Json? /// [PageStampOverrides] @zod.custom.use(ZPageStampOverridesSchema)
 
   language           String                     @default("en")
   distributionMethod DocumentDistributionMethod @default(EMAIL)

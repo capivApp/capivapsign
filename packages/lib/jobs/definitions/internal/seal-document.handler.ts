@@ -23,7 +23,7 @@ import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-
 import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE, type TDocumentAuditLog } from '../../../types/document-audit-logs';
-import { isPadesPipelineEnvelope } from '../../../types/signature-level';
+import { isIcpEnvelope, isPadesPipelineEnvelope } from '../../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../../types/webhook-payload';
 import { prefixedId } from '../../../universal/id';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
@@ -184,8 +184,15 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
       // which appends them (incremental, preserving recipient signatures) before
       // the archival timestamp. Mirrors the SES sidecar generation below.
       const sidecarDocsByItemId = new Map<string, PDF[]>();
-      const padesNeedsCertificate = settings.includeSigningCertificate;
-      const padesNeedsAuditLog = settings.includeAuditLog;
+
+      // ICP envelopes already carry their audit/validation page in the SIGNED
+      // content — single-signer bakes a full (logged) page at `prepare`,
+      // multi-signer bakes a static one at materialise. Either way, appending a
+      // sidecar page here would be a post-signature modification, so skip it.
+      const certificateAlreadyEmbedded = isIcpEnvelope(envelope);
+
+      const padesNeedsCertificate = settings.includeSigningCertificate && !certificateAlreadyEmbedded;
+      const padesNeedsAuditLog = settings.includeAuditLog && !certificateAlreadyEmbedded;
       const padesUsePlaywrightPdf = NEXT_PRIVATE_USE_PLAYWRIGHT_PDF();
 
       if (padesNeedsCertificate || padesNeedsAuditLog) {

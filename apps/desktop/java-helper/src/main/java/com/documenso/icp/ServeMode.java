@@ -2,7 +2,18 @@ package com.documenso.icp;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import java.awt.AWTException;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.RenderingHints;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -31,9 +42,19 @@ import javax.swing.SwingUtilities;
 final class ServeMode {
   static final int PORT = 3231;
 
+  // Set in `--no-gui` (tray) mode; result feedback then goes to a tray balloon
+  // instead of a modal dialog. The cert/PIN pickers still show (they MUST, the
+  // user has to choose an identity) — only the idle "waiting" window is dropped.
+  private static volatile TrayIcon trayIcon;
+
   private ServeMode() {}
 
-  static void start() throws IOException {
+  /**
+   * @param tray when true (auto-start / `serve --no-gui`), run silently in the
+   *     system tray: no "waiting" window, results shown as tray balloons. When
+   *     false, show the foreground waiting window (manual `serve`).
+   */
+  static void start(boolean tray) throws IOException {
     HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", PORT), 0);
     server.createContext("/ping", ServeMode::handlePing);
     server.createContext("/sign", ServeMode::handleSign);
@@ -43,8 +64,13 @@ final class ServeMode {
     server.setExecutor(Executors.newCachedThreadPool());
     server.start();
 
-    showWaitingWindow();
-    System.err.println("CapivaSign agent listening on http://127.0.0.1:" + PORT);
+    if (tray) {
+      installTray();
+    } else {
+      showWaitingWindow();
+    }
+    System.err.println("CapivaSign agent listening on http://127.0.0.1:" + PORT
+        + (tray ? " (tray)" : ""));
   }
 
   private static void handlePing(HttpExchange exchange) throws IOException {
@@ -93,9 +119,17 @@ final class ServeMode {
     }
   }
 
-  /** Pop a non-blocking result dialog so the signer always gets feedback. */
+  /** Pop a non-blocking result so the signer always gets feedback. */
   private static void showResult(boolean ok, String message) {
     if (GraphicsEnvironment.isHeadless()) {
+      return;
+    }
+    // Tray mode: a balloon, so we never steal focus or block the desktop.
+    if (trayIcon != null) {
+      trayIcon.displayMessage(
+          ok ? "CapivaSign — Sucesso" : "CapivaSign — Erro",
+          message,
+          ok ? TrayIcon.MessageType.INFO : TrayIcon.MessageType.ERROR);
       return;
     }
     SwingUtilities.invokeLater(() ->
@@ -104,6 +138,61 @@ final class ServeMode {
             message,
             ok ? "CapivaSign — Sucesso" : "CapivaSign — Erro",
             ok ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.ERROR_MESSAGE));
+  }
+
+  // ---- system tray (--no-gui / auto-start) ----------------------------------
+
+  /**
+   * Install a tray icon with a "Sair" menu so the silently-running agent is
+   * discoverable and quittable. No-op when the platform has no tray (the agent
+   * keeps serving regardless).
+   */
+  private static void installTray() {
+    if (GraphicsEnvironment.isHeadless() || !SystemTray.isSupported()) {
+      return;
+    }
+
+    SystemTray tray = SystemTray.getSystemTray();
+
+    MenuItem status = new MenuItem("Assinador ativo · porta " + PORT);
+    status.setEnabled(false);
+    MenuItem quit = new MenuItem("Sair");
+
+    PopupMenu menu = new PopupMenu();
+    menu.add(status);
+    menu.addSeparator();
+    menu.add(quit);
+
+    TrayIcon icon = new TrayIcon(buildTrayImage(), "CapivaSign — Assinador ICP-Brasil", menu);
+    icon.setImageAutoSize(true);
+    quit.addActionListener((e) -> {
+      tray.remove(icon);
+      System.exit(0);
+    });
+
+    try {
+      tray.add(icon);
+      trayIcon = icon;
+      icon.displayMessage(
+          "CapivaSign", "Assinador ICP-Brasil em execução.", TrayIcon.MessageType.INFO);
+    } catch (AWTException e) {
+      System.err.println("Tray unavailable: " + e.getMessage());
+    }
+  }
+
+  /** A tiny rounded "C" glyph so we don't ship a binary icon asset. */
+  private static Image buildTrayImage() {
+    int size = 16;
+    BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = image.createGraphics();
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g.setColor(new Color(0x25, 0x63, 0xEB));
+    g.fillRoundRect(0, 0, size, size, 6, 6);
+    g.setColor(Color.WHITE);
+    g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
+    g.drawString("C", 4, 12);
+    g.dispose();
+    return image;
   }
 
   // ---- helpers --------------------------------------------------------------

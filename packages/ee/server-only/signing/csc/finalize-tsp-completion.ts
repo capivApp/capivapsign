@@ -1,3 +1,4 @@
+import { getIsSigningTimestampEnabled } from '@documenso/lib/server-only/site-settings/get-is-signing-timestamp-enabled';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
@@ -58,16 +59,19 @@ type ArchivedItem = {
 export const finalizeTspEnvelopeCompletion = async (opts: FinalizeTspEnvelopeCompletionOptions): Promise<void> => {
   const { envelope, envelopeCompletedAuditLog } = opts;
 
-  // Resolve the TSA up-front — fail fast if the instance is mis-configured
-  // before we start round-tripping PDF bytes through storage.
-  const tsa = resolveCscSealTimeTsa();
-  const timestampAuthority = buildLibpdfTsa(tsa);
+  // Timestamping is admin-toggleable. When enabled, resolve the TSA up-front so
+  // a mis-configured instance fails fast before round-tripping PDF bytes. When
+  // disabled, the seal skips the archival `/DocTimeStamp` entirely (no TSA call)
+  // and recipient signatures stay at B-B (certificate only).
+  const timestampEnabled = await getIsSigningTimestampEnabled();
+  const timestampAuthority = timestampEnabled ? buildLibpdfTsa(resolveCscSealTimeTsa()) : null;
 
   const archivedItems: ArchivedItem[] = [];
 
   for (const envelopeItem of envelope.envelopeItems) {
     const pdfBytes = await getFileServerSide(envelopeItem.documentData);
     let pdfDoc = await PDF.load(pdfBytes);
+    let finalBytes = pdfBytes;
 
     // Append the certificate / audit-log pages (if any) BEFORE archival. Done
     // as an incremental update so the existing recipient signatures' `/ByteRange`
@@ -83,33 +87,38 @@ export const finalizeTspEnvelopeCompletion = async (opts: FinalizeTspEnvelopeCom
         );
       }
 
-      pdfDoc = await PDF.load(await pdfDoc.save({ incremental: true }));
+      finalBytes = await pdfDoc.save({ incremental: true });
+      pdfDoc = await PDF.load(finalBytes);
     }
 
-    // PAdES B-LTA in one call. Internally:
-    //   1. Gather LTV (certs/OCSP/CRL) for every existing signed field and
-    //      write a single DSS incremental update.
-    //   2. Add an archival `/DocTimeStamp` over the result.
-    //   3. Gather LTV for the new timestamp's own certificate chain.
-    // All three are append-only incremental updates — every prior recipient
-    // signature's `/ByteRange` stays valid.
-    const archived = await pdfDoc.addArchivalData({ timestampAuthority });
+    if (timestampAuthority) {
+      // PAdES B-LTA in one call. Internally:
+      //   1. Gather LTV (certs/OCSP/CRL) for every existing signed field and
+      //      write a single DSS incremental update.
+      //   2. Add an archival `/DocTimeStamp` over the result.
+      //   3. Gather LTV for the new timestamp's own certificate chain.
+      // All three are append-only incremental updates — every prior recipient
+      // signature's `/ByteRange` stays valid.
+      const archived = await pdfDoc.addArchivalData({ timestampAuthority });
 
-    // Surface (don't swallow) any LTV/timestamp warnings. A failed TSA round-trip
-    // can leave a structurally-present but unusable `/DocTimeStamp`, so making it
-    // loud is the difference between "valid B-LTA" and a silently broken seal.
-    if (archived.warnings.length > 0) {
-      console.warn(
-        `[seal] addArchivalData warnings for envelope item ${envelopeItem.id} (${envelope.id}):`,
-        archived.warnings,
-      );
+      // Surface (don't swallow) any LTV/timestamp warnings. A failed TSA round-trip
+      // can leave a structurally-present but unusable `/DocTimeStamp`, so making it
+      // loud is the difference between "valid B-LTA" and a silently broken seal.
+      if (archived.warnings.length > 0) {
+        console.warn(
+          `[seal] addArchivalData warnings for envelope item ${envelopeItem.id} (${envelope.id}):`,
+          archived.warnings,
+        );
+      }
+
+      finalBytes = archived.bytes;
     }
 
     const { documentData: uploaded } = await putPdfFileServerSide(
       {
         name: envelopeItem.title.endsWith('.pdf') ? envelopeItem.title : `${envelopeItem.title}.pdf`,
         type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(archived.bytes),
+        arrayBuffer: async () => Promise.resolve(finalBytes),
       },
       envelopeItem.documentData.initialData,
     );

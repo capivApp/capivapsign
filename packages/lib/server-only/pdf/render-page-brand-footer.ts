@@ -32,6 +32,12 @@ export type StampBrandMarkOptions = {
   /** CUSTOM placement — percentages (0–100) of the page, top-left origin. */
   customX?: number;
   customY?: number;
+  /**
+   * Per-page position overrides (1-based page number → top-left %). A page with
+   * an override is placed there regardless of `position`; pages without one use
+   * `position`. Lets the sender drag the mark independently on each page.
+   */
+  overridesByPage?: Map<number, { x: number; y: number }>;
 };
 
 const DEFAULT_LOGO_PATH = () => createRequire(import.meta.url).resolve('@documenso/assets/logo_icon.png');
@@ -59,7 +65,12 @@ export const stampBrandMarkOnAllPages = async (pdfDoc: PDF, opts: StampBrandMark
       continue;
     }
 
-    const { x, y, rotate } = placement(position, page.width, page.height, opts.customX, opts.customY);
+    // A per-page override (sender dragged the mark on this page) wins over the
+    // document-wide preset and is treated as a CUSTOM placement.
+    const override = opts.overridesByPage?.get(i + 1);
+    const { x, y, rotate } = override
+      ? placement('CUSTOM', page.width, page.height, override.x, override.y)
+      : placement(position, page.width, page.height, opts.customX, opts.customY);
 
     drawMark(page, logo, fileHash, verifyUrl, x, y, rotate);
   }

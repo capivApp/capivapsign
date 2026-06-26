@@ -1,18 +1,33 @@
+import { createHash } from 'node:crypto';
+
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { buildIcpAuditPagePdf } from '@documenso/lib/server-only/pdf/render-icp-audit-page';
 import { stampBrandMarkOnAllPages } from '@documenso/lib/server-only/pdf/render-page-brand-footer';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { ZPageStampPositionSchema } from '@documenso/lib/types/document-meta';
-import { isPadesPipelineEnvelope } from '@documenso/lib/types/signature-level';
+import { pageStampOverrideKey, ZPageStampOverridesSchema } from '@documenso/lib/types/page-stamp';
+import { isIcpEnvelope, isPadesPipelineEnvelope } from '@documenso/lib/types/signature-level';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { prisma } from '@documenso/prisma';
 import { PDF } from '@libpdf/core';
+import { RecipientRole } from '@prisma/client';
+import { DateTime } from 'luxon';
 
 import { buildTspAnchorName, buildTspStampName } from './pdf-names';
 
 export type MaterializeTspAnchorsForEnvelopeOptions = {
   envelopeId: string;
+};
+
+/** Portuguese recipient-role label shown on the ICP audit page. */
+const ICP_AUDIT_ROLE_LABEL: Record<RecipientRole, string> = {
+  [RecipientRole.SIGNER]: 'Signatário',
+  [RecipientRole.APPROVER]: 'Aprovador',
+  [RecipientRole.CC]: 'Cópia',
+  [RecipientRole.VIEWER]: 'Visualizador',
+  [RecipientRole.ASSISTANT]: 'Assistente',
 };
 
 /**
@@ -74,6 +89,12 @@ export const materializeTspAnchorsForEnvelope = async ({
   // position (from document settings) + the team's white-label logo if branded.
   const stampPosition = ZPageStampPositionSchema.catch('FOOTER').parse(envelope.documentMeta?.pageStampPosition);
   const brandLogoBytes = stampPosition === 'NONE' ? undefined : await resolveBrandingLogoBytes(envelope.teamId);
+
+  // The static ICP audit page is baked here only for multi-signer documents
+  // (single-signer bakes a full, logged page at `prepare`).
+  const isMultiSignerIcp =
+    isIcpEnvelope(envelope) &&
+    envelope.recipients.filter((recipient) => recipient.role !== RecipientRole.CC).length > 1;
 
   for (const envelopeItem of envelope.envelopeItems) {
     const expectedAnchorNames = envelope.recipients.map((recipient) =>
@@ -190,7 +211,44 @@ export const materializeTspAnchorsForEnvelope = async ({
         logoBytes: brandLogoBytes,
         customX: envelope.documentMeta?.pageStampX ?? undefined,
         customY: envelope.documentMeta?.pageStampY ?? undefined,
+        overridesByPage: resolveOverridesForItem(envelope.documentMeta?.pageStampOverrides, envelopeItem.id),
       });
+    }
+
+    // Multi-signer ICP: append the STATIC audit/validation page here, once,
+    // before anyone signs — so it's part of the bytes EVERY signer covers and
+    // the buffer never changes between signatures. Identity-only (no per-signer
+    // event logs / stamps), since those would change the buffer post-signature.
+    // Single-signer ICP bakes its (full, with logs) page at `prepare` instead.
+    if (isMultiSignerIcp && envelope.qrToken) {
+      const lastPage = pdfDoc.getPage(pdfDoc.getPageCount() - 1);
+
+      const auditPdfBytes = await buildIcpAuditPagePdf({
+        pageWidth: lastPage?.width ?? 595,
+        pageHeight: lastPage?.height ?? 842,
+        identifier: envelope.qrToken,
+        generatedAtText: `Data/Hora ${DateTime.now().toFormat(
+          `${envelope.documentMeta?.dateFormat ?? 'dd/MM/yyyy HH:mm'} (ZZZZ)`,
+        )}`,
+        verifyUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${envelope.qrToken}`,
+        documentHashHex: createHash('sha256').update(Buffer.from(bytes)).digest('hex'),
+        brandName: 'CapivaSign',
+        signers: envelope.recipients
+          .filter((r) => r.role !== RecipientRole.CC)
+          .map((r) => ({
+            name: r.name || r.email,
+            email: r.email,
+            cpfCnpj: null,
+            roleLabel: ICP_AUDIT_ROLE_LABEL[r.role],
+            status: 'pending' as const,
+          })),
+      });
+
+      const auditDoc = await PDF.load(auditPdfBytes);
+      await pdfDoc.copyPagesFrom(
+        auditDoc,
+        Array.from({ length: auditDoc.getPageCount() }, (_, index) => index),
+      );
     }
 
     const newBytes = await pdfDoc.save({ useXRefStream: true });
@@ -219,6 +277,38 @@ export const materializeTspAnchorsForEnvelope = async ({
       },
     });
   }
+};
+
+/**
+ * Build the per-page override map for one envelope item from the document meta's
+ * `pageStampOverrides` JSON, keyed `"{envelopeItemId}:{page}"`. Returns undefined
+ * when there are no overrides for this item (the renderer then uses the preset).
+ */
+const resolveOverridesForItem = (
+  raw: unknown,
+  envelopeItemId: string,
+): Map<number, { x: number; y: number }> | undefined => {
+  const parsed = ZPageStampOverridesSchema.safeParse(raw);
+
+  if (!parsed.success) {
+    return undefined;
+  }
+
+  const byPage = new Map<number, { x: number; y: number }>();
+
+  for (const [key, value] of Object.entries(parsed.data)) {
+    const page = Number(key.slice(envelopeItemId.length + 1));
+
+    if (
+      key.startsWith(`${envelopeItemId}:`) &&
+      Number.isInteger(page) &&
+      key === pageStampOverrideKey(envelopeItemId, page)
+    ) {
+      byPage.set(page, value);
+    }
+  }
+
+  return byPage.size > 0 ? byPage : undefined;
 };
 
 /**

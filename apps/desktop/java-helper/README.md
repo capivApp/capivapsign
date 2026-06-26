@@ -49,12 +49,43 @@ A1/PKCS#11 sign via raw RSA cipher over `DigestInfo`; Windows-MY via
 `NONEwithRSA` (non-extractable keys). All produce the same RSASSA-PKCS1-v1_5
 value libpdf embeds.
 
+## Windows installer (.exe)
+
+For an end-user Windows box, ship the one-click installer instead of asking the
+signer to run scripts. On a Windows machine with **JDK 17+** and **[Inno Setup
+6](https://jrsoftware.org/isdl.php)** on PATH:
+
+```bat
+windows\build-installer.bat https://app.suaempresa.com
+REM -> dist\installer\IcpAgent-Setup.exe
+```
+
+`IcpAgent-Setup.exe` (admin) is fully self-contained (bundles a JRE) and:
+
+1. installs the agent under `C:\Program Files\IcpAgent`;
+2. registers the **`documenso-icp://` deep link** per-machine (HKLM);
+3. sets **`ICP_ALLOWED_ORIGIN`** (the origin passed to `build-installer.bat`) as a
+   system env var, so the agent refuses any other host;
+4. **auto-starts the serve agent at every user logon** via the HKLM `Run` key
+   as `IcpAgent.exe serve --no-gui` — it lives in the **system tray** (no
+   "Aguardando…" window), keeps `http://127.0.0.1:3231/ping` answering, and only
+   pops the **certificate/PIN selector** when a sign request actually arrives.
+
+So the signing page works through either path with zero per-signer setup: the
+loopback `serve` agent (tray) **or** the `documenso-icp://` deep link.
+
+> The Windows **service** route (Session 0) is deliberately avoided: a true
+> service can't show the certificate/PIN dialogs to the user. Logon auto-start
+> runs in the user session, so the picker appears. `windows\register-protocol.reg`
+> remains for manual/dev registration without the installer.
+
 ## Build & run
 
 ```bash
 ./build.sh                      # Linux/macOS: javac -> build/icp-helper.jar (no Gradle/deps)
 windows\build.bat               # Windows equivalent
 windows\package-windows.bat     # Windows: self-contained IcpAgent.exe (jlink+jpackage, bundles a JRE)
+windows\build-installer.bat     # Windows: one-click IcpAgent-Setup.exe (protocol + logon auto-start)
 ```
 
 > The packaged exe is built with `--win-console` so stdout/stderr show in cmd —
