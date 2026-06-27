@@ -9,7 +9,10 @@ import {
   Building2Icon,
   CreditCardIcon,
   GroupIcon,
+  BarChart3Icon,
+  KeyRoundIcon,
   MailboxIcon,
+  MessageSquareIcon,
   Settings2Icon,
   ShieldCheckIcon,
   Users2Icon,
@@ -61,6 +64,21 @@ export default function SettingsLayout() {
       path: `/o/${organisation.url}/settings/email-domains`,
       label: t`Email Domains`,
       icon: MailboxIcon,
+    },
+    {
+      path: `/o/${organisation.url}/settings/message-templates`,
+      label: t`Message Templates`,
+      icon: MessageSquareIcon,
+    },
+    {
+      path: `/o/${organisation.url}/settings/api-keys`,
+      label: t`API Keys`,
+      icon: KeyRoundIcon,
+    },
+    {
+      path: `/o/${organisation.url}/settings/usage`,
+      label: t`Usage & Billing`,
+      icon: BarChart3Icon,
     },
     {
       path: `/o/${organisation.url}/settings/teams`,

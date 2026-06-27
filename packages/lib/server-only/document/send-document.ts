@@ -11,6 +11,7 @@ import {
   DocumentStatus,
   EnvelopeType,
   FieldType,
+  RecipientDeliveryChannel,
   RecipientRole,
   SendStatus,
   SigningStatus,
@@ -346,6 +347,24 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
           return;
         }
 
+        // Route by delivery channel: WhatsApp recipients get the WhatsApp job
+        // (per-org transport + CapivaApp fallback); everyone else gets email.
+        if (recipient.deliveryChannel === RecipientDeliveryChannel.WHATSAPP) {
+          await jobs.triggerJob({
+            name: 'send.signing.requested.whatsapp',
+            payload: {
+              userId,
+              documentId: legacyDocumentId,
+              recipientId: recipient.id,
+              requestMetadata: requestMetadata?.requestMetadata,
+              // Carried so the WhatsApp job bills the message only for API sends.
+              source: requestMetadata?.source,
+            },
+          });
+
+          return;
+        }
+
         await jobs.triggerJob({
           name: 'send.signing.requested.email',
           payload: {
@@ -353,6 +372,8 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
             documentId: legacyDocumentId,
             recipientId: recipient.id,
             requestMetadata: requestMetadata?.requestMetadata,
+            // Carried so the email job bills the message only for API sends.
+            source: requestMetadata?.source,
           },
         });
       }),

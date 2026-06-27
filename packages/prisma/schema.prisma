@@ -231,6 +231,13 @@ model ApiToken {
   user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId    Int
   team      Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  // Owning organisation, for org-level key management and usage attribution.
+  // Nullable for legacy rows; set from the team's org on creation.
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  @@index([organisationId])
 }
 
 enum SubscriptionStatus {
@@ -257,7 +264,7 @@ model Subscription {
   @@index([organisationId])
 }
 
-/// @zod.import(["import { ZClaimFlagsSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';"])
+/// @zod.import(["import { ZClaimFlagsSchema, ZClaimPricingSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';"])
 model SubscriptionClaim {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -273,6 +280,9 @@ model SubscriptionClaim {
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 
+  // Per-item pricing for metered, API-only billable actions (cents, BRL).
+  pricing Json @default("{}") /// [ClaimPricing] @zod.custom.use(ZClaimPricingSchema)
+
   documentRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
   documentQuota      Int?
 
@@ -284,9 +294,12 @@ model SubscriptionClaim {
 
   emailTransportId String?
   emailTransport   EmailTransport? @relation(fields: [emailTransportId], references: [id], onDelete: SetNull)
+
+  whatsappTransportId String?
+  whatsappTransport   WhatsappTransport? @relation(fields: [whatsappTransportId], references: [id], onDelete: SetNull)
 }
 
-/// @zod.import(["import { ZClaimFlagsSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';"])
+/// @zod.import(["import { ZClaimFlagsSchema, ZClaimPricingSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';"])
 model OrganisationClaim {
   id        String   @id
   createdAt DateTime @default(now())
@@ -302,6 +315,9 @@ model OrganisationClaim {
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 
+  // Per-item pricing for metered, API-only billable actions (cents, BRL).
+  pricing Json @default("{}") /// [ClaimPricing] @zod.custom.use(ZClaimPricingSchema)
+
   documentRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
   documentQuota      Int?
 
@@ -313,6 +329,9 @@ model OrganisationClaim {
 
   emailTransportId String?
   emailTransport   EmailTransport? @relation(fields: [emailTransportId], references: [id], onDelete: SetNull)
+
+  whatsappTransportId String?
+  whatsappTransport   WhatsappTransport? @relation(fields: [whatsappTransportId], references: [id], onDelete: SetNull)
 }
 
 model OrganisationMonthlyStat {
@@ -332,6 +351,74 @@ model OrganisationMonthlyStat {
   emailReports  Int @default(0)
 
   @@unique([organisationId, period])
+  @@index([organisationId])
+}
+
+enum BillableEventType {
+  CREATE_DOCUMENT
+  RECOVER_FILE
+  WHATSAPP_MESSAGE
+  WEBHOOK_DELIVERY
+  EMAIL_MESSAGE
+}
+
+/// One metered, billable action. Written ONLY for API-originated usage (panel
+/// usage is free) by `server-only/billing/record-usage.ts`. Priced at write time
+/// off the organisation claim's `pricing`, so the rate is frozen on the event.
+model UsageEvent {
+  id String @id
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  teamId     Int?
+  userId     Int?
+  apiTokenId Int?
+
+  type           BillableEventType
+  quantity       Int               @default(1)
+  unitPriceCents Int               @default(0)
+  amountCents    Int               @default(0)
+
+  /// Request source, e.g. "apiV1" / "apiV2".
+  source   String
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([organisationId, createdAt])
+  @@index([organisationId, type, createdAt])
+}
+
+enum MessageTemplateChannel {
+  EMAIL
+  WHATSAPP
+}
+
+enum MessageTemplateEvent {
+  SIGNING_REQUEST
+}
+
+/// Organisation-managed message template for a (channel, event) pair. Resolved
+/// at send time by `server-only/messaging/resolve-message-template.ts`, falling
+/// back to the built-in CapivaApp default when absent. Placeholders use the
+/// existing `{key}` syntax (see `renderCustomEmailTemplate`).
+model MessageTemplate {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  channel MessageTemplateChannel
+  event   MessageTemplateEvent
+
+  /// Email subject (ignored for WhatsApp).
+  subject String?
+  body    String
+
+  @@unique([organisationId, channel, event])
   @@index([organisationId])
 }
 
@@ -573,10 +660,10 @@ model DocumentMeta {
   drawSignatureEnabled   Boolean @default(true)
 
   /// Per-page verification mark: NONE | FOOTER | HEADER | LEFT | RIGHT | CUSTOM.
-  pageStampPosition String @default("FOOTER")
+  pageStampPosition  String @default("FOOTER")
   /// CUSTOM placement — percentages (0–100) of the page from the top-left.
-  pageStampX        Float?
-  pageStampY        Float?
+  pageStampX         Float?
+  pageStampY         Float?
   /// Per-page position overrides for the mark, keyed by `"{envelopeItemId}:{page}"`
   /// → `{ x, y }` (top-left %). Set when the sender drags the mark on a specific
   /// page; pages without an entry fall back to `pageStampPosition`.
@@ -639,11 +726,19 @@ enum RecipientRole {
 }
 
 /// @zod.import(["import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';"])
+enum RecipientDeliveryChannel {
+  EMAIL
+  WHATSAPP
+}
+
 model Recipient {
-  id                   Int           @id @default(autoincrement())
+  id                   Int                      @id @default(autoincrement())
   envelopeId           String
-  email                String        @db.VarChar(255)
-  name                 String        @default("") @db.VarChar(255)
+  email                String                   @db.VarChar(255)
+  name                 String                   @default("") @db.VarChar(255)
+  // E.164-ish phone, required only when deliveryChannel is WHATSAPP.
+  phone                String?                  @db.VarChar(32)
+  deliveryChannel      RecipientDeliveryChannel @default(EMAIL)
   token                String
   documentDeletedAt    DateTime?
   expired              DateTime? // deprecated Not in use. To be removed in a future migration.
@@ -653,15 +748,15 @@ model Recipient {
   signedAt             DateTime?
   lastReminderSentAt   DateTime?
   nextReminderAt       DateTime?
-  reminderCount        Int           @default(0)
+  reminderCount        Int                      @default(0)
   authOptions          Json? /// [RecipientAuthOptions] @zod.custom.use(ZRecipientAuthOptionsSchema)
   signingOrder         Int? /// @zod.number.describe("The order in which the recipient should sign the document. Only works if the document is set to sequential signing.")
   rejectionReason      String?
-  role                 RecipientRole @default(SIGNER)
-  readStatus           ReadStatus    @default(NOT_OPENED)
-  signingStatus        SigningStatus @default(NOT_SIGNED)
-  sendStatus           SendStatus    @default(NOT_SENT)
-  envelope             Envelope      @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  role                 RecipientRole            @default(SIGNER)
+  readStatus           ReadStatus               @default(NOT_OPENED)
+  signingStatus        SigningStatus            @default(NOT_SIGNED)
+  sendStatus           SendStatus               @default(NOT_SENT)
+  envelope             Envelope                 @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
   fields               Field[]
   signatures           Signature[]
 
@@ -924,7 +1019,10 @@ model Organisation {
   emailDomains       EmailDomain[]
   organisationEmails OrganisationEmail[]
 
-  monthlyStats OrganisationMonthlyStat[]
+  monthlyStats     OrganisationMonthlyStat[]
+  usageEvents      UsageEvent[]
+  messageTemplates MessageTemplate[]
+  apiTokens        ApiToken[]
 
   avatarImage AvatarImage? @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
@@ -1324,6 +1422,32 @@ model EmailTransport {
   // Required from-address override (plaintext, non-secret).
   fromName    String
   fromAddress String
+
+  // Encrypted JSON blob of the full transport config (secrets + non-secrets).
+  config String
+
+  subscriptionClaims SubscriptionClaim[]
+  organisationClaims OrganisationClaim[]
+}
+
+enum WhatsappTransportType {
+  ZAPI
+}
+
+// Per-plan WhatsApp sender, mirroring EmailTransport: a pluggable provider
+// (Z-API today; factory/strategy by `type`) whose secret connection settings are
+// stored as an encrypted JSON blob. Attached to a claim; falls back to the
+// CapivaApp default transport (env) when unset.
+model WhatsappTransport {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  type WhatsappTransportType
+
+  // Sender display name (non-secret). Provider sender number lives in `config`.
+  fromName String
 
   // Encrypted JSON blob of the full transport config (secrets + non-secrets).
   config String

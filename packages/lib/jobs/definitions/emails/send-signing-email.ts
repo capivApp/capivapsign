@@ -10,6 +10,8 @@ const SEND_SIGNING_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   documentId: z.number(),
   recipientId: z.number(),
   requestMetadata: ZRequestMetadataSchema.optional(),
+  // Originating request source — bills the email only for API-originated sends.
+  source: z.enum(['apiV1', 'apiV2', 'app']).optional(),
 });
 
 export type TSendSigningEmailJobDefinition = z.infer<typeof SEND_SIGNING_EMAIL_JOB_DEFINITION_SCHEMA>;

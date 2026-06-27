@@ -16,6 +16,7 @@ export const generateDefaultSubscriptionClaim = (): Omit<
     recipientCount: DEFAULT_RECIPIENT_COUNT,
     locked: false,
     flags: {},
+    pricing: {},
 
     documentRateLimits: [],
     documentQuota: null,
@@ -24,5 +25,6 @@ export const generateDefaultSubscriptionClaim = (): Omit<
     apiRateLimits: [],
     apiQuota: null,
     emailTransportId: null,
+    whatsappTransportId: null,
   };
 };

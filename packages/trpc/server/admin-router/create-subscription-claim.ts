@@ -24,6 +24,8 @@ export const createSubscriptionClaimRoute = adminProcedure
       apiRateLimits,
       apiQuota,
       emailTransportId,
+      whatsappTransportId,
+      pricing,
     } = input;
 
     ctx.logger.info({
@@ -45,6 +47,8 @@ export const createSubscriptionClaimRoute = adminProcedure
         apiRateLimits,
         apiQuota,
         emailTransportId,
+        whatsappTransportId,
+        pricing,
       },
     });
   });

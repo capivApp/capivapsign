@@ -23,6 +23,8 @@ export const ZFindSubscriptionClaimsResponseSchema = ZFindResultResponse.extend(
     apiRateLimits: true,
     apiQuota: true,
     emailTransportId: true,
+    whatsappTransportId: true,
+    pricing: true,
   }).array(),
 });
 

@@ -13,7 +13,7 @@ export const updateSubscriptionClaimRoute = adminProcedure
   .input(ZUpdateSubscriptionClaimRequestSchema)
   .output(ZUpdateSubscriptionClaimResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { id, data, backportEmailTransport } = input;
+    const { id, data, backportEmailTransport, backportWhatsappTransport } = input;
 
     ctx.logger.info({
       input,
@@ -40,6 +40,13 @@ export const updateSubscriptionClaimRoute = adminProcedure
       await prisma.organisationClaim.updateMany({
         where: { originalSubscriptionClaimId: id },
         data: { emailTransportId: data.emailTransportId ?? null },
+      });
+    }
+
+    if (backportWhatsappTransport) {
+      await prisma.organisationClaim.updateMany({
+        where: { originalSubscriptionClaimId: id },
+        data: { whatsappTransportId: data.whatsappTransportId ?? null },
       });
     }
 

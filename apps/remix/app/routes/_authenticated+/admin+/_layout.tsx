@@ -12,6 +12,7 @@ import {
   FileStack,
   LineChartIcon,
   MailIcon,
+  MessageCircleIcon,
   Settings,
   Trophy,
   Users,
@@ -137,6 +138,17 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/email-transports">
               <MailIcon className="mr-2 h-5 w-5" />
               <Trans>Email Transports</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn('justify-start md:w-full', pathname?.startsWith('/admin/whatsapp-transports') && 'bg-secondary')}
+            asChild
+          >
+            <Link to="/admin/whatsapp-transports">
+              <MessageCircleIcon className="mr-2 h-5 w-5" />
+              <Trans>WhatsApp Transports</Trans>
             </Link>
           </Button>
 

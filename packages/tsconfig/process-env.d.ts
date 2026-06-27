@@ -35,6 +35,13 @@ declare namespace NodeJS {
     NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_NAME?: string;
     NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_KEY?: string;
     NEXT_PRIVATE_UPLOAD_AZURE_CONTAINER?: string;
+
+    // CapivaApp default WhatsApp (Z-API) transport — fallback when an org has no
+    // per-plan WhatsappTransport configured on its claim.
+    NEXT_PRIVATE_WHATSAPP_ZAPI_INSTANCE_ID?: string;
+    NEXT_PRIVATE_WHATSAPP_ZAPI_TOKEN?: string;
+    NEXT_PRIVATE_WHATSAPP_ZAPI_CLIENT_TOKEN?: string;
+    NEXT_PRIVATE_WHATSAPP_ZAPI_BASE_URL?: string;
     NEXT_PRIVATE_UPLOAD_AZURE_ENDPOINT?: string;
 
     NEXT_PRIVATE_SIGNING_TRANSPORT?: 'local' | 'http' | 'gcloud-hsm' | 'csc';

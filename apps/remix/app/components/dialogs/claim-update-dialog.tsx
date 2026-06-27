@@ -30,6 +30,7 @@ export const ClaimUpdateDialog = ({ claim, trigger, licenseFlags }: ClaimUpdateD
 
   const [open, setOpen] = useState(false);
   const [backportEmailTransport, setBackportEmailTransport] = useState(false);
+  const [backportWhatsappTransport, setBackportWhatsappTransport] = useState(false);
 
   const { mutateAsync: updateClaim, isPending } = trpc.admin.claims.update.useMutation({
     onSuccess: () => {
@@ -70,6 +71,7 @@ export const ClaimUpdateDialog = ({ claim, trigger, licenseFlags }: ClaimUpdateD
               id: claim.id,
               data,
               backportEmailTransport,
+              backportWhatsappTransport,
             })
           }
           licenseFlags={licenseFlags}
@@ -83,6 +85,17 @@ export const ClaimUpdateDialog = ({ claim, trigger, licenseFlags }: ClaimUpdateD
                 />
                 <label htmlFor="backport-email-transport" className="text-muted-foreground text-sm">
                   <Trans>Backport email transport</Trans>
+                </label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="backport-whatsapp-transport"
+                  checked={backportWhatsappTransport}
+                  onCheckedChange={(checked) => setBackportWhatsappTransport(checked === true)}
+                />
+                <label htmlFor="backport-whatsapp-transport" className="text-muted-foreground text-sm">
+                  <Trans>Backport WhatsApp transport</Trans>
                 </label>
               </div>
 

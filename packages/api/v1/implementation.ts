@@ -1,7 +1,9 @@
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { DocumentDataType, DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
+import { BillableEventType, DocumentDataType, DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
+
+import { recordUsage } from '@documenso/lib/server-only/billing/record-usage';
 import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 import '@documenso/lib/constants/time-zones';
@@ -189,7 +191,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  downloadSignedDocument: authenticatedMiddleware(async (args, user, team, { logger }) => {
+  downloadSignedDocument: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
     const { downloadOriginalDocument } = args.query;
 
@@ -266,6 +268,16 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       const { url } = await getPresignGetUrl(
         downloadOriginalDocument ? firstDocumentData.initialData : firstDocumentData.data,
       );
+
+      // API-only billable action: recovering a document file.
+      await recordUsage({
+        type: BillableEventType.RECOVER_FILE,
+        source: metadata.source,
+        teamId: team.id,
+        userId: user.id,
+        apiTokenId: metadata.apiTokenId,
+        metadata: { documentId: documentId },
+      });
 
       return {
         status: 200,
@@ -445,6 +457,16 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       });
 
       const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
+      // API-only billable action: creating a document.
+      await recordUsage({
+        type: BillableEventType.CREATE_DOCUMENT,
+        source: metadata.source,
+        teamId: team.id,
+        userId: user.id,
+        apiTokenId: metadata.apiTokenId,
+        metadata: { documentId: legacyDocumentId },
+      });
 
       const { recipients } = await setDocumentRecipients({
         userId: user.id,

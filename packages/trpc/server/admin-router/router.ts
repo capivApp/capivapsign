@@ -16,6 +16,11 @@ import { deleteEmailTransportRoute } from './email-transport/delete-email-transp
 import { findEmailTransportsRoute } from './email-transport/find-email-transports';
 import { sendTestEmailTransportRoute } from './email-transport/send-test-email-transport';
 import { updateEmailTransportRoute } from './email-transport/update-email-transport';
+import { createWhatsappTransportRoute } from './whatsapp-transport/create-whatsapp-transport';
+import { deleteWhatsappTransportRoute } from './whatsapp-transport/delete-whatsapp-transport';
+import { findWhatsappTransportsRoute } from './whatsapp-transport/find-whatsapp-transports';
+import { sendTestWhatsappTransportRoute } from './whatsapp-transport/send-test-whatsapp-transport';
+import { updateWhatsappTransportRoute } from './whatsapp-transport/update-whatsapp-transport';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
@@ -111,6 +116,13 @@ export const adminRouter = router({
     update: updateEmailTransportRoute,
     delete: deleteEmailTransportRoute,
     sendTest: sendTestEmailTransportRoute,
+  },
+  whatsappTransport: {
+    find: findWhatsappTransportsRoute,
+    create: createWhatsappTransportRoute,
+    update: updateWhatsappTransportRoute,
+    delete: deleteWhatsappTransportRoute,
+    sendTest: sendTestWhatsappTransportRoute,
   },
   team: {
     get: getAdminTeamRoute,

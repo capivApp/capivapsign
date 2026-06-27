@@ -30,6 +30,12 @@ export type ApiRequestMetadata = {
   auth: 'api' | 'session' | null;
 
   /**
+   * The API token id used for the request, when authenticated via an API key.
+   * Used to attribute metered usage to a specific key.
+   */
+  apiTokenId?: number;
+
+  /**
    * The user that is performing the action.
    *
    * If a team API key is used, the user will classified as the team.

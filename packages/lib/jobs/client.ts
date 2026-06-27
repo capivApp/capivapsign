@@ -26,6 +26,7 @@ import { SEAL_DOCUMENT_JOB_DEFINITION } from './definitions/internal/seal-docume
 import { SEAL_DOCUMENT_SWEEP_JOB_DEFINITION } from './definitions/internal/seal-document-sweep';
 import { SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION } from './definitions/internal/send-signing-reminders-sweep';
 import { SYNC_EMAIL_DOMAINS_JOB_DEFINITION } from './definitions/internal/sync-email-domains';
+import { SEND_SIGNING_WHATSAPP_JOB_DEFINITION } from './definitions/whatsapp/send-signing-whatsapp';
 
 /**
  * The `as const` assertion is load bearing as it provides the correct level of type inference for
@@ -34,6 +35,7 @@ import { SYNC_EMAIL_DOMAINS_JOB_DEFINITION } from './definitions/internal/sync-e
 export const jobsClient = new JobClient([
   SEND_ADMIN_USER_CREATED_EMAIL_JOB_DEFINITION,
   SEND_SIGNING_EMAIL_JOB_DEFINITION,
+  SEND_SIGNING_WHATSAPP_JOB_DEFINITION,
   SEND_CONFIRMATION_EMAIL_JOB_DEFINITION,
   SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION,
   SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION,

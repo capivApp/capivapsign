@@ -8,6 +8,8 @@ export const ZUpdateSubscriptionClaimRequestSchema = z.object({
   // When enabled, the claim's email transport is propagated to all organisations
   // currently using this claim.
   backportEmailTransport: z.boolean().default(false),
+  // Same, for the WhatsApp transport.
+  backportWhatsappTransport: z.boolean().default(false),
 });
 
 export const ZUpdateSubscriptionClaimResponseSchema = z.void();

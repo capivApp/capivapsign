@@ -18,6 +18,17 @@ import { getOrganisationQuotaFlagsRoute } from './get-organisation-quota-flags';
 import { getOrganisationSessionRoute } from './get-organisation-session';
 import { getOrganisationsRoute } from './get-organisations';
 import { leaveOrganisationRoute } from './leave-organisation';
+import {
+  createOrganisationApiTokenRoute,
+  deleteOrganisationApiTokenRoute,
+  findOrganisationApiTokensRoute,
+} from './api-token';
+import {
+  deleteMessageTemplateRoute,
+  findMessageTemplatesRoute,
+  upsertMessageTemplateRoute,
+} from './message-template';
+import { getOrganisationUsageSummaryRoute } from './usage';
 import { resendOrganisationMemberInviteRoute } from './resend-organisation-member-invite';
 import { updateOrganisationRoute } from './update-organisation';
 import { updateOrganisationGroupRoute } from './update-organisation-group';
@@ -55,6 +66,19 @@ export const organisationRouter = router({
   },
   settings: {
     update: updateOrganisationSettingsRoute,
+  },
+  messageTemplate: {
+    find: findMessageTemplatesRoute,
+    upsert: upsertMessageTemplateRoute,
+    delete: deleteMessageTemplateRoute,
+  },
+  apiToken: {
+    find: findOrganisationApiTokensRoute,
+    create: createOrganisationApiTokenRoute,
+    delete: deleteOrganisationApiTokenRoute,
+  },
+  usage: {
+    summary: getOrganisationUsageSummaryRoute,
   },
   internal: {
     getOrganisationSession: getOrganisationSessionRoute,

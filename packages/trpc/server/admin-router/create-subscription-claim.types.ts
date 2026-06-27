@@ -1,4 +1,4 @@
-import { ZClaimFlagsSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';
+import { ZClaimFlagsSchema, ZClaimPricingSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';
 import { z } from 'zod';
 
 export const ZCreateSubscriptionClaimRequestSchema = z.object({
@@ -19,6 +19,9 @@ export const ZCreateSubscriptionClaimRequestSchema = z.object({
   apiQuota: z.number().int().min(0).nullable(),
 
   emailTransportId: z.string().nullable(),
+  whatsappTransportId: z.string().nullable(),
+
+  pricing: ZClaimPricingSchema.default({}),
 });
 
 export const ZCreateSubscriptionClaimResponseSchema = z.void();

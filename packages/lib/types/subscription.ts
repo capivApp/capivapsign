@@ -63,6 +63,36 @@ export const ZClaimFlagsSchema = z.object({
 
 export type TClaimFlags = z.infer<typeof ZClaimFlagsSchema>;
 
+/**
+ * Per-item pricing for metered, API-only billable actions. Values are in cents
+ * (BRL). Absent / null = not billed. Lives on the claim (Subscription +
+ * Organisation), alongside `emailTransportId`/`whatsappTransportId`, so the
+ * admin sets prices when creating a claim and they flow to each organisation.
+ *
+ * README: keep in sync with `BillableEventType` and the metering instrumentation.
+ */
+export const ZClaimPricingSchema = z.object({
+  createDocumentCents: z.number().int().min(0).nullable().optional(),
+  recoverFileCents: z.number().int().min(0).nullable().optional(),
+  whatsappMessageCents: z.number().int().min(0).nullable().optional(),
+  webhookDeliveryCents: z.number().int().min(0).nullable().optional(),
+  emailMessageCents: z.number().int().min(0).nullable().optional(),
+});
+
+export type TClaimPricing = z.infer<typeof ZClaimPricingSchema>;
+
+/** UI metadata for the per-item pricing fields. */
+export const SUBSCRIPTION_CLAIM_PRICING_ITEMS: {
+  key: keyof TClaimPricing;
+  label: string;
+}[] = [
+  { key: 'createDocumentCents', label: 'Create document' },
+  { key: 'recoverFileCents', label: 'Recover file (download)' },
+  { key: 'whatsappMessageCents', label: 'WhatsApp message' },
+  { key: 'webhookDeliveryCents', label: 'Webhook delivery' },
+  { key: 'emailMessageCents', label: 'Email message' },
+];
+
 // When adding keys, update internal documentation with this.
 export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   keyof TClaimFlags,

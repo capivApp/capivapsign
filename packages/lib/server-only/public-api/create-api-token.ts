@@ -19,9 +19,20 @@ type CreateApiTokenInput = {
   teamId: number;
   tokenName: string;
   expiresIn: string | null;
+  /**
+   * Assign the token to a specific member instead of the creator (org-level
+   * "key for a specific user"). Must belong to the team's organisation.
+   */
+  targetUserId?: number;
 };
 
-export const createApiToken = async ({ userId, teamId, tokenName, expiresIn }: CreateApiTokenInput) => {
+export const createApiToken = async ({
+  userId,
+  teamId,
+  tokenName,
+  expiresIn,
+  targetUserId,
+}: CreateApiTokenInput) => {
   const apiToken = `api_${alphaid(16)}`;
 
   const hashedToken = hashString(apiToken);
@@ -42,13 +53,28 @@ export const createApiToken = async ({ userId, teamId, tokenName, expiresIn }: C
     });
   }
 
+  // When targeting another member, ensure they belong to the team's organisation.
+  if (targetUserId && targetUserId !== userId) {
+    const member = await prisma.organisationMember.findFirst({
+      where: { organisationId: team.organisationId, userId: targetUserId },
+      select: { id: true },
+    });
+
+    if (!member) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'The target user is not a member of this organisation',
+      });
+    }
+  }
+
   const storedToken = await prisma.apiToken.create({
     data: {
       name: tokenName,
       token: hashedToken,
       expires: expiresIn ? DateTime.now().plus(timeConstantsRecords[expiresIn]).toJSDate() : null,
-      userId,
+      userId: targetUserId ?? userId,
       teamId,
+      organisationId: team.organisationId,
     },
   });
 

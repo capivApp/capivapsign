@@ -195,6 +195,9 @@ export const createOrganisationClaimUpsertData = (
       flags: {
         ...subscriptionClaim.flags,
       },
+      pricing: {
+        ...subscriptionClaim.pricing,
+      },
       envelopeItemCount: subscriptionClaim.envelopeItemCount,
       recipientCount: subscriptionClaim.recipientCount,
       teamCount: subscriptionClaim.teamCount,
@@ -206,6 +209,7 @@ export const createOrganisationClaimUpsertData = (
       apiRateLimits: subscriptionClaim.apiRateLimits ?? [],
       apiQuota: subscriptionClaim.apiQuota,
       emailTransportId: subscriptionClaim.emailTransportId ?? null,
+      whatsappTransportId: subscriptionClaim.whatsappTransportId ?? null,
     };
 
   return {

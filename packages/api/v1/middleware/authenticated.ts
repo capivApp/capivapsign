@@ -78,6 +78,7 @@ export const authenticatedMiddleware = <
         requestMetadata,
         source: 'apiV1',
         auth: 'api',
+        apiTokenId: apiToken.id,
         auditUser: {
           id: apiToken.team ? null : apiToken.user.id,
           email: apiToken.team ? null : apiToken.user.email,

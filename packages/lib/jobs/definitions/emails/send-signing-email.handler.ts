@@ -3,9 +3,12 @@ import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
 import {
+  BillableEventType,
   DocumentSource,
   DocumentStatus,
   EnvelopeType,
+  MessageTemplateChannel,
+  MessageTemplateEvent,
   OrganisationType,
   RecipientRole,
   SendStatus,
@@ -16,7 +19,9 @@ import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
 import { buildEnvelopeEmailHeaders } from '../../../server-only/email/build-envelope-email-headers';
+import { recordUsage } from '../../../server-only/billing/record-usage';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { resolveMessageTemplate } from '../../../server-only/messaging/resolve-message-template';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
@@ -29,7 +34,7 @@ import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningEmailJobDefinition } from './send-signing-email';
 
 export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefinition; io: JobRunIO }) => {
-  const { userId, documentId, recipientId, requestMetadata } = payload;
+  const { userId, documentId, recipientId, requestMetadata, source } = payload;
 
   const [user, envelope, recipient] = await Promise.all([
     prisma.user.findFirstOrThrow({
@@ -158,6 +163,21 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     }
   }
 
+  // Org-managed email template (if any) overrides the default subject/body.
+  const orgTemplate = await resolveMessageTemplate({
+    organisationId,
+    channel: MessageTemplateChannel.EMAIL,
+    event: MessageTemplateEvent.SIGNING_REQUEST,
+  });
+
+  if (orgTemplate) {
+    emailMessage = orgTemplate.body;
+
+    if (orgTemplate.subject) {
+      emailSubject = orgTemplate.subject;
+    }
+  }
+
   const customEmailTemplate = {
     'signer.name': name,
     'signer.email': email,
@@ -231,6 +251,15 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
           teamId: envelope.teamId,
         }),
       });
+    });
+
+    // Bill the email only when the send originated from the API.
+    await recordUsage({
+      type: BillableEventType.EMAIL_MESSAGE,
+      source: source ?? 'app',
+      organisationId,
+      teamId: envelope.teamId,
+      metadata: { envelopeId: envelope.id, recipientId: recipient.id },
     });
   }
 
