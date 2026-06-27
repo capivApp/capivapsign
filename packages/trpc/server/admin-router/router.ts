@@ -26,6 +26,7 @@ import {
   getSigningCertificateRoute,
   uploadSigningCertificateRoute,
 } from './signing-certificate';
+import { chargeOrganisationMonthRoute } from './charge-organisation-month';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
@@ -133,6 +134,9 @@ export const adminRouter = router({
     get: getSigningCertificateRoute,
     upload: uploadSigningCertificateRoute,
     delete: deleteSigningCertificateRoute,
+  },
+  billing: {
+    chargeOrganisationMonth: chargeOrganisationMonthRoute,
   },
   team: {
     get: getAdminTeamRoute,

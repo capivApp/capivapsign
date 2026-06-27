@@ -3303,6 +3303,22 @@ msgstr "Limite de caracteres"
 msgid "Character Limit"
 msgstr "Limite de Caracteres"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Charge failed"
+msgstr "Falha na cobrança"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid ""
+"Charge the fixed plan price + metered usage for a month via Stripe. "
+"Idempotent per month."
+msgstr ""
+"Cobra o preço fixo do plano + uso medido de um mês via Stripe. Idempotente "
+"por mês."
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Charge via Stripe"
+msgstr "Cobrar via Stripe"
+
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Charts"
 msgstr "Gráficos"
@@ -7584,6 +7600,10 @@ msgstr "Convidado em"
 msgid "Invoice"
 msgstr "Fatura"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Invoice generated"
+msgstr "Fatura gerada"
+
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
@@ -8332,6 +8352,10 @@ msgstr "Modifique os detalhes da reivindicação de assinatura."
 msgid "Modify the details of the WhatsApp transport."
 msgstr "Altere os dados do transporte WhatsApp."
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Month"
+msgstr "Mês"
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Monthly"
@@ -8352,6 +8376,10 @@ msgstr ""
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "Monthly API quota"
 msgstr "Cota mensal de API"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Monthly billing"
+msgstr "Faturamento mensal"
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "Monthly document quota"
@@ -9527,6 +9555,10 @@ msgstr "Espaço reservado"
 msgid "Placeholders:"
 msgstr "Variáveis:"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "plan"
+msgstr "plano"
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Plan & usage pricing (cents, BRL)"
 msgstr "Preços do plano e de uso (centavos, BRL)"
@@ -9875,6 +9907,7 @@ msgstr "Preferências"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Preview"
 msgstr "Visualizar"
 
@@ -9882,10 +9915,18 @@ msgstr "Visualizar"
 msgid "Preview and configure template."
 msgstr "Visualizar e configurar modelo."
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Preview failed"
+msgstr "Falha na pré-visualização"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "Preview Mode"
 msgstr "Modo de Visualização"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Preview ready"
+msgstr "Pré-visualização pronta"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Preview the document before sending"
@@ -14658,6 +14699,10 @@ msgstr "Enviando"
 msgid "URL"
 msgstr "URL"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "usage"
+msgstr "uso"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
@@ -15974,6 +16019,10 @@ msgstr "X (% da esquerda)"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Y (% do topo)"
 msgstr "Y (% do topo)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Year"
+msgstr "Ano"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx

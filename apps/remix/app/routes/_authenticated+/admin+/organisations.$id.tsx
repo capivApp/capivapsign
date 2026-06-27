@@ -32,7 +32,7 @@ import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { OrganisationMemberRole } from '@prisma/client';
 import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
@@ -401,6 +401,8 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
           </div>
         )}
       </Alert>
+
+      <AdminChargeMonthSection organisationId={organisationId} />
 
       <OrganisationAdminForm organisation={organisation} licenseFlags={licenseFlags} />
 
@@ -912,5 +914,94 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
         </div>
       </form>
     </Form>
+  );
+};
+
+const brlFromCents = (cents: number) =>
+  (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+const AdminChargeMonthSection = ({ organisationId }: { organisationId: string }) => {
+  const { t } = useLingui();
+  const { toast } = useToast();
+
+  // Default to the previous calendar month.
+  const now = new Date();
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const [year, setYear] = useState(prev.getFullYear());
+  const [month, setMonth] = useState(prev.getMonth() + 1);
+  const [result, setResult] = useState<{
+    period: string;
+    totalCents: number;
+    monthlyPriceCents: number;
+    meteredCents: number;
+  } | null>(null);
+
+  const { mutateAsync: charge, isPending } = trpc.admin.billing.chargeOrganisationMonth.useMutation();
+
+  const run = async (dryRun: boolean) => {
+    try {
+      const res = await charge({ organisationId, year, month, dryRun });
+      setResult(res);
+      toast({ title: dryRun ? t`Preview ready` : t`Invoice generated` });
+    } catch (err) {
+      toast({
+        title: dryRun ? t`Preview failed` : t`Charge failed`,
+        description: err instanceof Error ? err.message : undefined,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <Alert className="my-6 flex flex-col gap-4 p-6" variant="neutral">
+      <div>
+        <AlertTitle>
+          <Trans>Monthly billing</Trans>
+        </AlertTitle>
+        <AlertDescription>
+          <Trans>
+            Charge the fixed plan price + metered usage for a month via Stripe. Idempotent per month.
+          </Trans>
+        </AlertDescription>
+      </div>
+
+      <div className="flex flex-wrap items-end gap-3">
+        <div>
+          <label className="text-muted-foreground text-xs">
+            <Trans>Year</Trans>
+          </label>
+          <Input type="number" value={year} onChange={(e) => setYear(e.target.valueAsNumber)} className="w-28" />
+        </div>
+        <div>
+          <label className="text-muted-foreground text-xs">
+            <Trans>Month</Trans>
+          </label>
+          <Input
+            type="number"
+            min={1}
+            max={12}
+            value={month}
+            onChange={(e) => setMonth(e.target.valueAsNumber)}
+            className="w-24"
+          />
+        </div>
+
+        <Button variant="outline" loading={isPending} onClick={async () => run(true)}>
+          <Trans>Preview</Trans>
+        </Button>
+        <Button loading={isPending} onClick={async () => run(false)}>
+          <Trans>Charge via Stripe</Trans>
+        </Button>
+      </div>
+
+      {result && (
+        <p className="text-sm">
+          <span className="font-medium">{result.period}:</span> {brlFromCents(result.monthlyPriceCents)}{' '}
+          <Trans>plan</Trans> + {brlFromCents(result.meteredCents)} <Trans>usage</Trans> ={' '}
+          <span className="font-semibold">{brlFromCents(result.totalCents)}</span>
+        </p>
+      )}
+    </Alert>
   );
 };

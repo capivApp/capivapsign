@@ -4,7 +4,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@documenso/ui/primitives/table';
-import { BillableEventType } from '@prisma/client';
+import type { BillableEventType } from '@prisma/client';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { DateTime } from 'luxon';
@@ -19,12 +19,14 @@ export function meta() {
 }
 
 // Stable order + colour + label per billable category.
+// String literals (not the Prisma enum object) so this works in the browser
+// bundle — `@prisma/client` enum values are not available client-side.
 const CATEGORY_META: { type: BillableEventType; label: string; color: string }[] = [
-  { type: BillableEventType.CREATE_DOCUMENT, label: 'Create document', color: '#94a3b8' },
-  { type: BillableEventType.RECOVER_FILE, label: 'Recover file', color: '#64748b' },
-  { type: BillableEventType.EMAIL_MESSAGE, label: 'Email', color: '#3b82f6' },
-  { type: BillableEventType.WHATSAPP_MESSAGE, label: 'WhatsApp', color: '#22c55e' },
-  { type: BillableEventType.WEBHOOK_DELIVERY, label: 'Webhook', color: '#a855f7' },
+  { type: 'CREATE_DOCUMENT', label: 'Create document', color: '#94a3b8' },
+  { type: 'RECOVER_FILE', label: 'Recover file', color: '#64748b' },
+  { type: 'EMAIL_MESSAGE', label: 'Email', color: '#3b82f6' },
+  { type: 'WHATSAPP_MESSAGE', label: 'WhatsApp', color: '#22c55e' },
+  { type: 'WEBHOOK_DELIVERY', label: 'Webhook', color: '#a855f7' },
 ];
 
 const brl = (cents: number) => (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });

@@ -223,7 +223,10 @@ const handleOrganisationEmailContext = async (organisationId: string) => {
     claims.flags.hidePoweredBy ?? false,
   );
 
-  const allowBrandedEmailColors = !IS_BILLING_ENABLED() || claims.flags.embedSigningWhiteLabel === true;
+  const allowBrandedEmailColors =
+    !IS_BILLING_ENABLED() ||
+    claims.flags.embedSigningWhiteLabel === true ||
+    claims.flags.whiteLabelBranding === true;
 
   if (!allowBrandedEmailColors) {
     branding.brandingColors = undefined;
@@ -283,7 +286,10 @@ const handleTeamEmailContext = async (teamId: number) => {
 
   const branding = teamGlobalSettingsToBranding(teamSettings, teamId, claims.flags.hidePoweredBy ?? false);
 
-  const allowBrandedEmailColors = !IS_BILLING_ENABLED() || claims.flags.embedSigningWhiteLabel === true;
+  const allowBrandedEmailColors =
+    !IS_BILLING_ENABLED() ||
+    claims.flags.embedSigningWhiteLabel === true ||
+    claims.flags.whiteLabelBranding === true;
 
   if (!allowBrandedEmailColors) {
     branding.brandingColors = undefined;

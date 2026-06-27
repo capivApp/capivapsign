@@ -422,6 +422,29 @@ model MessageTemplate {
   @@index([organisationId])
 }
 
+/// One generated monthly bill per organisation. The unique (organisationId,
+/// period) guarantees idempotency: the monthly sweep can run repeatedly without
+/// double-charging. `stripeInvoiceId` is set once the Stripe invoice is created.
+model UsageInvoice {
+  id String @id
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  /// Billed calendar month, `YYYY-MM`.
+  period String
+
+  monthlyPriceCents Int     @default(0)
+  meteredCents      Int     @default(0)
+  totalCents        Int     @default(0)
+  stripeInvoiceId   String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([organisationId, period])
+  @@index([organisationId])
+}
+
 /// System-wide default signing certificate for NON-ICP (PAdES local) signatures,
 /// uploaded by an admin. Both the .p12 bytes and the passphrase are stored
 /// ENCRYPTED at rest (symmetric, DOCUMENSO_ENCRYPTION_SECONDARY_KEY). Effectively
@@ -1038,6 +1061,7 @@ model Organisation {
 
   monthlyStats     OrganisationMonthlyStat[]
   usageEvents      UsageEvent[]
+  usageInvoices    UsageInvoice[]
   messageTemplates MessageTemplate[]
   apiTokens        ApiToken[]
 

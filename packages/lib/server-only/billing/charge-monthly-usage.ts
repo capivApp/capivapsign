@@ -2,6 +2,7 @@ import { prisma } from '@documenso/prisma';
 
 import { stripe } from '../stripe';
 import type { TClaimPricing } from '../../types/subscription';
+import { generateDatabaseId } from '../../universal/id';
 import { logger } from '../../utils/logger';
 
 export type ChargeMonthlyUsageOptions = {
@@ -79,14 +80,42 @@ export const chargeOrganisationMonthlyUsage = async (
     return breakdown;
   }
 
-  const customerId = organisation.subscription?.customerId;
+  // Idempotency: one bill per (organisation, period). If already billed, skip —
+  // the unique constraint also protects against concurrent sweeps.
+  const existing = await prisma.usageInvoice.findUnique({
+    where: { organisationId_period: { organisationId, period } },
+  });
 
-  if (!customerId) {
-    logger.warn({ msg: 'chargeMonthlyUsage: organisation has no Stripe customer', organisationId, period });
+  if (existing) {
+    logger.info({ msg: 'chargeMonthlyUsage: already billed, skipping', organisationId, period });
     return breakdown;
   }
 
   if (totalCents <= 0) {
+    return breakdown;
+  }
+
+  // Reserve the period first so a concurrent run hits the unique constraint.
+  try {
+    await prisma.usageInvoice.create({
+      data: {
+        id: generateDatabaseId('usage_invoice'),
+        organisationId,
+        period,
+        monthlyPriceCents,
+        meteredCents,
+        totalCents,
+      },
+    });
+  } catch (err) {
+    logger.info({ msg: 'chargeMonthlyUsage: period already reserved, skipping', organisationId, period });
+    return breakdown;
+  }
+
+  const customerId = organisation.subscription?.customerId;
+
+  if (!customerId) {
+    logger.warn({ msg: 'chargeMonthlyUsage: organisation has no Stripe customer', organisationId, period });
     return breakdown;
   }
 
@@ -112,13 +141,18 @@ export const chargeOrganisationMonthlyUsage = async (
 
   // Collect the pending invoice items into a single invoice and let Stripe
   // finalise + collect automatically.
-  await stripe.invoices.create({
+  const invoice = await stripe.invoices.create({
     customer: customerId,
     auto_advance: true,
     description: `CapivaSign — fatura ${period}`,
   });
 
-  logger.info({ msg: 'chargeMonthlyUsage: invoice created', organisationId, period, totalCents });
+  await prisma.usageInvoice.update({
+    where: { organisationId_period: { organisationId, period } },
+    data: { stripeInvoiceId: invoice.id },
+  });
+
+  logger.info({ msg: 'chargeMonthlyUsage: invoice created', organisationId, period, totalCents, stripeInvoiceId: invoice.id });
 
   return breakdown;
 };

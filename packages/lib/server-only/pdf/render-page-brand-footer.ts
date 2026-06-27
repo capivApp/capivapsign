@@ -42,10 +42,14 @@ export type StampBrandMarkOptions = {
 
 const DEFAULT_LOGO_PATH = () => createRequire(import.meta.url).resolve('@documenso/assets/logo_icon.png');
 
-// Mark size, in points.
+// Compact CUSTOM card size, in points (the draggable, gated placement).
 export const MARK_WIDTH = 250;
 export const MARK_HEIGHT = 50;
 const PAGE_MARGIN = 12;
+
+// Preset positions (FOOTER/HEADER/LEFT/RIGHT) render as a band that spans 100%
+// of that edge, capped at this thickness (points). This is the non-gated model.
+const BAND_THICKNESS = 40;
 
 const LINK_COLOR = rgb(0.23, 0.23, 0.72);
 const MUTED_COLOR = rgb(0.45, 0.45, 0.45);
@@ -68,11 +72,18 @@ export const stampBrandMarkOnAllPages = async (pdfDoc: PDF, opts: StampBrandMark
     // A per-page override (sender dragged the mark on this page) wins over the
     // document-wide preset and is treated as a CUSTOM placement.
     const override = opts.overridesByPage?.get(i + 1);
-    const { x, y, rotate } = override
-      ? placement('CUSTOM', page.width, page.height, override.x, override.y)
-      : placement(position, page.width, page.height, opts.customX, opts.customY);
 
-    drawMark(page, logo, fileHash, verifyUrl, x, y, rotate);
+    // Draggable (CUSTOM / per-page override) keeps the compact 250×50 card,
+    // unchanged. Preset positions render as a full-edge band instead.
+    if (override) {
+      const { x, y, rotate } = placement('CUSTOM', page.width, page.height, override.x, override.y);
+      drawMark(page, logo, fileHash, verifyUrl, x, y, rotate);
+    } else if (position === 'CUSTOM') {
+      const { x, y, rotate } = placement('CUSTOM', page.width, page.height, opts.customX, opts.customY);
+      drawMark(page, logo, fileHash, verifyUrl, x, y, rotate);
+    } else {
+      drawBand(page, logo, fileHash, verifyUrl, position, page.width, page.height);
+    }
   }
 };
 
@@ -133,6 +144,97 @@ type DrawablePage = {
   drawText: (text: string, options: Record<string, unknown>) => void;
   drawRectangle: (options: Record<string, unknown>) => void;
   addLinkAnnotation: (options: Record<string, unknown>) => unknown;
+};
+
+/**
+ * Draw a preset (non-draggable) mark as a band spanning 100% of the chosen edge,
+ * capped at {@link BAND_THICKNESS} thick: FOOTER/HEADER are full-width horizontal
+ * bands, LEFT/RIGHT are full-height vertical bands (text rotated 90°). The whole
+ * band is the clickable verification link.
+ */
+const drawBand = (
+  page: unknown,
+  logo: unknown,
+  fileHash: string,
+  verifyUrl: string,
+  position: PageStampPosition,
+  pageWidth: number,
+  pageHeight: number,
+) => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const p = page as DrawablePage;
+  const pad = 8;
+  const glyph = BAND_THICKNESS - pad * 2;
+  const isVertical = position === 'LEFT' || position === 'RIGHT';
+
+  const band = isVertical
+    ? {
+        x: position === 'LEFT' ? 0 : pageWidth - BAND_THICKNESS,
+        y: 0,
+        width: BAND_THICKNESS,
+        height: pageHeight,
+      }
+    : {
+        x: 0,
+        y: position === 'HEADER' ? pageHeight - BAND_THICKNESS : 0,
+        width: pageWidth,
+        height: BAND_THICKNESS,
+      };
+
+  p.drawRectangle({
+    ...band,
+    color: rgb(1, 1, 1),
+    borderColor: rgb(0.8, 0.85, 0.9),
+    borderWidth: 1,
+  });
+
+  const shortHash = fileHash.slice(0, 16);
+
+  if (!isVertical) {
+    const logoX = band.x + pad;
+    const logoY = band.y + pad;
+    p.drawImage(logo, { x: logoX, y: logoY, width: glyph, height: glyph });
+
+    const textX = logoX + glyph + pad;
+    p.drawText('Documento assinado eletronicamente · verificar:', {
+      x: textX,
+      y: band.y + BAND_THICKNESS - pad - 8,
+      size: 7,
+      color: MUTED_COLOR,
+    });
+    p.drawText(`${verifyUrl}  ·  SHA-256: ${shortHash}…`, {
+      x: textX,
+      y: band.y + pad + 1,
+      size: 7,
+      color: LINK_COLOR,
+    });
+  } else {
+    // Vertical band: square logo at the bottom, two text lines rotated 90° (CCW)
+    // running upward along the strip.
+    const rot = { rotate: degrees(90) };
+    const logoX = band.x + pad;
+    const logoY = band.y + pad;
+    p.drawImage(logo, { x: logoX, y: logoY, width: glyph, height: glyph });
+
+    const textStartY = logoY + glyph + pad;
+    p.drawText('Documento assinado · verificar:', {
+      x: band.x + pad + 9,
+      y: textStartY,
+      size: 7,
+      color: MUTED_COLOR,
+      ...rot,
+    });
+    p.drawText(`${verifyUrl} · SHA-256: ${shortHash}…`, {
+      x: band.x + pad - 1,
+      y: textStartY,
+      size: 7,
+      color: LINK_COLOR,
+      ...rot,
+    });
+  }
+
+  // The whole band is the clickable verification link.
+  p.addLinkAnnotation({ rect: band, uri: verifyUrl });
 };
 
 /**

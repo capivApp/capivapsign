@@ -6,7 +6,7 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-import { MessageTemplateChannel, MessageTemplateEvent } from '@prisma/client';
+import type { MessageTemplateChannel, MessageTemplateEvent } from '@prisma/client';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
@@ -49,7 +49,7 @@ const ChannelCard = ({ organisationId, channel, title, withSubject, initial, onS
       await upsert({
         organisationId,
         channel,
-        event: MessageTemplateEvent.SIGNING_REQUEST,
+        event: ('SIGNING_REQUEST' as MessageTemplateEvent),
         subject: withSubject ? subject || null : null,
         body,
       });
@@ -121,7 +121,7 @@ export default function OrganisationMessageTemplatesPage() {
 
   const templates = data?.data ?? [];
   const findFor = (channel: MessageTemplateChannel) =>
-    templates.find((tpl) => tpl.channel === channel && tpl.event === MessageTemplateEvent.SIGNING_REQUEST);
+    templates.find((tpl) => tpl.channel === channel && tpl.event === ('SIGNING_REQUEST' as MessageTemplateEvent));
 
   return (
     <div className="max-w-2xl">
@@ -133,19 +133,19 @@ export default function OrganisationMessageTemplatesPage() {
       <div className="space-y-6">
         <ChannelCard
           organisationId={organisation.id}
-          channel={MessageTemplateChannel.EMAIL}
+          channel={('EMAIL' as MessageTemplateChannel)}
           title={t`Email · Signing request`}
           withSubject
-          initial={findFor(MessageTemplateChannel.EMAIL)}
+          initial={findFor(('EMAIL' as MessageTemplateChannel))}
           onSaved={() => void refetch()}
         />
 
         <ChannelCard
           organisationId={organisation.id}
-          channel={MessageTemplateChannel.WHATSAPP}
+          channel={('WHATSAPP' as MessageTemplateChannel)}
           title={t`WhatsApp · Signing request`}
           withSubject={false}
-          initial={findFor(MessageTemplateChannel.WHATSAPP)}
+          initial={findFor(('WHATSAPP' as MessageTemplateChannel))}
           onSaved={() => void refetch()}
         />
       </div>

@@ -28,6 +28,7 @@ type DatabaseIdPrefix =
   | 'usage_event'
   | 'message_template'
   | 'signing_certificate'
+  | 'usage_invoice'
   | 'org_claim'
   | 'org_group'
   | 'org_sso'

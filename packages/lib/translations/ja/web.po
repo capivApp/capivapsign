@@ -2862,6 +2862,18 @@ msgstr "文字数制限"
 msgid "Character Limit"
 msgstr "文字数制限"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Charge failed"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Charge the fixed plan price + metered usage for a month via Stripe. Idempotent per month."
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Charge via Stripe"
+msgstr ""
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #~ msgid "Charged per action only when used via the API. Leave blank for free."
 #~ msgstr ""
@@ -6839,6 +6851,10 @@ msgstr "招待日時"
 msgid "Invoice"
 msgstr "請求書"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Invoice generated"
+msgstr ""
+
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
@@ -7534,6 +7550,10 @@ msgstr "サブスクリプションクレームの詳細を変更します。"
 msgid "Modify the details of the WhatsApp transport."
 msgstr ""
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Month"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Monthly"
@@ -7550,6 +7570,10 @@ msgstr "月間アクティブユーザー：1 つ以上の文書が完了した�
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "Monthly API quota"
 msgstr "月間 API クォータ"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Monthly billing"
+msgstr ""
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "Monthly document quota"
@@ -8648,6 +8672,10 @@ msgstr "プレースホルダー"
 msgid "Placeholders:"
 msgstr ""
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "plan"
+msgstr ""
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Plan & usage pricing (cents, BRL)"
 msgstr ""
@@ -8935,6 +8963,7 @@ msgstr "設定"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Preview"
 msgstr "プレビュー"
 
@@ -8942,10 +8971,18 @@ msgstr "プレビュー"
 msgid "Preview and configure template."
 msgstr "テンプレートをプレビューして構成します。"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Preview failed"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "Preview Mode"
 msgstr "プレビューモード"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Preview ready"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Preview the document before sending"
@@ -13175,6 +13212,10 @@ msgstr "アップロード中"
 msgid "URL"
 msgstr "URL"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "usage"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
@@ -14150,6 +14191,10 @@ msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Y (% do topo)"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Year"
 msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx

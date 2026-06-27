@@ -141,6 +141,27 @@ export const updateEnvelope = async ({
     globalActionAuth: newGlobalActionAuth,
   });
 
+  // Gate the draggable verification mark (custom X/Y + per-page overrides). When
+  // the plan lacks the flag, coerce any custom placement back to the FOOTER
+  // preset and drop the coordinates/overrides — defence-in-depth behind the UI.
+  if (!envelope.team.organisation.organisationClaim.flags.draggableVerificationMark) {
+    if (meta.pageStampPosition === 'CUSTOM') {
+      meta.pageStampPosition = 'FOOTER';
+    }
+
+    if (meta.pageStampX !== undefined) {
+      meta.pageStampX = null;
+    }
+
+    if (meta.pageStampY !== undefined) {
+      meta.pageStampY = null;
+    }
+
+    if (meta.pageStampOverrides !== undefined) {
+      meta.pageStampOverrides = {};
+    }
+  }
+
   const emailId = meta.emailId;
 
   // Validate the emailId belongs to the organisation.

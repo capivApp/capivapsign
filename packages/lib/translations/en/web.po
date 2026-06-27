@@ -2857,6 +2857,18 @@ msgstr "Character limit"
 msgid "Character Limit"
 msgstr "Character Limit"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Charge failed"
+msgstr "Charge failed"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Charge the fixed plan price + metered usage for a month via Stripe. Idempotent per month."
+msgstr "Charge the fixed plan price + metered usage for a month via Stripe. Idempotent per month."
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Charge via Stripe"
+msgstr "Charge via Stripe"
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #~ msgid "Charged per action only when used via the API. Leave blank for free."
 #~ msgstr "Charged per action only when used via the API. Leave blank for free."
@@ -6834,6 +6846,10 @@ msgstr "Invited At"
 msgid "Invoice"
 msgstr "Invoice"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Invoice generated"
+msgstr "Invoice generated"
+
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
@@ -7529,6 +7545,10 @@ msgstr "Modify the details of the subscription claim."
 msgid "Modify the details of the WhatsApp transport."
 msgstr "Modify the details of the WhatsApp transport."
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Month"
+msgstr "Month"
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Monthly"
@@ -7545,6 +7565,10 @@ msgstr "Monthly Active Users: Users that had at least one of their documents com
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "Monthly API quota"
 msgstr "Monthly API quota"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Monthly billing"
+msgstr "Monthly billing"
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "Monthly document quota"
@@ -8643,6 +8667,10 @@ msgstr "Placeholder"
 msgid "Placeholders:"
 msgstr "Placeholders:"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "plan"
+msgstr "plan"
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Plan & usage pricing (cents, BRL)"
 msgstr "Plan & usage pricing (cents, BRL)"
@@ -8930,6 +8958,7 @@ msgstr "Preferences"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Preview"
 msgstr "Preview"
 
@@ -8937,10 +8966,18 @@ msgstr "Preview"
 msgid "Preview and configure template."
 msgstr "Preview and configure template."
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Preview failed"
+msgstr "Preview failed"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "Preview Mode"
 msgstr "Preview Mode"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Preview ready"
+msgstr "Preview ready"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Preview the document before sending"
@@ -13170,6 +13207,10 @@ msgstr "Uploading"
 msgid "URL"
 msgstr "URL"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "usage"
+msgstr "usage"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
@@ -14146,6 +14187,10 @@ msgstr "X (% da esquerda)"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Y (% do topo)"
 msgstr "Y (% do topo)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Year"
+msgstr "Year"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
