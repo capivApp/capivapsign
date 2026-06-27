@@ -180,6 +180,9 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
   const team = useCurrentTeam();
   const organisation = useCurrentOrganisation();
 
+  // Dragging the verification mark to a custom X/Y position is a gated feature.
+  const canDragVerificationMark = organisation.organisationClaim.flags.draggableVerificationMark ?? false;
+
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<EnvelopeEditorSettingsTabType>('general');
 
@@ -534,11 +537,13 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                 <SelectItem value="HEADER">{t`Topo`}</SelectItem>
                                 <SelectItem value="LEFT">{t`Lateral esquerda`}</SelectItem>
                                 <SelectItem value="RIGHT">{t`Lateral direita`}</SelectItem>
-                                <SelectItem value="CUSTOM">{t`Personalizada (X/Y)`}</SelectItem>
+                                {canDragVerificationMark && (
+                                  <SelectItem value="CUSTOM">{t`Personalizada (X/Y)`}</SelectItem>
+                                )}
                               </SelectContent>
                             </Select>
 
-                            {field.value === 'CUSTOM' && (
+                            {canDragVerificationMark && field.value === 'CUSTOM' && (
                               <div className="mt-2 grid grid-cols-2 gap-2">
                                 <FormField
                                   control={form.control}

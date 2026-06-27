@@ -325,6 +325,13 @@ msgstr "{0} per conto di \"{1}\" ti ha invitato a {recipientActionVerb} il docum
 msgid "{0} Teams"
 msgstr "{0} Squadre"
 
+#. placeholder {0}: whatsapp.fromName
+#. placeholder {1}: envelope.team.name
+#. placeholder {2}: envelope.title
+#: packages/lib/jobs/definitions/whatsapp/send-signing-whatsapp.handler.ts
+msgid "{0}: {1} convidou você a {actionVerb} o documento \"{2}\". Acesse: {signLink}"
+msgstr ""
+
 #. placeholder {0}: currentStepData.order
 #. placeholder {1}: envelopeEditorSteps.length
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
@@ -424,6 +431,7 @@ msgid "{maximumEnvelopeItemCount, plural, one {You cannot upload more than # ite
 msgstr "{maximumEnvelopeItemCount, plural, one {Non puoi caricare più di # elemento per busta.} other {Non puoi caricare più di # elementi per busta.}}"
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-delete-dialog.tsx
 msgid "{organisationClaimCount, plural, one {# Organisation claim} other {# Organisation claims}}"
 msgstr "{organisationClaimCount, plural, one {# richiesta di organizzazione} other {# richieste di organizzazione}}"
 
@@ -479,6 +487,7 @@ msgid "{signerName} has rejected the document \"{documentName}\"."
 msgstr "{signerName} ha rifiutato il documento \"{documentName}\"."
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-delete-dialog.tsx
 msgid "{subscriptionClaimCount, plural, one {# Subscription claim} other {# Subscription claims}}"
 msgstr "{subscriptionClaimCount, plural, one {# richiesta di abbonamento} other {# richieste di abbonamento}}"
 
@@ -544,6 +553,10 @@ msgstr "{user} ha eliminato il documento"
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} failed to validate a 2FA token for the document"
 msgstr "{user} non è riuscito a convalidare un token 2FA per il documento"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} initiated ICP-Brasil signing"
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} moved the document to team"
@@ -654,6 +667,10 @@ msgid "{user} viewed the document"
 msgstr "{user} ha visualizzato il documento"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgid "{user}'s ICP-Brasil signature was applied"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts
 msgid "{user}'s remote signature was applied"
 msgstr "La firma remota di {user} è stata applicata"
 
@@ -681,6 +698,14 @@ msgstr "{validationLength, plural, one {Seleziona esattamente # opzione} other {
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
 msgstr "{visibleRows, plural, one {Visualizzazione di # risultato.} other {Visualizzazione di # risultati.}}"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "/mês + consumo de API"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "© CapivaSign. Todos os direitos reservados."
+msgstr ""
 
 #. placeholder {0}: document.title
 #. placeholder {0}: envelope.title
@@ -949,6 +974,10 @@ msgstr "5 Documenti al mese"
 msgid "500 Internal Server Error"
 msgstr "500 Errore Interno del Server"
 
+#: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
+msgid "5511999999999"
+msgstr ""
+
 #: apps/remix/app/components/forms/token.tsx
 msgid "6 months"
 msgstr "{VAR_PLURAL, select, one {1 mese} other {6 mesi}}"
@@ -956,6 +985,10 @@ msgstr "{VAR_PLURAL, select, one {1 mese} other {6 mesi}}"
 #: apps/remix/app/components/forms/token.tsx
 msgid "7 days"
 msgstr "{VAR_PLURAL, select, one {1 giorno} other {7 giorni}}"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "A CapivaSign reúne assinatura eletrônica, ICP-Brasil e WhatsApp em uma plataforma simples, rápida e pronta para integrar com os seus sistemas."
+msgstr ""
 
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
 msgid "A confirmation email has been sent, and it should arrive in your inbox shortly."
@@ -1092,6 +1125,10 @@ msgstr "È richiesta un'email valida"
 msgid "A verification email will be sent to the provided email."
 msgstr "Un'email di verifica sarà inviata all'email fornita."
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Abrindo o agente CapivaSign…"
+msgstr ""
+
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: packages/email/templates/confirm-team-email.tsx
 #: packages/email/templates/organisation-invite.tsx
@@ -1175,6 +1212,10 @@ msgstr "Ri-autenticazione dell'account"
 msgid "Account unlinked"
 msgstr "Account scollegato"
 
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
+msgid "Account-level security token sent as the Client-Token header."
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Acknowledgment"
 msgstr "Riconoscimento"
@@ -1195,6 +1236,7 @@ msgstr "Azione"
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
+#: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
@@ -1476,8 +1518,13 @@ msgid "Add this URL to your provider's allowed redirect URIs"
 msgstr "Aggiungi questo URL agli URI di reindirizzamento consentiti del tuo provider"
 
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-create-dialog.tsx
 msgid "Add transport"
 msgstr "Aggiungi trasporto"
+
+#: apps/remix/app/components/dialogs/whatsapp-transport-create-dialog.tsx
+msgid "Add WhatsApp Transport"
+msgstr ""
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Additional brand information to display at the bottom of emails"
@@ -1969,6 +2016,7 @@ msgstr "Si è verificato un errore inaspettato."
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/forms/team-update-form.tsx
 #: apps/remix/app/components/general/admin-email-blocklist-section.tsx
+#: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
@@ -2012,10 +2060,24 @@ msgstr "Qualsiasi stato"
 msgid "API"
 msgstr "API"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "API e webhooks para conectar a CapivaSign aos seus sistemas, com cobrança por uso transparente."
+msgstr ""
+
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "API key"
 msgstr "Chiave API"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "API key created"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "API Keys"
+msgstr ""
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "API rate limits"
@@ -2117,6 +2179,7 @@ msgid "Are you sure you want to delete the following claim?"
 msgstr "Sei sicuro di voler eliminare la seguente richiesta?"
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-delete-dialog.tsx
 msgid "Are you sure you want to delete the following transport?"
 msgstr "Sei sicuro di voler eliminare il seguente trasporto?"
 
@@ -2168,6 +2231,27 @@ msgstr "Sei sicuro?"
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 msgid "Assigned Teams"
 msgstr "Team Assegnati"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Assinatura com validade jurídica"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Assinatura digital ICP-Brasil"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Assinatura Qualificada (ICP-Brasil)"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Assine de qualquer lugar"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Assine documentos com segurança e validade jurídica"
+msgstr ""
 
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role action verb"
@@ -2297,6 +2381,10 @@ msgstr "Avatar"
 msgid "Avatar Updated"
 msgstr "Avatar aggiornato"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
+msgid "Average cost per document"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "Awaiting email confirmation"
 msgstr "In attesa della conferma email"
@@ -2330,6 +2418,10 @@ msgstr "Lavori di background"
 msgid "Backport email transport"
 msgstr "Backport trasporto email"
 
+#: apps/remix/app/components/dialogs/claim-update-dialog.tsx
+msgid "Backport WhatsApp transport"
+msgstr ""
+
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Backup Code"
@@ -2350,6 +2442,10 @@ msgstr "Colore di sfondo di base."
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Base text colour."
 msgstr "Colore del testo di base."
+
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
+msgid "Base URL (optional)"
+msgstr ""
 
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Before you get started, please confirm your email address by clicking the button below:"
@@ -2612,6 +2708,10 @@ msgstr "Non riesci a trovare qualcuno?"
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-create-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-update-dialog.tsx
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
@@ -2680,6 +2780,14 @@ msgstr "Impossibile rimuovere il firmatario"
 msgid "Cannot upload items after the document has been sent"
 msgstr "Non è possibile caricare gli elementi dopo che il documento è stato inviato"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Carimba em cada página o logo, o link de verificação, o hash do arquivo e um QR Code."
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
+msgid "Category"
+msgstr ""
+
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role name"
 msgid "Cc"
@@ -2709,6 +2817,26 @@ msgstr "Copiatori"
 msgid "Center"
 msgstr "Centro"
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Certificado instalado (A3 token / A1)"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Certificate file (.p12 / .pfx)"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Certificate password"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Certificate removed"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Certificate saved"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Field Type"
 msgstr "Modifica tipo di campo"
@@ -2733,6 +2861,10 @@ msgstr "Limite di caratteri"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Character Limit"
 msgstr "Limite di caratteri"
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+#~ msgid "Charged per action only when used via the API. Leave blank for free."
+#~ msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Charts"
@@ -2866,6 +2998,10 @@ msgstr "Segreto Cliente"
 msgid "Client secret is required"
 msgstr "È richiesto il segreto cliente"
 
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
+msgid "Client token (optional)"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
@@ -2900,6 +3036,10 @@ msgstr "Chiudi"
 msgid "Collapse sidebar"
 msgstr "Comprimi barra laterale"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Começar agora"
+msgstr ""
+
 #: apps/remix/app/components/general/admin-email-blocklist-section.tsx
 msgid "Comma-separated list of email domains to block from signing up."
 msgstr "Elenco di domini email, separati da virgola, da bloccare per la registrazione."
@@ -2907,6 +3047,10 @@ msgstr "Elenco di domini email, separati da virgola, da bloccare per la registra
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Communication"
 msgstr "Comunicazione"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Como funciona"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Compare all plans and features in detail"
@@ -2965,6 +3109,10 @@ msgstr "Documenti Completati"
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Completed on {formattedDate}"
 msgstr "Completato il {formattedDate}"
+
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Conectando ao agente local…"
+msgstr ""
 
 #: packages/lib/constants/pdf-viewer-i18n.ts
 #: packages/lib/constants/pdf-viewer-i18n.ts
@@ -3088,6 +3236,14 @@ msgstr "Email di conferma inviato"
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Consent to Electronic Transactions"
 msgstr "Consenso alle transazioni elettroniche"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Consumo por ação"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
+msgid "Consumption"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Contact Information"
@@ -3270,6 +3426,10 @@ msgstr "Copia il token"
 msgid "Copy Value"
 msgstr "Copia valore"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "Copy your API key now"
+msgstr ""
+
 #: apps/remix/app/components/general/organisation-usage-reset-button.tsx
 msgid "Counter reset."
 msgstr "Contatore reimpostato."
@@ -3281,6 +3441,7 @@ msgstr "Contatore reimpostato."
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-create-dialog.tsx
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Create"
 msgstr "Crea"
@@ -3339,6 +3500,10 @@ msgstr "Crea un'organizzazione per iniziare."
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create and send"
 msgstr "Crea e invia"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "Create API key"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create as draft"
@@ -3419,6 +3584,10 @@ msgstr "Crea organizzazione"
 msgid "Create Organisation"
 msgstr "Crea Organizzazione"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "Create organisation API keys for integrations, optionally scoped to a specific member. Usage is billed per the organisation plan."
+msgstr ""
+
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Create separate organisation"
 msgstr "Crea organizzazione separata"
@@ -3490,6 +3659,7 @@ msgstr "Crea il tuo account e inizia a utilizzare firme digitali all'avanguardia
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
+#: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -3508,6 +3678,11 @@ msgstr "Crea il tuo account e inizia a utilizzare firme digitali all'avanguardia
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "Created"
 msgstr "Creato"
+
+#. placeholder {0}: i18n.date(token.createdAt, DateTime.DATETIME_MED)
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "Created {0}"
+msgstr ""
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
@@ -3538,6 +3713,22 @@ msgstr "Creazione del documento"
 msgid "Creating Template"
 msgstr "Creazione del modello"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Criação de documento"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Criar conta"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Criar conta gratuita"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Crie sua conta gratuitamente e envie seu primeiro documento em minutos."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "CSS rules were dropped during sanitisation"
@@ -3550,6 +3741,10 @@ msgstr "Struttura CSV"
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Current"
 msgstr "Corrente"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Current certificate"
+msgstr ""
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "Current Password"
@@ -3603,6 +3798,10 @@ msgstr "Gruppi di Organizzazione Personalizzati"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Customise the colours used on your signing pages."
 msgstr "Personalizza i colori utilizzati nelle tue pagine di firma."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "Customise the signing-request message for email and WhatsApp. Empty falls back to the CapivaApp default."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Danger Zone"
@@ -3659,6 +3858,11 @@ msgstr "Declina"
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
+msgid "Default (CapivaApp WhatsApp)"
+msgstr ""
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Default (system mailer)"
@@ -3667,6 +3871,10 @@ msgstr "Predefinito (mailer di sistema)"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Default border colour."
 msgstr "Colore del bordo predefinito."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Default certificate used for non-ICP (PAdES) signatures. The file and password are stored encrypted."
+msgstr ""
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Date Format"
@@ -3767,10 +3975,12 @@ msgstr "elimina"
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-delete-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
+#: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
@@ -3780,6 +3990,7 @@ msgstr "elimina"
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
@@ -3909,6 +4120,10 @@ msgstr "Elimina l'account utente e tutti i suoi contenuti. Questa azione è irre
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 msgid "Delete Webhook"
 msgstr "Elimina Webhook"
+
+#: apps/remix/app/components/dialogs/whatsapp-transport-delete-dialog.tsx
+msgid "Delete WhatsApp Transport"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Delete your account and all its contents, including completed documents. This action is irreversible and will cancel your subscription, so proceed with caution."
@@ -4576,6 +4791,10 @@ msgstr "Documenti annullati"
 msgid "Documents Completed"
 msgstr "Documenti completati"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
+msgid "Documents created"
+msgstr ""
+
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 msgid "Documents Created"
 msgstr "Documenti creati"
@@ -4718,6 +4937,10 @@ msgstr "Trascina e rilascia o fai clic per caricare"
 msgid "Drag and drop your document here"
 msgstr "Trascina e rilascia qui il tuo documento"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+msgid "Drag to position"
+msgstr ""
+
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgctxt "Draw signature"
@@ -4804,15 +5027,24 @@ msgstr "Es. 0"
 msgid "E.g. 100"
 msgstr "Es. 100"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "e.g. Integration key"
+msgstr ""
+
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "e.g. Resend (free plans)"
 msgstr "es. Resend (piani gratuiti)"
+
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
+msgid "e.g. Z-API (production)"
+msgstr ""
 
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/teams/team-email-dropdown.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
+#: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
@@ -4837,6 +5069,10 @@ msgstr "Modifica Modello"
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "Edit webhook"
 msgstr "Modifica webhook"
+
+#: apps/remix/app/components/dialogs/whatsapp-transport-update-dialog.tsx
+msgid "Edit WhatsApp Transport"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
@@ -4904,6 +5140,10 @@ msgstr "Divulgazione della firma elettronica"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "Email"
 msgstr "Email"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "Email · Signing request"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
@@ -5100,6 +5340,10 @@ msgstr "Verifica email rinviata"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Emails"
 msgstr "Email"
+
+#: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
+msgid "Embed timestamp"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Embedding, 5 members included and more"
@@ -5324,6 +5568,15 @@ msgstr "Inserisci il tuo testo qui"
 msgid "Enterprise"
 msgstr "Impresa"
 
+#: apps/remix/app/components/general/landing-page.tsx
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Entrar"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Entrega de webhook"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 msgid "Envelope distributed"
 msgstr "Busta distribuita"
@@ -5373,6 +5626,18 @@ msgstr "Titolo della Busta"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Envelope updated"
 msgstr "Busta aggiornata"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Envie o documento"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Envie o pedido de assinatura direto no WhatsApp do signatário e acompanhe em tempo real."
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Envio de e-mail"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
@@ -5473,6 +5738,10 @@ msgstr "Errore durante il caricamento della pagina"
 msgid "Error uploading file"
 msgstr "Errore durante il caricamento del file"
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Este documento exige assinatura com certificado digital ICP-Brasil (A1 ou A3). Escolha como assinar — o agente CapivaSign abre na sua máquina e usa o seu certificado."
+msgstr ""
+
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Event"
@@ -5504,11 +5773,20 @@ msgstr "Tutti hanno firmato! Riceverai una copia del documento firmato via email
 msgid "Exceeded timeout"
 msgstr "Tempo scaduto"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Exige que cada signatário assine com certificado digital ICP-Brasil (A1/A3) via o agente local. Força ordem sequencial."
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "Existing keys"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 msgid "Expand sidebar"
 msgstr "Espandi barra laterale"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
 msgid "Expiration"
 msgstr "Scadenza"
 
@@ -5521,6 +5799,10 @@ msgstr "Scaduto"
 msgctxt "Subscription status"
 msgid "Expired"
 msgstr "Scaduto"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "expires"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Expires"
@@ -5560,6 +5842,10 @@ msgstr "Non riuscito"
 msgid "Failed to complete the document. Please try again."
 msgstr "Impossibile completare il documento. Riprova."
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "Failed to create API key"
+msgstr ""
+
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
 msgid "Failed to create document. Please try again."
 msgstr "Creazione del documento non riuscita. Riprova."
@@ -5577,6 +5863,7 @@ msgid "Failed to create support ticket"
 msgstr "Impossibile creare un ticket di supporto"
 
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-create-dialog.tsx
 msgid "Failed to create transport."
 msgstr "Impossibile creare il trasporto."
 
@@ -5589,6 +5876,7 @@ msgid "Failed to delete subscription claim."
 msgstr "Eliminazione di rivendicazione di abbonamento fallita."
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-delete-dialog.tsx
 msgid "Failed to delete transport."
 msgstr "Impossibile eliminare il trasporto."
 
@@ -5628,11 +5916,20 @@ msgstr "Impossibile reimpostare il contatore."
 msgid "Failed to revoke session"
 msgstr "Impossibile revocare la sessione"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Failed to save certificate"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Failed to save settings."
 msgstr "Impossibile salvare le impostazioni."
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "Failed to save template"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-update-dialog.tsx
 msgid "Failed to save transport."
 msgstr "Impossibile salvare il trasporto."
 
@@ -5696,6 +5993,10 @@ msgstr "Falliti: {failedCount}"
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "Fair use limit exceeded"
 msgstr "Limite di utilizzo corretto superato."
+
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Falha ao assinar pelo agente local."
+msgstr ""
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
@@ -5790,6 +6091,10 @@ msgstr "Compila i dettagli per creare un nuovo trasporto email."
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Fill in the details to create a new subscription claim."
 msgstr "Compila i dettagli per creare una nuova rivendicazione di abbonamento."
+
+#: apps/remix/app/components/dialogs/whatsapp-transport-create-dialog.tsx
+msgid "Fill in the details to create a new WhatsApp transport."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Filter by status"
@@ -5902,11 +6207,17 @@ msgstr "Firma gratuita"
 msgid "Free Signature Settings"
 msgstr "Impostazioni Firma Gratuita"
 
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+msgid "free/month"
+msgstr ""
+
 #: packages/lib/constants/i18n.ts
 msgid "French"
 msgstr "Francese"
 
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
+#: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
 msgid "From"
 msgstr "Da"
 
@@ -5915,6 +6226,7 @@ msgid "From address"
 msgstr "Indirizzo mittente"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
 msgid "From name"
 msgstr "Nome mittente"
 
@@ -6414,6 +6726,10 @@ msgstr "Impostazioni Iniziali"
 msgid "Inserted"
 msgstr "Inserito"
 
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
+msgid "Instance ID"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Instance Stats"
 msgstr "Statistiche istanze"
@@ -6575,6 +6891,10 @@ msgstr "Al momento, non è il tuo turno di firmare. Riceverai un'email con le is
 msgid "Italian"
 msgstr "Italiano"
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Já assinei — atualizar"
+msgstr ""
+
 #: packages/lib/constants/i18n.ts
 msgid "Japanese"
 msgstr "Giapponese"
@@ -6691,6 +7011,14 @@ msgstr "Ultima verifica"
 msgid "Last Year"
 msgstr "Ultimo anno"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Lateral direita"
+msgstr ""
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Lateral esquerda"
+msgstr ""
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/components/general/admin-license-card.tsx
 #: apps/remix/app/components/general/organisations/organisation-quota-banner.tsx
@@ -6711,6 +7039,7 @@ msgid "Leave blank to inherit from the organisation."
 msgstr "Lascia vuoto per ereditare dall'organizzazione."
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
 msgid "Leave blank to keep current"
 msgstr "Lascia vuoto per mantenere quello attuale"
 
@@ -6892,6 +7221,10 @@ msgstr "Gestisci tutte le organizzazioni con cui sei attualmente associato."
 msgid "Manage all subscription claims"
 msgstr "Gestisci tutte le rivendicazioni di abbonamento"
 
+#: apps/remix/app/routes/_authenticated+/admin+/whatsapp-transports._index.tsx
+msgid "Manage all WhatsApp transports"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Manage and view template"
 msgstr "Gestisci e visualizza il modello"
@@ -7042,6 +7375,10 @@ msgstr "Manager e superiori"
 msgid "Mapping fields to recipients"
 msgstr "Associazione dei campi ai destinatari in corso"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Marca de verificação nas páginas"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Mark as viewed"
 msgstr "Segna come visualizzato"
@@ -7095,6 +7432,10 @@ msgstr "Numero massimo di file caricati consentiti per busta"
 msgid "Member"
 msgstr "Membro"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "Member (optional)"
+msgstr ""
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Member Count"
@@ -7132,7 +7473,12 @@ msgstr "Membri"
 msgid "Members that currently belong to this team."
 msgstr "Membri che attualmente appartengono a questo team."
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Mensagem por WhatsApp"
+msgstr ""
+
 #: apps/remix/app/components/forms/support-ticket-form.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Message"
 msgstr "Messaggio"
 
@@ -7143,6 +7489,16 @@ msgstr "Messaggio"
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Message <0>(Optional)</0>"
 msgstr "Messaggio <0>(Opzionale)</0>"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "Message Templates"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
+msgid "Metered usage billed to this organisation. Only actions performed via the API are charged."
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Middle"
@@ -7174,6 +7530,10 @@ msgstr "Modifica i dettagli del trasporto email."
 msgid "Modify the details of the subscription claim."
 msgstr "Modifica i dettagli della rivendicazione di abbonamento."
 
+#: apps/remix/app/components/dialogs/whatsapp-transport-update-dialog.tsx
+msgid "Modify the details of the WhatsApp transport."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Monthly"
@@ -7198,6 +7558,14 @@ msgstr "Quota documenti mensile"
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "Monthly email quota"
 msgstr "Quota email mensile"
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+msgid "Monthly plan price (cents)"
+msgstr ""
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+msgid "Monthly price is charged every month. Per-action prices are billed only for API usage beyond the free quota. Leave blank for free."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -7260,6 +7628,7 @@ msgstr "N/A"
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
@@ -7270,11 +7639,13 @@ msgstr "N/A"
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
+#: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/add-fields.tsx
@@ -7311,6 +7682,10 @@ msgstr "Necessita di firma"
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Needs to view"
 msgstr "Necessita di visualizzazione"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Nenhuma"
+msgstr ""
 
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
 msgid "Never"
@@ -7374,6 +7749,10 @@ msgstr "No"
 msgid "No active drafts"
 msgstr "Nessuna bozza attiva"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "No API keys yet."
+msgstr ""
+
 #: apps/remix/app/components/general/pdf-viewer/envelope-pdf-viewer.tsx
 #: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
 msgid "No document found"
@@ -7399,6 +7778,15 @@ msgstr "Nessuna email rilevata"
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "No emails configured for this domain."
 msgstr "Nessuna email configurata per questo dominio."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "no expiration"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "No expiration"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "No features enabled"
@@ -7458,6 +7846,10 @@ msgstr "Nessun modello di organizzazione è ancora condiviso con il tuo team."
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "No organisations found"
 msgstr "Nessuna organizzazione trovata"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "No password"
+msgstr ""
 
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "No public profile templates found"
@@ -7639,6 +8031,14 @@ msgstr "Numero di team consentiti. 0 = Illimitati"
 msgid "Number Settings"
 msgstr "Impostazioni Numero"
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "O agente CapivaSign precisa estar em execução (porta 3231) ou com o protocolo documenso-icp:// registrado. Sua chave privada nunca sai da sua máquina."
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "O documento é selado e auditável, com trilha completa de evidências."
+msgstr ""
+
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Off"
 msgstr "Disattivato"
@@ -7760,6 +8160,7 @@ msgstr "Oppure continua con"
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 #: packages/ui/components/template/template-type-select.tsx
@@ -7769,6 +8170,10 @@ msgstr "Organizzazione"
 #: packages/lib/server-only/organisation/delete-organisation-email.ts
 msgid "Organisation \"{organisationName}\" has been deleted"
 msgstr "L'organizzazione \"{organisationName}\" è stata eliminata"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "Organisation (owner)"
+msgstr ""
 
 #: packages/lib/constants/organisations-translations.ts
 msgid "Organisation Admin"
@@ -7933,6 +8338,10 @@ msgstr "Organizza i tuoi modelli"
 msgid "Organize your documents and templates"
 msgstr "Organizza i tuoi documenti e modelli."
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Origem: {baseUrl}"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgctxt "Original document (adjective)"
 msgid "Original"
@@ -7941,6 +8350,11 @@ msgstr "Originale"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Otherwise, the document will be created as a draft."
 msgstr "Altrimenti, il documento sarà creato come bozza."
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Overlapping fields detected"
+msgstr ""
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
@@ -7979,6 +8393,10 @@ msgstr "Destinatario del proprietario scaduto"
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 msgid "Ownership transferred to {organisationMemberName}."
 msgstr "Proprietà trasferita a {organisationMemberName}."
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Padrão ICP-Brasil (A1 e A3) e assinatura eletrônica avançada, em conformidade com a Lei nº 14.063/2020 e o eIDAS."
+msgstr ""
 
 #. placeholder {0}: table.getState().pagination.pageIndex + 1
 #. placeholder {1}: table.getPageCount() || 1
@@ -8051,6 +8469,7 @@ msgstr "Le passkey non sono supportate su questo browser"
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
 msgid "Password"
 msgstr "\"Password\""
 
@@ -8066,6 +8485,10 @@ msgstr "Richiesta di reimpostazione password"
 #: packages/email/templates/reset-password.tsx
 msgid "Password Reset Successful"
 msgstr "Reimpostazione password riuscita"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Password set"
+msgstr ""
 
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
@@ -8183,6 +8606,14 @@ msgstr "Account personale"
 msgid "Personal Inbox"
 msgstr "Posta in arrivo personale"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Personalizada (X/Y)"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
+msgid "Phone"
+msgstr ""
+
 #: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 msgid "Pick a number"
@@ -8212,6 +8643,18 @@ msgstr "Posiziona e configura i campi del modulo nel documento"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Placeholder"
 msgstr "Segnaposto"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "Placeholders:"
+msgstr ""
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+msgid "Plan & usage pricing (cents, BRL)"
+msgstr ""
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+msgid "Plans without a transport fall back to the CapivaApp default WhatsApp sender."
+msgstr ""
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Plans without a transport use the system default mailer."
@@ -8444,6 +8887,10 @@ msgstr "Si prega di caricare un logo"
 msgid "Polish"
 msgstr "Polacco"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Por link, e-mail ou WhatsApp — com ou sem certificado ICP-Brasil."
+msgstr ""
+
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "Port"
 msgstr "Porta"
@@ -8475,6 +8922,10 @@ msgstr "Offerto da"
 msgid "Pre-formatted CSV template with example data."
 msgstr "Modello CSV preformattato con dati di esempio."
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Preços transparentes por uso"
+msgstr ""
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
@@ -8504,6 +8955,15 @@ msgstr "Visualizza l'anteprima del documento prima di inviarlo"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "Preview what the signed document will look like with placeholder data"
 msgstr "Visualizza come apparirà il documento firmato con i dati segnaposto"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
+msgid "Price (BRL)"
+msgstr ""
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+msgid "price (cents)"
+msgstr ""
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Primary"
@@ -8565,9 +9025,23 @@ msgstr "Profilo aggiornato"
 msgid "Progress"
 msgstr "Progresso"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Pronto para assinar com a CapivaSign?"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Pronto para integrar"
+msgstr ""
+
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
+#: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Provider"
 msgstr "Fornitore"
+
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
+msgid "Provider cannot be changed after creation."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Provider has been updated successfully"
@@ -8698,6 +9172,14 @@ msgstr "È richiesta una riautenticazione per firmare questo campo"
 msgid "Reauthorise and retry"
 msgstr "Autorizza nuovamente e riprova"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Receba com validade jurídica"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Recebeu um link para assinar? Você não precisa de conta."
+msgstr ""
+
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Receives copy"
 msgstr "Riceve copia"
@@ -8774,6 +9256,10 @@ msgid "Recipient ID:"
 msgstr "ID destinatario:"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient initiated ICP-Brasil signing"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient rejected the document"
 msgstr "Il destinatario ha rifiutato il documento"
 
@@ -8833,6 +9319,10 @@ msgstr "Il destinatario ha convalidato un token 2FA per il documento"
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient viewed the document"
 msgstr "Il destinatario ha visualizzato il documento"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient's ICP-Brasil signature was applied"
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient's remote signature was applied"
@@ -8897,6 +9387,10 @@ msgstr "Codice di recupero copiato"
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Recovery codes"
 msgstr "Codici di recupero"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Recuperação de arquivo"
+msgstr ""
 
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Red"
@@ -9021,6 +9515,10 @@ msgstr "Promemoria"
 #: packages/ui/primitives/document-flow/field-item.tsx
 msgid "Remove"
 msgstr "Rimuovi"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Remove certificate"
+msgstr ""
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
@@ -9221,6 +9719,10 @@ msgstr "Reimposta password"
 msgid "Reset the users two factor authentication. This action is irreversible and will disable two factor authentication for the user."
 msgstr "Reimposta l'autenticazione a due fattori dell'utente. Questa azione è irreversibile e disabiliterà l'autenticazione a due fattori per l'utente."
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "Reset to default"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/admin-user-reset-two-factor-dialog.tsx
 msgid "Reset Two Factor Authentication"
 msgstr "Reimposta autenticazione a due fattori"
@@ -9331,6 +9833,10 @@ msgstr "Destra"
 msgid "Ring"
 msgstr "Anello"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Rodapé"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
@@ -9365,6 +9871,7 @@ msgstr "Righe per pagina"
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Save"
 msgstr "Salva"
@@ -9378,7 +9885,12 @@ msgstr "Salva"
 msgid "Save as Template"
 msgstr "Salva come modello"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Save certificate"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-update-dialog.tsx
 msgid "Save changes"
 msgstr "Salva le modifiche"
 
@@ -9429,6 +9941,10 @@ msgstr "Cerca per dominio o nome dell’organizzazione"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Search by ID"
 msgstr "Cerca per ID"
+
+#: apps/remix/app/routes/_authenticated+/admin+/whatsapp-transports._index.tsx
+msgid "Search by name"
+msgstr ""
 
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 msgid "Search by name or email"
@@ -9498,6 +10014,10 @@ msgstr "Consulta la documentazione"
 msgid "See the background jobs tab for the status"
 msgstr "Consulta la scheda lavori in background per lo stato"
 
+#: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
+msgid "Selecione os arquivos para baixar. A cópia <0>Assinada</0> é o PDF certificado (PAdES) com o certificado digital embutido — os certificados ICP-Brasil dos signatários, ou o certificado padrão do sistema quando nenhuma assinatura usou certificado próprio."
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-dropdown-field.tsx
 #: packages/ui/primitives/document-flow/field-content.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
@@ -9524,6 +10044,10 @@ msgstr "Seleziona un piano per continuare"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Select a recipient"
 msgstr "Seleziona un destinatario"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "Select a team"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Select a team to view its dashboard"
@@ -9660,10 +10184,6 @@ msgstr "Seleziona i tipi di firme"
 msgid "Select text align"
 msgstr "Seleziona l'allineamento del testo"
 
-#: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
-msgid "Select the files you would like to download."
-msgstr "Seleziona i file che desideri scaricare."
-
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Select the members to add to this group"
 msgstr "Seleziona i membri da aggiungere a questo gruppo"
@@ -9713,6 +10233,7 @@ msgstr "Selettore"
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
@@ -9727,6 +10248,10 @@ msgstr "Invia un'email di prova utilizzando questo trasporto per verificare la c
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Send a test webhook with sample data to verify your integration is working correctly."
 msgstr "Invia un webhook di prova con dati di esempio per verificare che la tua integrazione funzioni correttamente."
+
+#: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
+msgid "Send a test WhatsApp message using this transport to verify the configuration."
+msgstr ""
 
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
 msgid "Send confirmation email"
@@ -9780,12 +10305,17 @@ msgid "Send Status"
 msgstr "Stato di invio"
 
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
+#: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
 msgid "Send test"
 msgstr "Invia test"
 
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
 msgid "Send Test Email"
 msgstr "Invia email di prova"
+
+#: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
+msgid "Send Test Message"
+msgstr ""
 
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
@@ -9839,6 +10369,10 @@ msgstr "Configura le proprietà del modello e le informazioni sui destinatari"
 #: packages/email/templates/admin-user-created.tsx
 msgid "Set your password for Documenso"
 msgstr "Imposta la tua password per Documenso"
+
+#: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
+msgid "Setting updated"
+msgstr ""
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
@@ -9958,8 +10492,8 @@ msgid "Sign Document"
 msgstr "Firma documento"
 
 #: apps/remix/app/routes/_recipient+/_layout.tsx
-msgid "Sign Document - Documenso"
-msgstr "Firma documento - Documenso"
+msgid "Sign Document - CapivaSign"
+msgstr ""
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
@@ -10117,6 +10651,9 @@ msgstr "Firma in corso"
 msgid "Signing algorithm is not supported"
 msgstr "L'algoritmo di firma non è supportato"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Signing Certificate"
@@ -10176,6 +10713,10 @@ msgstr "Promemoria di firma"
 msgid "Signing Status"
 msgstr "Stato della firma"
 
+#: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
+msgid "Signing Timestamp"
+msgstr ""
+
 #: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Signing Window Expired"
 msgstr "Finestra di firma scaduta"
@@ -10218,6 +10759,15 @@ msgstr "Impostazioni del sito"
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Skip"
 msgstr "Salta"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Solicite assinaturas por WhatsApp"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
+msgstr ""
 
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
@@ -10427,7 +10977,12 @@ msgstr "ID cliente di Stripe"
 msgid "Stuck For"
 msgstr "Bloccato da"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Suba o PDF e escolha os signatários."
+msgstr ""
+
 #: apps/remix/app/components/forms/support-ticket-form.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Subject"
 msgstr "Soggetto"
 
@@ -10632,6 +11187,7 @@ msgstr "Organizzazione di destinazione"
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 msgid "Team"
@@ -10876,6 +11432,7 @@ msgid "Template resent"
 msgstr "Modello reinviato"
 
 #: apps/remix/app/components/general/template/template-edit-form.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Template saved"
 msgstr "Modello salvato"
 
@@ -10933,8 +11490,13 @@ msgid "Test email sent."
 msgstr "Email di prova inviata."
 
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
 msgid "Test failed."
 msgstr "Test non riuscito."
+
+#: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
+msgid "Test message sent."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Test Webhook"
@@ -11338,6 +11900,10 @@ msgstr "Il link di firma è stato copiato negli appunti."
 #: apps/remix/app/components/general/document-signing/csc-recipient-signing-in-progress-page.tsx
 msgid "The signing provider did not respond in time. Please retry."
 msgstr "Il provider di firma non ha risposto in tempo. Riprova."
+
+#: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
+msgid "The signing timestamp setting has been updated."
+msgstr ""
 
 #: packages/email/templates/recipient-expired.tsx
 msgid "The signing window for \"{recipientName}\" on document \"{documentName}\" has expired."
@@ -11821,6 +12387,10 @@ msgstr "Titolo"
 msgid "Title cannot be empty"
 msgstr "Il titolo non può essere vuoto"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
+msgid "To"
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "To accept this invitation you must create an account."
 msgstr "Per accettare questo invito devi creare un account."
@@ -11974,6 +12544,7 @@ msgid "Toggle the switch to show your profile to the public."
 msgstr "Attiva l'interruttore per mostrare il tuo profilo al pubblico."
 
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
 msgid "Token"
 msgstr "Token"
 
@@ -12022,9 +12593,17 @@ msgstr "Troppe richieste"
 msgid "Top"
 msgstr "Superiore"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Topo"
+msgstr ""
+
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "Total"
 msgstr "Totale"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
+msgid "Total cost"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Total Documents"
@@ -12051,10 +12630,12 @@ msgid "Transfer documents to a different team"
 msgstr "Trasferisci i documenti a un altro team"
 
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-create-dialog.tsx
 msgid "Transport created."
 msgstr "Trasporto creato."
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-delete-dialog.tsx
 msgid "Transport deleted."
 msgstr "Trasporto eliminato."
 
@@ -12067,6 +12648,7 @@ msgid "Transport type cannot be changed after creation."
 msgstr "Il tipo di trasporto non può essere modificato dopo la creazione."
 
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
+#: apps/remix/app/components/dialogs/whatsapp-transport-update-dialog.tsx
 msgid "Transport updated."
 msgstr "Trasporto aggiornato."
 
@@ -12082,6 +12664,10 @@ msgstr "Trigger"
 #: apps/remix/app/components/general/document-signing/csc-recipient-blocked-page.tsx
 msgid "Try again"
 msgstr "Riprova"
+
+#: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
+msgid "Turn off if no timestamp authority is configured."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not retain your data for training."
@@ -12404,6 +12990,10 @@ msgstr "Aggiorna destinatario"
 msgid "Update role"
 msgstr "Aggiorna ruolo"
 
+#: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
+msgid "Update Setting"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Update Subscription Claim"
 msgstr "Aggiorna reclamo di sottoscrizione"
@@ -12442,6 +13032,11 @@ msgstr "Aggiorna il titolo o sostituisci il file PDF."
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Update user"
 msgstr "Aggiorna utente"
+
+#. placeholder {0}: i18n.date(current.updatedAt, DateTime.DATETIME_MED)
+#: apps/remix/app/routes/_authenticated+/admin+/signing-certificate.tsx
+msgid "Updated {0}"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 msgid "Updated {organisationMemberName} to {roleLabel}."
@@ -12580,10 +13175,20 @@ msgstr "Caricamento in corso"
 msgid "URL"
 msgstr "URL"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.usage.tsx
+msgid "Usage & Billing"
+msgstr ""
+
 #. placeholder {0}: selectedStat?.period || 'N/A'
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "Usage for period: {0}"
 msgstr "Utilizzo per il periodo: {0}"
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+#~ msgid "Usage pricing (cents, BRL)"
+#~ msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Use"
@@ -12613,6 +13218,7 @@ msgid "Use your passkey for authentication"
 msgstr "Usa la tua chiave di accesso per l'autenticazione"
 
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
+#: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
 msgid "Used by claims"
 msgstr "Utilizzato dai claim"
 
@@ -12684,6 +13290,10 @@ msgstr "Validazione"
 msgid "Validation failed"
 msgstr "Validazione fallita"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Valores por ação, em reais. Ações não listadas não são cobradas."
+msgstr ""
+
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
@@ -12704,6 +13314,10 @@ msgstr "Email di Verifica Inviata"
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Verification email sent successfully."
 msgstr "Email di verifica inviata con successo."
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+msgid "Verification mark"
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Verify & Complete"
@@ -12934,6 +13548,10 @@ msgstr "Visualizzazione in corso"
 msgid "Visibility"
 msgstr "Visibilità"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Você paga apenas pelo que usar. Veja o custo detalhado de cada ação cobrada — de webhooks a envios de mensagem."
+msgstr ""
+
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 msgid "Waiting"
 msgstr "In attesa"
@@ -12967,6 +13585,10 @@ msgstr "Vuoi il tuo profilo pubblico?"
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
 msgid "Warning, this email transport is currently being used by:"
 msgstr "Attenzione, questo trasporto email è attualmente utilizzato da:"
+
+#: apps/remix/app/components/dialogs/whatsapp-transport-delete-dialog.tsx
+msgid "Warning, this WhatsApp transport is currently being used by:"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -13022,6 +13644,10 @@ msgstr "Non siamo riusciti ad aggiornare l'organizzazione. Si prega di riprovare
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "We couldn't update the provider. Please try again."
 msgstr "Non siamo riusciti ad aggiornare il provider. Per favore riprova."
+
+#: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
+msgid "We couldn't update the signing timestamp setting. Please try again later."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "We encountered an error while attempting to delete this organisation. Please try again later."
@@ -13429,12 +14055,15 @@ msgstr "Bentornato! Ecco una panoramica del tuo account."
 msgid "Welcome to {organisationName}"
 msgstr "Benvenuto a {organisationName}"
 
+#: packages/email/template-components/template-confirmation-email.tsx
+msgid "Welcome to CapivaSign!"
+msgstr ""
+
 #: packages/lib/jobs/definitions/emails/send-admin-user-created-email.handler.ts
 msgid "Welcome to Documenso"
 msgstr "Benvenuto in Documenso"
 
 #: packages/email/template-components/template-admin-user-created.tsx
-#: packages/email/template-components/template-confirmation-email.tsx
 msgid "Welcome to Documenso!"
 msgstr "Benvenuto su Documenso!"
 
@@ -13449,6 +14078,23 @@ msgstr "Stavi provando a modificare questo documento invece?"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "What you can do with teams:"
 msgstr "Cosa puoi fare con i team:"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "WhatsApp · Signing request"
+msgstr ""
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+msgid "WhatsApp transport"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/whatsapp-transports._index.tsx
+msgid "WhatsApp Transports"
+msgstr ""
+
+#: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
+msgid "When enabled, signatures embed a trusted RFC 3161 timestamp (PAdES B-T per signer plus the archival B-LTA document timestamp). Disable it to sign with the certificate only (B-B) — useful when you don't have a timestamp authority. Affects documents signed after the change."
+msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -13497,6 +14143,14 @@ msgstr "Ritiro del consenso"
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Write a description to display on your public profile"
 msgstr "Scrivi una descrizione da mostrare sul tuo profilo pubblico"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "X (% da esquerda)"
+msgstr ""
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Y (% do topo)"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -14055,6 +14709,10 @@ msgid "You have verified your email address for <0>{0}</0>."
 msgstr "Hai verificato il tuo indirizzo email per <0>{0}</0>."
 
 #: packages/lib/utils/document-audit-logs.ts
+msgid "You initiated ICP-Brasil signing"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts
 msgid "You moved the document to team"
 msgstr "Hai spostato il documento al team"
 
@@ -14286,6 +14944,10 @@ msgstr "Ora ti verrà richiesto di inserire un codice dalla tua app di autentica
 msgid "You will receive an email copy of the signed document once everyone has signed."
 msgstr "Riceverai una copia del documento firmato via email non appena tutti avranno firmato."
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
+msgid "You won't be able to see it again."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "You're an admin. You can enable AI features for this team right away. Everyone on the team will see AI detection once enabled."
 msgstr "Sei un amministratore. Puoi abilitare subito le funzionalità di IA per questo team. Tutti i membri del team vedranno il rilevamento IA una volta abilitato."
@@ -14494,6 +15156,10 @@ msgstr "La tua busta è stata reinviata con successo."
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your existing tokens"
 msgstr "I tuoi token esistenti"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Your ICP-Brasil signature was applied"
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Your Name"
@@ -14716,4 +15382,3 @@ msgstr "Il tuo codice di verifica:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "tuo-dominio.com altro-dominio.com"
-

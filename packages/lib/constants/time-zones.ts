@@ -2,7 +2,8 @@ import { rawTimeZones, timeZonesNames } from '@vvo/tzdb';
 
 export const TIME_ZONE_DATA = rawTimeZones;
 
-export const DEFAULT_DOCUMENT_TIME_ZONE = 'Etc/UTC';
+// Brazilian default timezone (BRT, UTC-3).
+export const DEFAULT_DOCUMENT_TIME_ZONE = 'America/Sao_Paulo';
 
 export type TimeZone = {
   name: string;

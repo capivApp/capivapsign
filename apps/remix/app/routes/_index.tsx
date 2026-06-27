@@ -1,11 +1,25 @@
 import { extractCookieFromHeaders } from '@documenso/auth/server/lib/utils/cookies';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getPublicPricingClaims } from '@documenso/lib/server-only/subscription/get-public-pricing-claims';
 import { getTeams } from '@documenso/lib/server-only/team/get-teams';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { ZTeamUrlSchema } from '@documenso/trpc/server/team-router/schema';
 import { redirect } from 'react-router';
 
+import { LandingPage } from '~/components/general/landing-page';
+
 import type { Route } from './+types/_index';
+
+export function meta() {
+  return [
+    { title: 'CapivaSign — Assinatura digital com validade jurídica' },
+    {
+      name: 'description',
+      content:
+        'Assinatura eletrônica e ICP-Brasil com WhatsApp e API. Simples, rápida e com validade jurídica.',
+    },
+  ];
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getOptionalSession(request);
@@ -47,5 +61,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect(formatDocumentsPath(currentTeam.url));
   }
 
-  throw redirect('/signin');
+  // Unauthenticated visitors land on the public marketing page (no redirect).
+  // Public signing-by-link routes live under `_recipient+` and remain accessible
+  // without an account — unaffected by this.
+  const pricingClaims = await getPublicPricingClaims();
+
+  return { pricingClaims };
+}
+
+export default function IndexPage({ loaderData }: Route.ComponentProps) {
+  return <LandingPage pricingClaims={loaderData?.pricingClaims ?? []} />;
 }

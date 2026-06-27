@@ -13,6 +13,12 @@ export type WhatsappContext = {
   /** Sender display name surfaced to the message flow. */
   fromName: string;
   /**
+   * Which transport is in use, for conditional billing:
+   *  - `own`    → the organisation's own configured transport
+   *  - `capiva` → CapivaSign's default (env) transport
+   */
+  kind: 'own' | 'capiva';
+  /**
    * False when neither a per-plan transport nor the CapivaApp env default is
    * configured — the caller must skip sending instead of throwing.
    */
@@ -70,6 +76,7 @@ export const getWhatsappContext = async (
       organisationId: organisation.id,
       adapter: resolution.adapter,
       fromName: resolution.row.fromName,
+      kind: 'own',
       enabled: true,
     };
   }
@@ -80,6 +87,7 @@ export const getWhatsappContext = async (
     organisationId: organisation.id,
     adapter: fallback ?? noopAdapter,
     fromName: DEFAULT_FROM_NAME,
+    kind: 'capiva',
     enabled: fallback !== null,
   };
 };

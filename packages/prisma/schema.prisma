@@ -422,6 +422,23 @@ model MessageTemplate {
   @@index([organisationId])
 }
 
+/// System-wide default signing certificate for NON-ICP (PAdES local) signatures,
+/// uploaded by an admin. Both the .p12 bytes and the passphrase are stored
+/// ENCRYPTED at rest (symmetric, DOCUMENSO_ENCRYPTION_SECONDARY_KEY). Effectively
+/// a singleton: upload replaces any existing row; the loader takes the latest.
+model SigningCertificate {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fileName String
+
+  /// symmetricEncrypt() of the base64-encoded .p12/.pfx bytes.
+  encryptedData     String
+  /// symmetricEncrypt() of the passphrase (an encrypted empty string if none).
+  encryptedPassword String
+}
+
 model Account {
   id                String   @id @default(cuid())
   // When this record was created, unrelated to anything passed back by the provider.
@@ -1147,12 +1164,12 @@ model OrganisationGlobalSettings {
   organisation Organisation?
 
   documentVisibility        DocumentVisibility @default(EVERYONE)
-  documentLanguage          String             @default("en")
+  documentLanguage          String             @default("pt-BR")
   includeSenderDetails      Boolean            @default(true)
   includeSigningCertificate Boolean            @default(true)
   includeAuditLog           Boolean            @default(false)
-  documentTimezone          String? // Nullable to allow using local timezones if not set.
-  documentDateFormat        String             @default("yyyy-MM-dd hh:mm a")
+  documentTimezone          String?            @default("America/Sao_Paulo")
+  documentDateFormat        String             @default("dd/MM/yyyy HH:mm")
   delegateDocumentOwnership Boolean            @default(false)
 
   typedSignatureEnabled  Boolean @default(true)

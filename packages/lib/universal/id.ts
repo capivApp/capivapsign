@@ -27,6 +27,7 @@ type DatabaseIdPrefix =
   | 'org_monthly_stat'
   | 'usage_event'
   | 'message_template'
+  | 'signing_certificate'
   | 'org_claim'
   | 'org_group'
   | 'org_sso'

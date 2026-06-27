@@ -127,12 +127,16 @@ export default function OrganisationSettingsBrandingPage() {
     <div className="max-w-2xl">
       <SettingsHeader title={settingsHeaderText} subtitle={settingsHeaderSubtitle} />
 
-      {organisationWithSettings.organisationClaim.flags.allowCustomBranding || !IS_BILLING_ENABLED() ? (
+      {organisationWithSettings.organisationClaim.flags.allowCustomBranding ||
+      organisationWithSettings.organisationClaim.flags.whiteLabelBranding ||
+      !IS_BILLING_ENABLED() ? (
         <section>
           <BrandingPreferencesForm
             context="Organisation"
             hasAdvancedBranding={
-              organisationWithSettings.organisationClaim.flags.embedSigningWhiteLabel === true || !IS_BILLING_ENABLED()
+              organisationWithSettings.organisationClaim.flags.embedSigningWhiteLabel === true ||
+              organisationWithSettings.organisationClaim.flags.whiteLabelBranding === true ||
+              !IS_BILLING_ENABLED()
             }
             settings={organisationWithSettings.organisationGlobalSettings}
             onFormSubmit={onBrandingPreferencesFormSubmit}

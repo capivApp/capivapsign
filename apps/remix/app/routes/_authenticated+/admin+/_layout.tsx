@@ -10,6 +10,7 @@ import {
   BarChart3,
   Building2Icon,
   FileStack,
+  FileKeyIcon,
   LineChartIcon,
   MailIcon,
   MessageCircleIcon,
@@ -149,6 +150,17 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/whatsapp-transports">
               <MessageCircleIcon className="mr-2 h-5 w-5" />
               <Trans>WhatsApp Transports</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn('justify-start md:w-full', pathname?.startsWith('/admin/signing-certificate') && 'bg-secondary')}
+            asChild
+          >
+            <Link to="/admin/signing-certificate">
+              <FileKeyIcon className="mr-2 h-5 w-5" />
+              <Trans>Signing Certificate</Trans>
             </Link>
           </Button>
 

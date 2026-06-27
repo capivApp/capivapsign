@@ -52,7 +52,19 @@ export const ZClaimFlagsSchema = z.object({
   signingReminders: z.boolean().optional(),
 
   cscQesSigning: z.boolean().optional(),
-  
+
+  /**
+   * White-label branding with the customer's own brand (logo/colours) across
+   * signing pages, emails and certificates — gated to paid claims.
+   */
+  whiteLabelBranding: z.boolean().optional(),
+
+  /**
+   * Allows dragging to reposition the audit/verification mark on the document
+   * pages (custom X/Y). When off, only the preset positions are available.
+   */
+  draggableVerificationMark: z.boolean().optional(),
+
   /**
    * Controls whether an organisation is prevented from sending emails.
    *
@@ -71,26 +83,57 @@ export type TClaimFlags = z.infer<typeof ZClaimFlagsSchema>;
  *
  * README: keep in sync with `BillableEventType` and the metering instrumentation.
  */
+const ZCents = z.number().int().min(0).nullable().optional();
+const ZQuota = z.number().int().min(0).nullable().optional();
+
 export const ZClaimPricingSchema = z.object({
-  createDocumentCents: z.number().int().min(0).nullable().optional(),
-  recoverFileCents: z.number().int().min(0).nullable().optional(),
-  whatsappMessageCents: z.number().int().min(0).nullable().optional(),
-  webhookDeliveryCents: z.number().int().min(0).nullable().optional(),
-  emailMessageCents: z.number().int().min(0).nullable().optional(),
+  /** Fixed plan price charged every month, on top of metered usage. */
+  monthlyPriceCents: ZCents,
+
+  // Per-action unit prices (cents). Absent / null = not billed.
+  createDocumentCents: ZCents,
+  recoverFileCents: ZCents,
+  // WhatsApp is conditional on which transport sent the message:
+  //  - whatsappMessageCents     → CapivaSign's default transport (typically pricier)
+  //  - whatsappOwnMessageCents  → the organisation's own configured transport
+  whatsappMessageCents: ZCents,
+  whatsappOwnMessageCents: ZCents,
+  webhookDeliveryCents: ZCents,
+  emailMessageCents: ZCents,
+
+  // Free monthly allowance per action; usage up to the quota is not charged.
+  createDocumentFreeQuota: ZQuota,
+  recoverFileFreeQuota: ZQuota,
+  whatsappMessageFreeQuota: ZQuota,
+  webhookDeliveryFreeQuota: ZQuota,
+  emailMessageFreeQuota: ZQuota,
 });
 
 export type TClaimPricing = z.infer<typeof ZClaimPricingSchema>;
 
-/** UI metadata for the per-item pricing fields. */
+/**
+ * UI metadata for the per-item pricing fields, grouped for the admin claim form.
+ * `unitKey` = price field, `quotaKey` = free-allowance field.
+ */
 export const SUBSCRIPTION_CLAIM_PRICING_ITEMS: {
-  key: keyof TClaimPricing;
+  unitKey: keyof TClaimPricing;
+  quotaKey: keyof TClaimPricing;
   label: string;
+  /** Optional secondary price (WhatsApp via the org's own transport). */
+  altUnitKey?: keyof TClaimPricing;
+  altLabel?: string;
 }[] = [
-  { key: 'createDocumentCents', label: 'Create document' },
-  { key: 'recoverFileCents', label: 'Recover file (download)' },
-  { key: 'whatsappMessageCents', label: 'WhatsApp message' },
-  { key: 'webhookDeliveryCents', label: 'Webhook delivery' },
-  { key: 'emailMessageCents', label: 'Email message' },
+  { unitKey: 'createDocumentCents', quotaKey: 'createDocumentFreeQuota', label: 'Criar documento' },
+  { unitKey: 'recoverFileCents', quotaKey: 'recoverFileFreeQuota', label: 'Recuperar arquivo (download)' },
+  {
+    unitKey: 'whatsappMessageCents',
+    quotaKey: 'whatsappMessageFreeQuota',
+    label: 'WhatsApp (remetente CapivaSign)',
+    altUnitKey: 'whatsappOwnMessageCents',
+    altLabel: 'WhatsApp (remetente próprio)',
+  },
+  { unitKey: 'webhookDeliveryCents', quotaKey: 'webhookDeliveryFreeQuota', label: 'Entrega de webhook' },
+  { unitKey: 'emailMessageCents', quotaKey: 'emailMessageFreeQuota', label: 'Mensagem de e-mail' },
 ];
 
 // When adding keys, update internal documentation with this.
@@ -104,38 +147,46 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
 > = {
   unlimitedDocuments: {
     key: 'unlimitedDocuments',
-    label: 'Unlimited documents',
+    label: 'Documentos ilimitados',
   },
   allowCustomBranding: {
     key: 'allowCustomBranding',
-    label: 'Branding',
+    label: 'Marca personalizada',
   },
   hidePoweredBy: {
     key: 'hidePoweredBy',
-    label: 'Hide Documenso branding by',
+    label: 'Ocultar "Desenvolvido por"',
+  },
+  whiteLabelBranding: {
+    key: 'whiteLabelBranding',
+    label: 'White label (marca da empresa)',
+  },
+  draggableVerificationMark: {
+    key: 'draggableVerificationMark',
+    label: 'Marca de verificação arrastável (posição X/Y)',
   },
   emailDomains: {
     key: 'emailDomains',
-    label: 'Email domains',
+    label: 'Domínios de e-mail',
     isEnterprise: true,
   },
   embedAuthoring: {
     key: 'embedAuthoring',
-    label: 'Embed authoring',
+    label: 'Edição incorporada (embed)',
     isEnterprise: true,
   },
   embedSigning: {
     key: 'embedSigning',
-    label: 'Embed signing',
+    label: 'Assinatura incorporada (embed)',
   },
   embedAuthoringWhiteLabel: {
     key: 'embedAuthoringWhiteLabel',
-    label: 'White label for embed authoring',
+    label: 'White label para edição incorporada',
     isEnterprise: true,
   },
   embedSigningWhiteLabel: {
     key: 'embedSigningWhiteLabel',
-    label: 'White label for embed signing',
+    label: 'White label para assinatura incorporada',
   },
   cfr21: {
     key: 'cfr21',
@@ -149,25 +200,25 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   },
   authenticationPortal: {
     key: 'authenticationPortal',
-    label: 'Authentication portal',
+    label: 'Portal de autenticação',
     isEnterprise: true,
   },
   allowLegacyEnvelopes: {
     key: 'allowLegacyEnvelopes',
-    label: 'Allow Legacy Envelopes',
+    label: 'Permitir envelopes legados',
   },
   signingReminders: {
     key: 'signingReminders',
-    label: 'Signing reminders',
+    label: 'Lembretes de assinatura',
   },
   cscQesSigning: {
     key: 'cscQesSigning',
-    label: 'QES signing',
+    label: 'Assinatura QES',
     isEnterprise: true,
   },
   disableEmails: {
     key: 'disableEmails',
-    label: 'Disable emails',
+    label: 'Desativar e-mails',
   },
 };
 

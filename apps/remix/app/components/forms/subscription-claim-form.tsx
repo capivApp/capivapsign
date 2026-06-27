@@ -1,5 +1,9 @@
 import type { TLicenseClaim } from '@documenso/lib/types/license';
-import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS, SUBSCRIPTION_CLAIM_PRICING_ITEMS } from '@documenso/lib/types/subscription';
+import {
+  SUBSCRIPTION_CLAIM_FEATURE_FLAGS,
+  SUBSCRIPTION_CLAIM_PRICING_ITEMS,
+  type TClaimPricing,
+} from '@documenso/lib/types/subscription';
 import { trpc } from '@documenso/trpc/react';
 import { ZCreateSubscriptionClaimRequestSchema } from '@documenso/trpc/server/admin-router/create-subscription-claim.types';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -319,21 +323,58 @@ export const SubscriptionClaimForm = ({
 
           <div className="space-y-2">
             <FormLabel>
-              <Trans>Usage pricing (cents, BRL)</Trans>
+              <Trans>Plan & usage pricing (cents, BRL)</Trans>
             </FormLabel>
             <FormDescription>
-              <Trans>Charged per action only when used via the API. Leave blank for free.</Trans>
+              <Trans>
+                Monthly price is charged every month. Per-action prices are billed only for API usage
+                beyond the free quota. Leave blank for free.
+              </Trans>
             </FormDescription>
 
-            <div className="grid grid-cols-2 gap-4">
-              {SUBSCRIPTION_CLAIM_PRICING_ITEMS.map((item) => (
+            <FormField
+              control={form.control}
+              name="pricing.monthlyPriceCents"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    <Trans>Monthly plan price (cents)</Trans>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      {...field}
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.valueAsNumber)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-3 gap-4">
+              {SUBSCRIPTION_CLAIM_PRICING_ITEMS.flatMap((item) => {
+                const fields: { key: keyof TClaimPricing; label: string }[] = [
+                  { key: item.unitKey, label: `${item.label} — ${t`price (cents)`}` },
+                ];
+
+                if (item.altUnitKey && item.altLabel) {
+                  fields.push({ key: item.altUnitKey, label: `${item.altLabel} — ${t`price (cents)`}` });
+                }
+
+                fields.push({ key: item.quotaKey, label: `${item.label} — ${t`free/month`}` });
+
+                return fields;
+              }).map((entry) => (
                 <FormField
-                  key={item.key}
+                  key={entry.key}
                   control={form.control}
-                  name={`pricing.${item.key}`}
+                  name={`pricing.${entry.key}`}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{item.label}</FormLabel>
+                      <FormLabel className="text-xs">{entry.label}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"

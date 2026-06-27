@@ -21,6 +21,11 @@ import { deleteWhatsappTransportRoute } from './whatsapp-transport/delete-whatsa
 import { findWhatsappTransportsRoute } from './whatsapp-transport/find-whatsapp-transports';
 import { sendTestWhatsappTransportRoute } from './whatsapp-transport/send-test-whatsapp-transport';
 import { updateWhatsappTransportRoute } from './whatsapp-transport/update-whatsapp-transport';
+import {
+  deleteSigningCertificateRoute,
+  getSigningCertificateRoute,
+  uploadSigningCertificateRoute,
+} from './signing-certificate';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
@@ -123,6 +128,11 @@ export const adminRouter = router({
     update: updateWhatsappTransportRoute,
     delete: deleteWhatsappTransportRoute,
     sendTest: sendTestWhatsappTransportRoute,
+  },
+  signingCertificate: {
+    get: getSigningCertificateRoute,
+    upload: uploadSigningCertificateRoute,
+    delete: deleteSigningCertificateRoute,
   },
   team: {
     get: getAdminTeamRoute,

@@ -122,13 +122,15 @@ export const run = async ({
       providerMessageId: result.providerMessageId,
     });
 
-    // Bill the message only when the send originated from the API.
+    // Bill the message only when the send originated from the API. Price depends
+    // on which transport sent it (own vs CapivaSign default).
     await recordUsage({
       type: BillableEventType.WHATSAPP_MESSAGE,
       source: source ?? 'app',
       organisationId: whatsapp.organisationId,
       teamId: envelope.teamId,
-      metadata: { envelopeId: envelope.id, recipientId: recipient.id },
+      whatsappTransport: whatsapp.kind,
+      metadata: { envelopeId: envelope.id, recipientId: recipient.id, transport: whatsapp.kind },
     });
   });
 

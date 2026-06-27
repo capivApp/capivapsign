@@ -2,10 +2,11 @@ import { DateTime } from 'luxon';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from './time-zones';
 
-export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd hh:mm a';
+// Brazilian default: day/month/year, 24h.
+export const DEFAULT_DOCUMENT_DATE_FORMAT = 'dd/MM/yyyy HH:mm';
 
 export const VALID_DATE_FORMAT_VALUES = [
-  DEFAULT_DOCUMENT_DATE_FORMAT,
+  'yyyy-MM-dd hh:mm a',
   'yyyy-MM-dd',
   'dd/MM/yyyy',
   'dd-MM-yyyy',
@@ -38,7 +39,7 @@ export const DATE_FORMATS = [
   {
     key: 'yyyy-MM-dd_HH:mm_12H',
     label: 'YYYY-MM-DD hh:mm AM/PM',
-    value: DEFAULT_DOCUMENT_DATE_FORMAT,
+    value: 'yyyy-MM-dd hh:mm a',
   },
   {
     key: 'yyyy-MM-dd_HH:mm',
