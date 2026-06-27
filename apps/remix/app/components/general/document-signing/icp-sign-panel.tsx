@@ -1,9 +1,9 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { FileSignatureIcon, Loader2Icon, RefreshCwIcon } from 'lucide-react';
-import { useState } from 'react';
-import { useParams } from 'react-router';
+import { DownloadIcon, FileSignatureIcon, Loader2Icon, RefreshCwIcon } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router';
 
 /**
  * ICP-Brasil signing panel shown on the signing screen for `signatureLevel ===
@@ -33,6 +33,31 @@ export const IcpSignPanel = () => {
 
   const [status, setStatus] = useState<'idle' | 'working' | 'error'>('idle');
   const [message, setMessage] = useState('');
+
+  // Whether the local agent answers on :3231. null = still checking.
+  const [agentOnline, setAgentOnline] = useState<boolean | null>(null);
+
+  const pingAgent = useCallback(async () => {
+    setAgentOnline(null);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 1500);
+
+    try {
+      const res = await fetch(`${LOCAL_AGENT_URL}/ping`, { signal: controller.signal });
+      setAgentOnline(res.ok);
+    } catch {
+      setAgentOnline(false);
+    } finally {
+      clearTimeout(timeout);
+    }
+  }, []);
+
+  // Probe the agent on mount so we can tell the user to download it BEFORE they
+  // try to sign (and fail).
+  useEffect(() => {
+    void pingAgent();
+  }, [pingAgent]);
 
   const buildDeepLink = (source: SignSource) =>
     `documenso-icp://sign?baseUrl=${encodeURIComponent(baseUrl)}` +
@@ -87,6 +112,35 @@ export const IcpSignPanel = () => {
         </Trans>
       </p>
 
+      {agentOnline === false && (
+        <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/10 p-3">
+          <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
+            <Trans>Não detectamos o assinador na sua máquina.</Trans>
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            <Trans>Baixe e instale o programa para conseguir assinar com o seu certificado.</Trans>
+          </p>
+          <div className="mt-2 flex gap-2">
+            <Button type="button" size="sm" asChild>
+              <Link to="/signer" target="_blank" rel="noopener">
+                <DownloadIcon className="mr-2 h-3.5 w-3.5" />
+                <Trans>Baixar o assinador</Trans>
+              </Link>
+            </Button>
+            <Button type="button" size="sm" variant="outline" onClick={() => void pingAgent()}>
+              <RefreshCwIcon className="mr-2 h-3.5 w-3.5" />
+              <Trans>Verificar novamente</Trans>
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {agentOnline === true && (
+        <p className="mt-3 text-xs text-emerald-600 dark:text-emerald-400">
+          <Trans>Assinador detectado na sua máquina.</Trans>
+        </p>
+      )}
+
       <div className="mt-4 flex flex-col gap-2">
         <Button
           type="button"
@@ -120,6 +174,16 @@ export const IcpSignPanel = () => {
         </Trans>
         <span className="text-muted-foreground/70">{t`Origem: ${baseUrl}`}</span>
       </p>
+
+      <Link
+        to="/signer"
+        target="_blank"
+        rel="noopener"
+        className="mt-2 inline-flex items-center gap-1 text-primary text-xs underline"
+      >
+        <DownloadIcon className="h-3 w-3" />
+        <Trans>Baixar o assinador CapivaSign</Trans>
+      </Link>
     </div>
   );
 };

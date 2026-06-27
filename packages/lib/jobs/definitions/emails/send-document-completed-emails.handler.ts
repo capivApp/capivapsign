@@ -17,6 +17,7 @@ import { isRecipientEmailValidForSending } from '../../../utils/recipients';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../../utils/teams';
+import { sendWhatsappNotification } from '../../../server-only/whatsapp/send-whatsapp-notification';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendDocumentCompletedEmailsJobDefinition } from './send-document-completed-emails';
 
@@ -251,6 +252,21 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
         html,
         text,
         attachments: completedDocumentEmailAttachments,
+      });
+
+      // WhatsApp parity: also notify the recipient on WhatsApp when they have a
+      // phone (uses the org/admin template for DOCUMENT_COMPLETED, or a default).
+      await sendWhatsappNotification({
+        teamId: envelope.teamId,
+        event: 'DOCUMENT_COMPLETED',
+        to: recipient.phone,
+        vars: {
+          'signer.name': recipient.name,
+          'signer.email': recipient.email,
+          'document.name': envelope.title,
+          link: downloadLink,
+        },
+        fallbackBody: `Documento "${envelope.title}" concluído. Acesse: ${downloadLink}`,
       });
 
       await prisma.documentAuditLog.create({

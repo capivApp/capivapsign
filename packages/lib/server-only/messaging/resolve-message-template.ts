@@ -19,7 +19,8 @@ export const resolveMessageTemplate = async (options: {
   channel: MessageTemplateChannel;
   event: MessageTemplateEvent;
 }): Promise<ResolvedMessageTemplate | null> => {
-  const row = await prisma.messageTemplate
+  // 1) Organisation's own template (white-label).
+  const orgRow = await prisma.messageTemplate
     .findUnique({
       where: {
         organisationId_channel_event: {
@@ -31,9 +32,23 @@ export const resolveMessageTemplate = async (options: {
     })
     .catch(() => null);
 
-  if (!row) {
-    return null;
+  if (orgRow) {
+    return { subject: orgRow.subject, body: orgRow.body };
   }
 
-  return { subject: row.subject, body: row.body };
+  // 2) Admin-managed system default.
+  const defaultRow = await prisma.defaultMessageTemplate
+    .findUnique({
+      where: {
+        channel_event: { channel: options.channel, event: options.event },
+      },
+    })
+    .catch(() => null);
+
+  if (defaultRow) {
+    return { subject: defaultRow.subject, body: defaultRow.body };
+  }
+
+  // 3) Built-in code default (caller's existing copy).
+  return null;
 };

@@ -163,11 +163,13 @@ export default function SettingsLayout() {
             'col-span-12 mb-8 flex flex-wrap items-center justify-start gap-x-2 gap-y-4 md:col-span-3 md:w-full md:flex-col md:items-start md:gap-y-2',
           )}
         >
-          {organisationSettingRoutes.map((route) => (
+          {organisationSettingRoutes.map((route, index) => (
             <NavLink
               to={route.path}
               className={cn('group w-full justify-start', route.isSubNav && 'pl-8')}
-              key={route.path}
+              // path is not unique (e.g. Preferences + Document share /document),
+              // so include the label/index to keep React keys unique.
+              key={`${route.path}-${route.label ?? index}`}
             >
               <Button
                 variant="ghost"

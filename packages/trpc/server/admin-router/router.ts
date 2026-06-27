@@ -27,6 +27,17 @@ import {
   uploadSigningCertificateRoute,
 } from './signing-certificate';
 import { chargeOrganisationMonthRoute } from './charge-organisation-month';
+import {
+  deleteDefaultMessageTemplateRoute,
+  findDefaultMessageTemplatesRoute,
+  upsertDefaultMessageTemplateRoute,
+} from './default-message-template';
+import {
+  createSignerReleaseRoute,
+  createSignerReleaseUploadUrlRoute,
+  deleteSignerReleaseRoute,
+  findSignerReleasesRoute,
+} from './signer-release';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
@@ -137,6 +148,17 @@ export const adminRouter = router({
   },
   billing: {
     chargeOrganisationMonth: chargeOrganisationMonthRoute,
+  },
+  defaultMessageTemplate: {
+    find: findDefaultMessageTemplatesRoute,
+    upsert: upsertDefaultMessageTemplateRoute,
+    delete: deleteDefaultMessageTemplateRoute,
+  },
+  signerRelease: {
+    find: findSignerReleasesRoute,
+    createUploadUrl: createSignerReleaseUploadUrlRoute,
+    create: createSignerReleaseRoute,
+    delete: deleteSignerReleaseRoute,
   },
   team: {
     get: getAdminTeamRoute,

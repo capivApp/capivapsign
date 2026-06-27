@@ -2227,6 +2227,14 @@ msgstr "Are you sure?"
 msgid "Assigned Teams"
 msgstr "Assigned Teams"
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Assinador detectado na sua máquina."
+msgstr "Assinador detectado na sua máquina."
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Assinador ICP-Brasil"
+msgstr "Assinador ICP-Brasil"
+
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Assinatura com validade jurídica"
 msgstr "Assinatura com validade jurídica"
@@ -2425,6 +2433,30 @@ msgstr "Backup Code"
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
 msgid "Backup codes"
 msgstr "Backup codes"
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Baixar"
+msgstr "Baixar"
+
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Baixar o assinador"
+msgstr "Baixar o assinador"
+
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Baixar o assinador CapivaSign"
+msgstr "Baixar o assinador CapivaSign"
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Baixe e instale o assinador para o seu sistema."
+msgstr "Baixe e instale o assinador para o seu sistema."
+
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Baixe e instale o programa para conseguir assinar com o seu certificado."
+msgstr "Baixe e instale o programa para conseguir assinar com o seu certificado."
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Baixe o assinador CapivaSign"
+msgstr "Baixe o assinador CapivaSign"
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Banner Updated"
@@ -2949,6 +2981,10 @@ msgstr "Claim account"
 msgid "Claims"
 msgstr "Claims"
 
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
+msgid "Clear"
+msgstr "Clear"
+
 #: packages/ui/primitives/data-table.tsx
 msgid "Clear filters"
 msgstr "Clear filters"
@@ -3059,6 +3095,10 @@ msgstr "Communication"
 msgid "Como funciona"
 msgstr "Como funciona"
 
+#: apps/remix/app/routes/signer.tsx
+msgid "Como usar"
+msgstr "Como usar"
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Compare all plans and features in detail"
 msgstr "Compare all plans and features in detail"
@@ -3120,6 +3160,10 @@ msgstr "Completed on {formattedDate}"
 #: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
 msgid "Conectando ao agente local…"
 msgstr "Conectando ao agente local…"
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Conecte o seu token A3 ou tenha o seu certificado A1 (.p12) em mãos."
+msgstr "Conecte o seu token A3 ou tenha o seu certificado A1 (.p12) em mãos."
 
 #: packages/lib/constants/pdf-viewer-i18n.ts
 #: packages/lib/constants/pdf-viewer-i18n.ts
@@ -3798,6 +3842,10 @@ msgstr "Custom duration"
 msgid "Custom interval"
 msgstr "Custom interval"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "Custom message templates are available on white-label plans."
+msgstr "Custom message templates are available on white-label plans."
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
 msgstr "Custom Organisation Groups"
@@ -3807,8 +3855,12 @@ msgid "Customise the colours used on your signing pages."
 msgstr "Customise the colours used on your signing pages."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
-msgid "Customise the signing-request message for email and WhatsApp. Empty falls back to the CapivaApp default."
-msgstr "Customise the signing-request message for email and WhatsApp. Empty falls back to the CapivaApp default."
+msgid "Customise the email and WhatsApp messages for each notification. Empty falls back to the system default."
+msgstr "Customise the email and WhatsApp messages for each notification. Empty falls back to the system default."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+#~ msgid "Customise the signing-request message for email and WhatsApp. Empty falls back to the CapivaApp default."
+#~ msgstr "Customise the signing-request message for email and WhatsApp. Empty falls back to the CapivaApp default."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Danger Zone"
@@ -3911,6 +3963,10 @@ msgstr "Default Envelope Expiration"
 msgid "Default file"
 msgstr "Default file"
 
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
+msgid "Default Message Templates"
+msgstr "Default Message Templates"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Default Organisation Role for New Users"
 msgstr "Default Organisation Role for New Users"
@@ -3996,6 +4052,7 @@ msgstr "delete"
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
@@ -4888,6 +4945,7 @@ msgstr "Don't transfer (Delete all documents)"
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Download"
@@ -5149,8 +5207,8 @@ msgid "Email"
 msgstr "Email"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
-msgid "Email · Signing request"
-msgstr "Email · Signing request"
+#~ msgid "Email · Signing request"
+#~ msgstr "Email · Signing request"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
@@ -5931,6 +5989,7 @@ msgstr "Failed to save certificate"
 msgid "Failed to save settings."
 msgstr "Failed to save settings."
 
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Failed to save template"
 msgstr "Failed to save template"
@@ -6733,6 +6792,10 @@ msgstr "Initials Settings"
 msgid "Inserted"
 msgstr "Inserted"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Installer file"
+msgstr "Installer file"
+
 #: apps/remix/app/components/forms/whatsapp-transport-form.tsx
 msgid "Instance ID"
 msgstr "Instance ID"
@@ -7489,6 +7552,7 @@ msgid "Mensagem por WhatsApp"
 msgstr "Mensagem por WhatsApp"
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Message"
 msgstr "Message"
@@ -7501,6 +7565,7 @@ msgstr "Message"
 msgid "Message <0>(Optional)</0>"
 msgstr "Message <0>(Optional)</0>"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
@@ -7686,6 +7751,10 @@ msgstr "Name is required"
 msgid "Name Settings"
 msgstr "Name Settings"
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Não detectamos o assinador na sua máquina."
+msgstr "Não detectamos o assinador na sua máquina."
+
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Need to sign documents?"
 msgstr "Need to sign documents?"
@@ -7701,6 +7770,10 @@ msgstr "Needs to sign"
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Needs to view"
 msgstr "Needs to view"
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Nenhum download disponível no momento."
+msgstr "Nenhum download disponível no momento."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Nenhuma"
@@ -7905,6 +7978,10 @@ msgstr "No recipients were detected in your document."
 msgid "No recipients with this role"
 msgstr "No recipients with this role"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "No releases yet."
+msgstr "No releases yet."
+
 #: packages/ui/components/document/reminder-settings-picker.tsx
 msgid "No reminders"
 msgstr "No reminders"
@@ -8053,6 +8130,10 @@ msgstr "Number Settings"
 #: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
 msgid "O agente CapivaSign precisa estar em execução (porta 3231) ou com o protocolo documenso-icp:// registrado. Sua chave privada nunca sai da sua máquina."
 msgstr "O agente CapivaSign precisa estar em execução (porta 3231) ou com o protocolo documenso-icp:// registrado. Sua chave privada nunca sai da sua máquina."
+
+#: apps/remix/app/routes/signer.tsx
+msgid "O assinador roda na sua máquina e usa o seu certificado digital ICP-Brasil (A1 ou A3) para assinar com validade jurídica. Sua chave privada nunca sai do seu computador."
+msgstr "O assinador roda na sua máquina e usa o seu certificado digital ICP-Brasil (A1 ou A3) para assinar com validade jurídica. Sua chave privada nunca sai do seu computador."
 
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "O documento é selado e auditável, com trilha completa de evidências."
@@ -8663,6 +8744,7 @@ msgstr "Place and configure form fields in the document"
 msgid "Placeholder"
 msgstr "Placeholder"
 
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Placeholders:"
 msgstr "Placeholders:"
@@ -8682,6 +8764,10 @@ msgstr "Plans without a transport fall back to the CapivaApp default WhatsApp se
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Plans without a transport use the system default mailer."
 msgstr "Plans without a transport use the system default mailer."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Platform"
+msgstr "Platform"
 
 #. placeholder {0}: _(actionVerb).toLowerCase()
 #: packages/email/template-components/template-document-invite.tsx
@@ -9478,6 +9564,10 @@ msgstr "Rejection Confirmed"
 msgid "Rejection reason: {reason}"
 msgstr "Rejection reason: {reason}"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Release uploaded"
+msgstr "Release uploaded"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: apps/remix/app/components/tables/admin-document-jobs-table.tsx
 msgid "Reload"
@@ -9903,6 +9993,7 @@ msgstr "Rows per page"
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Save"
@@ -10669,6 +10760,12 @@ msgstr "Signer"
 msgid "Signer Events"
 msgstr "Signer Events"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Signer Releases"
+msgstr "Signer Releases"
+
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role plural name"
 msgid "Signers"
@@ -11014,6 +11111,7 @@ msgid "Suba o PDF e escolha os signatários."
 msgstr "Suba o PDF e escolha os signatários."
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Subject"
 msgstr "Subject"
@@ -11210,6 +11308,10 @@ msgstr "System Requirements"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "System Theme"
 msgstr "System Theme"
+
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
+msgid "System-wide default email and WhatsApp messages. Organisations without their own template fall back to these."
+msgstr "System-wide default email and WhatsApp messages. Organisations without their own template fall back to these."
 
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 msgid "Target Organisation"
@@ -11464,6 +11566,7 @@ msgid "Template resent"
 msgstr "Template resent"
 
 #: apps/remix/app/components/general/template/template-edit-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Template saved"
 msgstr "Template saved"
@@ -13105,6 +13208,7 @@ msgid "Upgrade your plan to upload more documents"
 msgstr "Upgrade your plan to upload more documents"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
 msgid "Upload"
 msgstr "Upload"
 
@@ -13156,6 +13260,7 @@ msgstr "Upload documents and add recipients"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
 msgid "Upload failed"
 msgstr "Upload failed"
 
@@ -13175,6 +13280,10 @@ msgstr "Upload Template"
 #: packages/ui/primitives/document-dropzone.tsx
 msgid "Upload Template Document"
 msgstr "Upload Template Document"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Upload the CapivaSign Java signer builds. Users download these from the public download page and the signing page. Requires S3 storage."
+msgstr "Upload the CapivaSign Java signer builds. Users download these from the public download page and the signing page. Requires S3 storage."
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Upload your brand logo (max 5MB, JPG, PNG, or WebP)"
@@ -13196,6 +13305,10 @@ msgstr "Uploaded file is too small"
 #: apps/remix/app/components/forms/avatar-image.tsx
 msgid "Uploaded file not an allowed file type"
 msgstr "Uploaded file not an allowed file type"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Uploaded releases"
+msgstr "Uploaded releases"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
@@ -13339,6 +13452,10 @@ msgstr "Valores por ação, em reais. Ações não listadas não são cobradas."
 msgid "Value"
 msgstr "Value"
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Verificar novamente"
+msgstr "Verificar novamente"
+
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "Verification Code Required"
 msgstr "Verification Code Required"
@@ -13387,6 +13504,10 @@ msgstr "Verify your email to upload documents."
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Verify your team email address"
 msgstr "Verify your team email address"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Version"
+msgstr "Version"
 
 #: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-radio-form.tsx
@@ -13587,6 +13708,10 @@ msgstr "Visibility"
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Você paga apenas pelo que usar. Veja o custo detalhado de cada ação cobrada — de webhooks a envios de mensagem."
 msgstr "Você paga apenas pelo que usar. Veja o custo detalhado de cada ação cobrada — de webhooks a envios de mensagem."
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Volte para a página de assinatura e clique em assinar com ICP-Brasil."
+msgstr "Volte para a página de assinatura e clique em assinar com ICP-Brasil."
 
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 msgid "Waiting"
@@ -14116,8 +14241,8 @@ msgid "What you can do with teams:"
 msgstr "What you can do with teams:"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
-msgid "WhatsApp · Signing request"
-msgstr "WhatsApp · Signing request"
+#~ msgid "WhatsApp · Signing request"
+#~ msgstr "WhatsApp · Signing request"
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "WhatsApp transport"
@@ -14162,6 +14287,10 @@ msgstr "Whether to enable the SSO portal for your organisation"
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
 msgstr "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "White-label required"
+msgstr "White-label required"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Whitelabeling, unlimited members and more"

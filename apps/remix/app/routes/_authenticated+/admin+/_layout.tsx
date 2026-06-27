@@ -10,10 +10,12 @@ import {
   BarChart3,
   Building2Icon,
   FileStack,
+  DownloadIcon,
   FileKeyIcon,
   LineChartIcon,
   MailIcon,
   MessageCircleIcon,
+  MessageSquareIcon,
   Settings,
   Trophy,
   Users,
@@ -161,6 +163,28 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/signing-certificate">
               <FileKeyIcon className="mr-2 h-5 w-5" />
               <Trans>Signing Certificate</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn('justify-start md:w-full', pathname?.startsWith('/admin/message-templates') && 'bg-secondary')}
+            asChild
+          >
+            <Link to="/admin/message-templates">
+              <MessageSquareIcon className="mr-2 h-5 w-5" />
+              <Trans>Message Templates</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn('justify-start md:w-full', pathname?.startsWith('/admin/signer-releases') && 'bg-secondary')}
+            asChild
+          >
+            <Link to="/admin/signer-releases">
+              <DownloadIcon className="mr-2 h-5 w-5" />
+              <Trans>Signer Releases</Trans>
             </Link>
           </Button>
 

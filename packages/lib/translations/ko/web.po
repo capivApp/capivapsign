@@ -2232,6 +2232,14 @@ msgstr "정말 진행하시겠습니까?"
 msgid "Assigned Teams"
 msgstr "할당된 팀"
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Assinador detectado na sua máquina."
+msgstr ""
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Assinador ICP-Brasil"
+msgstr ""
+
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Assinatura com validade jurídica"
 msgstr ""
@@ -2430,6 +2438,30 @@ msgstr "백업 코드"
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
 msgid "Backup codes"
 msgstr "백업 코드"
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Baixar"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Baixar o assinador"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Baixar o assinador CapivaSign"
+msgstr ""
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Baixe e instale o assinador para o seu sistema."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Baixe e instale o programa para conseguir assinar com o seu certificado."
+msgstr ""
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Baixe o assinador CapivaSign"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Banner Updated"
@@ -2954,6 +2986,10 @@ msgstr "계정 청구"
 msgid "Claims"
 msgstr "클레임"
 
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
+msgid "Clear"
+msgstr ""
+
 #: packages/ui/primitives/data-table.tsx
 msgid "Clear filters"
 msgstr "필터 지우기"
@@ -3064,6 +3100,10 @@ msgstr "커뮤니케이션"
 msgid "Como funciona"
 msgstr ""
 
+#: apps/remix/app/routes/signer.tsx
+msgid "Como usar"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Compare all plans and features in detail"
 msgstr "모든 요금제와 기능을 자세히 비교합니다."
@@ -3124,6 +3164,10 @@ msgstr "{formattedDate}에 완료됨"
 
 #: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
 msgid "Conectando ao agente local…"
+msgstr ""
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Conecte o seu token A3 ou tenha o seu certificado A1 (.p12) em mãos."
 msgstr ""
 
 #: packages/lib/constants/pdf-viewer-i18n.ts
@@ -3803,6 +3847,10 @@ msgstr "사용자 지정 기간"
 msgid "Custom interval"
 msgstr "사용자 지정 간격"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "Custom message templates are available on white-label plans."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
 msgstr "사용자 지정 조직 그룹"
@@ -3812,8 +3860,12 @@ msgid "Customise the colours used on your signing pages."
 msgstr "서명 페이지에서 사용되는 색상을 사용자 지정하세요."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
-msgid "Customise the signing-request message for email and WhatsApp. Empty falls back to the CapivaApp default."
+msgid "Customise the email and WhatsApp messages for each notification. Empty falls back to the system default."
 msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+#~ msgid "Customise the signing-request message for email and WhatsApp. Empty falls back to the CapivaApp default."
+#~ msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Danger Zone"
@@ -3916,6 +3968,10 @@ msgstr "기본 봉투 만료 기간"
 msgid "Default file"
 msgstr "기본 파일"
 
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
+msgid "Default Message Templates"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Default Organisation Role for New Users"
 msgstr "새 사용자 기본 조직 역할"
@@ -4001,6 +4057,7 @@ msgstr "delete"
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.api-keys.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
@@ -4893,6 +4950,7 @@ msgstr "전송하지 않음(모든 문서 삭제)"
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Download"
@@ -5154,8 +5212,8 @@ msgid "Email"
 msgstr "이메일"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
-msgid "Email · Signing request"
-msgstr ""
+#~ msgid "Email · Signing request"
+#~ msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
@@ -5936,6 +5994,7 @@ msgstr ""
 msgid "Failed to save settings."
 msgstr "설정을 저장하지 못했습니다."
 
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Failed to save template"
 msgstr ""
@@ -6738,6 +6797,10 @@ msgstr "이니셜 설정"
 msgid "Inserted"
 msgstr "삽입됨"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Installer file"
+msgstr ""
+
 #: apps/remix/app/components/forms/whatsapp-transport-form.tsx
 msgid "Instance ID"
 msgstr ""
@@ -7494,6 +7557,7 @@ msgid "Mensagem por WhatsApp"
 msgstr ""
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Message"
 msgstr "메시지"
@@ -7506,6 +7570,7 @@ msgstr "메시지"
 msgid "Message <0>(Optional)</0>"
 msgstr "메시지 <0>(선택 사항)</0>"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
@@ -7691,6 +7756,10 @@ msgstr "이름은 필수 항목입니다."
 msgid "Name Settings"
 msgstr "이름 설정"
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Não detectamos o assinador na sua máquina."
+msgstr ""
+
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Need to sign documents?"
 msgstr "문서에 서명이 필요하신가요?"
@@ -7706,6 +7775,10 @@ msgstr "서명 필요"
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Needs to view"
 msgstr "열람 필요"
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Nenhum download disponível no momento."
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Nenhuma"
@@ -7910,6 +7983,10 @@ msgstr "문서에서 감지된 수신자가 없습니다."
 msgid "No recipients with this role"
 msgstr "이 역할의 수신자가 없습니다."
 
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "No releases yet."
+msgstr ""
+
 #: packages/ui/components/document/reminder-settings-picker.tsx
 msgid "No reminders"
 msgstr "알림 없음"
@@ -8057,6 +8134,10 @@ msgstr "숫자 설정"
 
 #: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
 msgid "O agente CapivaSign precisa estar em execução (porta 3231) ou com o protocolo documenso-icp:// registrado. Sua chave privada nunca sai da sua máquina."
+msgstr ""
+
+#: apps/remix/app/routes/signer.tsx
+msgid "O assinador roda na sua máquina e usa o seu certificado digital ICP-Brasil (A1 ou A3) para assinar com validade jurídica. Sua chave privada nunca sai do seu computador."
 msgstr ""
 
 #: apps/remix/app/components/general/landing-page.tsx
@@ -8668,6 +8749,7 @@ msgstr "문서에 양식 필드를 배치하고 구성하세요"
 msgid "Placeholder"
 msgstr "플레이스홀더"
 
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Placeholders:"
 msgstr ""
@@ -8687,6 +8769,10 @@ msgstr ""
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Plans without a transport use the system default mailer."
 msgstr "전송 방식이 없는 플랜은 시스템 기본 메일러를 사용합니다."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Platform"
+msgstr ""
 
 #. placeholder {0}: _(actionVerb).toLowerCase()
 #: packages/email/template-components/template-document-invite.tsx
@@ -9483,6 +9569,10 @@ msgstr "거부가 확인되었습니다"
 msgid "Rejection reason: {reason}"
 msgstr "거부 사유: {reason}"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Release uploaded"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: apps/remix/app/components/tables/admin-document-jobs-table.tsx
 msgid "Reload"
@@ -9908,6 +9998,7 @@ msgstr "페이지당 행 수"
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Save"
@@ -10674,6 +10765,12 @@ msgstr "서명자"
 msgid "Signer Events"
 msgstr "서명자 이벤트"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Signer Releases"
+msgstr ""
+
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role plural name"
 msgid "Signers"
@@ -11019,6 +11116,7 @@ msgid "Suba o PDF e escolha os signatários."
 msgstr ""
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Subject"
 msgstr "제목"
@@ -11215,6 +11313,10 @@ msgstr "시스템 요구 사항"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "System Theme"
 msgstr "시스템 테마"
+
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
+msgid "System-wide default email and WhatsApp messages. Organisations without their own template fall back to these."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 msgid "Target Organisation"
@@ -11469,6 +11571,7 @@ msgid "Template resent"
 msgstr "템플릿을 다시 보냈습니다."
 
 #: apps/remix/app/components/general/template/template-edit-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/message-templates.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "Template saved"
 msgstr "템플릿이 저장되었습니다"
@@ -13110,6 +13213,7 @@ msgid "Upgrade your plan to upload more documents"
 msgstr "더 많은 문서를 업로드하려면 요금제를 업그레이드하세요."
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
 msgid "Upload"
 msgstr "업로드"
 
@@ -13161,6 +13265,7 @@ msgstr "문서를 업로드하고 수신자를 추가하세요"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
 msgid "Upload failed"
 msgstr "업로드 실패"
 
@@ -13180,6 +13285,10 @@ msgstr "템플릿 업로드"
 #: packages/ui/primitives/document-dropzone.tsx
 msgid "Upload Template Document"
 msgstr "템플릿 문서 업로드"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Upload the CapivaSign Java signer builds. Users download these from the public download page and the signing page. Requires S3 storage."
+msgstr ""
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Upload your brand logo (max 5MB, JPG, PNG, or WebP)"
@@ -13201,6 +13310,10 @@ msgstr "업로드된 파일이 너무 작습니다"
 #: apps/remix/app/components/forms/avatar-image.tsx
 msgid "Uploaded file not an allowed file type"
 msgstr "업로드된 파일이 허용된 형식이 아닙니다"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Uploaded releases"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
@@ -13344,6 +13457,10 @@ msgstr ""
 msgid "Value"
 msgstr "값"
 
+#: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
+msgid "Verificar novamente"
+msgstr ""
+
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "Verification Code Required"
 msgstr "인증 코드 필요"
@@ -13392,6 +13509,10 @@ msgstr "문서를 업로드하려면 이메일을 인증해야 합니다."
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Verify your team email address"
 msgstr "팀 이메일 주소를 인증하세요."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signer-releases.tsx
+msgid "Version"
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-radio-form.tsx
@@ -13591,6 +13712,10 @@ msgstr "공개 범위"
 
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Você paga apenas pelo que usar. Veja o custo detalhado de cada ação cobrada — de webhooks a envios de mensagem."
+msgstr ""
+
+#: apps/remix/app/routes/signer.tsx
+msgid "Volte para a página de assinatura e clique em assinar com ICP-Brasil."
 msgstr ""
 
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
@@ -14121,8 +14246,8 @@ msgid "What you can do with teams:"
 msgstr "팀으로 할 수 있는 일:"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
-msgid "WhatsApp · Signing request"
-msgstr ""
+#~ msgid "WhatsApp · Signing request"
+#~ msgstr ""
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "WhatsApp transport"
@@ -14167,6 +14292,10 @@ msgstr "조직에 대해 SSO 포털을 활성화할지 여부"
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
 msgstr "상대방을 기다리는 동안, Documenso 계정을 생성하고 바로 전자 서명을 시작할 수 있습니다."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
+msgid "White-label required"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Whitelabeling, unlimited members and more"

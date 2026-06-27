@@ -397,6 +397,14 @@ enum MessageTemplateChannel {
 
 enum MessageTemplateEvent {
   SIGNING_REQUEST
+  SIGNING_REMINDER
+  DOCUMENT_COMPLETED
+  DOCUMENT_REJECTED
+  DOCUMENT_CANCELLED
+  RECIPIENT_SIGNED
+  RECIPIENT_EXPIRED
+  OWNER_DOCUMENT_COMPLETED
+  DOCUMENT_CREATED_FROM_DIRECT_TEMPLATE
 }
 
 /// Organisation-managed message template for a (channel, event) pair. Resolved
@@ -420,6 +428,23 @@ model MessageTemplate {
 
   @@unique([organisationId, channel, event])
   @@index([organisationId])
+}
+
+/// System-wide default message templates, managed by an admin. Resolved as the
+/// fallback when an organisation has not set its own template for a
+/// (channel, event) pair (before the built-in code default).
+model DefaultMessageTemplate {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  channel MessageTemplateChannel
+  event   MessageTemplateEvent
+
+  subject String?
+  body    String
+
+  @@unique([channel, event])
 }
 
 /// One generated monthly bill per organisation. The unique (organisationId,
@@ -460,6 +485,30 @@ model SigningCertificate {
   encryptedData     String
   /// symmetricEncrypt() of the passphrase (an encrypted empty string if none).
   encryptedPassword String
+}
+
+enum SignerPlatform {
+  WINDOWS
+  MACOS
+  LINUX
+}
+
+/// An uploaded build of the CapivaSign Java signer (the local ICP-Brasil agent),
+/// per platform. The binary lives in object storage (`key`); admins upload new
+/// releases and users download them from the public download page / signing page.
+model SignerRelease {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  platform    SignerPlatform
+  version     String
+  fileName    String
+  contentType String
+  /// Object storage key for the uploaded binary.
+  key         String
+
+  @@index([platform])
 }
 
 model Account {
