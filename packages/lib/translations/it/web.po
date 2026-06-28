@@ -975,6 +975,7 @@ msgid "500 Internal Server Error"
 msgstr "500 Errore Interno del Server"
 
 #: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 msgid "5511999999999"
 msgstr ""
 
@@ -2662,6 +2663,10 @@ msgstr "Può preparare"
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "Can't find someone?"
 msgstr "Non riesci a trovare qualcuno?"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "Canal"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
@@ -5086,6 +5091,14 @@ msgstr "I valori duplicati non sono ammessi"
 #: packages/lib/constants/i18n.ts
 msgid "Dutch"
 msgstr "Olandese"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "E-mail"
+msgstr ""
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "E-mail (opcional)"
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -10470,6 +10483,10 @@ msgstr "Invio..."
 msgid "Sent"
 msgstr "Inviato"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Sessão de posicionador (embed)"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Session revoked"
 msgstr "Sessione revocata"
@@ -11505,6 +11522,10 @@ msgstr "Team a cui è attualmente assegnato questo gruppo di organizzazione"
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Teams that this user is a member of and their roles."
 msgstr "Team di cui questo utente è membro e i relativi ruoli."
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "Telefone (WhatsApp)"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx

@@ -100,6 +100,7 @@ export const ZClaimPricingSchema = z.object({
   whatsappOwnMessageCents: ZCents,
   webhookDeliveryCents: ZCents,
   emailMessageCents: ZCents,
+  embedSessionCents: ZCents,
 
   // Free monthly allowance per action; usage up to the quota is not charged.
   createDocumentFreeQuota: ZQuota,
@@ -107,6 +108,7 @@ export const ZClaimPricingSchema = z.object({
   whatsappMessageFreeQuota: ZQuota,
   webhookDeliveryFreeQuota: ZQuota,
   emailMessageFreeQuota: ZQuota,
+  embedSessionFreeQuota: ZQuota,
 });
 
 export type TClaimPricing = z.infer<typeof ZClaimPricingSchema>;
@@ -134,6 +136,7 @@ export const SUBSCRIPTION_CLAIM_PRICING_ITEMS: {
   },
   { unitKey: 'webhookDeliveryCents', quotaKey: 'webhookDeliveryFreeQuota', label: 'Entrega de webhook' },
   { unitKey: 'emailMessageCents', quotaKey: 'emailMessageFreeQuota', label: 'Mensagem de e-mail' },
+  { unitKey: 'embedSessionCents', quotaKey: 'embedSessionFreeQuota', label: 'Sessão de posicionador (embed)' },
 ];
 
 // When adding keys, update internal documentation with this.

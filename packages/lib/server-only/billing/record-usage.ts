@@ -15,6 +15,7 @@ const PRICING_KEY: Record<BillableEventType, keyof TClaimPricing> = {
   [BillableEventType.WHATSAPP_MESSAGE]: 'whatsappMessageCents',
   [BillableEventType.WEBHOOK_DELIVERY]: 'webhookDeliveryCents',
   [BillableEventType.EMAIL_MESSAGE]: 'emailMessageCents',
+  [BillableEventType.EMBED_SESSION]: 'embedSessionCents',
 };
 
 const QUOTA_KEY: Record<BillableEventType, keyof TClaimPricing> = {
@@ -23,6 +24,7 @@ const QUOTA_KEY: Record<BillableEventType, keyof TClaimPricing> = {
   [BillableEventType.WHATSAPP_MESSAGE]: 'whatsappMessageFreeQuota',
   [BillableEventType.WEBHOOK_DELIVERY]: 'webhookDeliveryFreeQuota',
   [BillableEventType.EMAIL_MESSAGE]: 'emailMessageFreeQuota',
+  [BillableEventType.EMBED_SESSION]: 'embedSessionFreeQuota',
 };
 
 export type RecordUsageOptions = {

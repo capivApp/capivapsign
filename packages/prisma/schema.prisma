@@ -360,6 +360,7 @@ enum BillableEventType {
   WHATSAPP_MESSAGE
   WEBHOOK_DELIVERY
   EMAIL_MESSAGE
+  EMBED_SESSION
 }
 
 /// One metered, billable action. Written ONLY for API-originated usage (panel

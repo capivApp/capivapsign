@@ -181,6 +181,8 @@ export const setDocumentRecipients = async ({
             role: recipient.role,
             signingOrder: recipient.signingOrder,
             envelopeId: envelope.id,
+            deliveryChannel: recipient.deliveryChannel ?? 'EMAIL',
+            phone: recipient.phone ?? null,
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
             authOptions,
@@ -192,6 +194,8 @@ export const setDocumentRecipients = async ({
             signingOrder: recipient.signingOrder,
             token: nanoid(),
             envelopeId: envelope.id,
+            deliveryChannel: recipient.deliveryChannel ?? 'EMAIL',
+            phone: recipient.phone ?? null,
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
             authOptions,
@@ -382,6 +386,8 @@ type RecipientData = {
   signingOrder?: number | null;
   accessAuth?: TRecipientAccessAuthTypes[];
   actionAuth?: TRecipientActionAuthTypes[];
+  deliveryChannel?: 'EMAIL' | 'WHATSAPP';
+  phone?: string | null;
 };
 
 type RecipientDataWithClientId = Recipient & {

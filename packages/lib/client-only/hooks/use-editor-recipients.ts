@@ -18,6 +18,10 @@ const LocalRecipientSchema = z.object({
   role: z.nativeEnum(RecipientRole),
   signingOrder: z.number().optional(),
   actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
+  // Delivery channel for the signing request. WhatsApp requires a phone.
+  // String enum (not the Prisma enum object) to stay browser-safe.
+  deliveryChannel: z.enum(['EMAIL', 'WHATSAPP']).default('EMAIL'),
+  phone: z.string().optional().default(''),
 });
 
 type TLocalRecipient = z.infer<typeof LocalRecipientSchema>;
@@ -64,6 +68,34 @@ export const ZEditorRecipientsFormSchema = z
         });
       }
     });
+  })
+  .superRefine((data, ctx) => {
+    // Channel-conditional contact: WhatsApp recipients need a phone (email is
+    // optional); email recipients need an email. Empty rows are ignored — they
+    // are dropped before submit.
+    data.signers.forEach((signer, index) => {
+      const isEmptyRow = !signer.name && !signer.email && !signer.phone;
+
+      if (isEmptyRow) {
+        return;
+      }
+
+      if (signer.deliveryChannel === 'WHATSAPP') {
+        if (!signer.phone || signer.phone.replace(/\D/g, '').length < 8) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Informe um telefone válido para o canal WhatsApp.',
+            path: ['signers', index, 'phone'],
+          });
+        }
+      } else if (!signer.email) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Informe um e-mail.',
+          path: ['signers', index, 'email'],
+        });
+      }
+    });
   });
 
 export type TEditorRecipientsFormSchema = z.infer<typeof ZEditorRecipientsFormSchema>;
@@ -96,6 +128,9 @@ export const useEditorRecipients = ({ envelope }: EditorRecipientsProps): UseEdi
       role: recipient.role,
       signingOrder: recipient.signingOrder ?? index + 1,
       actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      deliveryChannel: (recipient.deliveryChannel ?? 'EMAIL') as 'EMAIL' | 'WHATSAPP',
+      phone: recipient.phone ?? '',
     }));
 
     const signers: TLocalRecipient[] =
@@ -109,6 +144,8 @@ export const useEditorRecipients = ({ envelope }: EditorRecipientsProps): UseEdi
               role: RecipientRole.SIGNER,
               signingOrder: 1,
               actionAuth: [],
+              deliveryChannel: 'EMAIL',
+              phone: '',
             },
           ];
 

@@ -1225,6 +1225,7 @@ msgid "500 Internal Server Error"
 msgstr "500 Erro Interno do Servidor"
 
 #: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 msgid "5511999999999"
 msgstr "5511999999999"
 
@@ -3101,6 +3102,10 @@ msgstr "Pode preparar"
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "Can't find someone?"
 msgstr "Não encontrou alguém?"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "Canal"
+msgstr "Canal"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
@@ -5695,6 +5700,14 @@ msgstr "Valores duplicados não são permitidos"
 #: packages/lib/constants/i18n.ts
 msgid "Dutch"
 msgstr "Holandês"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "E-mail"
+msgstr "E-mail"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "E-mail (opcional)"
+msgstr "E-mail (opcional)"
 
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -11453,6 +11466,10 @@ msgstr "Enviando..."
 msgid "Sent"
 msgstr "Enviado"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Sessão de posicionador (embed)"
+msgstr "Sessão de posicionador (embed)"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Session revoked"
 msgstr "Sessão revogada"
@@ -12547,6 +12564,10 @@ msgstr "Equipes às quais este grupo da organização está atualmente atribuíd
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Teams that this user is a member of and their roles."
 msgstr "Times dos quais este usuário é membro e seus papéis."
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "Telefone (WhatsApp)"
+msgstr "Telefone (WhatsApp)"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx

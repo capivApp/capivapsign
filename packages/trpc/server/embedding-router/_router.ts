@@ -1,4 +1,5 @@
 import { router } from '../trpc';
+import { createEmbeddingAuthoringSessionRoute } from './create-embedding-authoring-session';
 import { createEmbeddingDocumentRoute } from './create-embedding-document';
 import { createEmbeddingEnvelopeRoute } from './create-embedding-envelope';
 import { createEmbeddingPresignTokenRoute } from './create-embedding-presign-token';
@@ -13,6 +14,7 @@ export const embeddingPresignRouter = router({
   createEmbeddingPresignToken: createEmbeddingPresignTokenRoute,
   verifyEmbeddingPresignToken: verifyEmbeddingPresignTokenRoute,
   createEmbeddingEnvelope: createEmbeddingEnvelopeRoute,
+  createEmbeddingAuthoringSession: createEmbeddingAuthoringSessionRoute,
   createEmbeddingDocument: createEmbeddingDocumentRoute,
   createEmbeddingTemplate: createEmbeddingTemplateRoute,
   updateEmbeddingEnvelope: updateEmbeddingEnvelopeRoute,

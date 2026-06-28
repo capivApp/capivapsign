@@ -19,6 +19,7 @@ import { buildEnvelopeEmailHeaders } from '../../../server-only/email/build-enve
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
+import { sendWhatsappNotification } from '../../../server-only/whatsapp/send-whatsapp-notification';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE, DOCUMENT_EMAIL_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
@@ -219,6 +220,20 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
         envelopeId: envelope.id,
         teamId: envelope.teamId,
       }),
+    });
+
+    // WhatsApp parity: remind the recipient on WhatsApp when they have a phone.
+    await sendWhatsappNotification({
+      teamId: envelope.teamId,
+      event: 'SIGNING_REMINDER',
+      to: recipient.phone,
+      vars: {
+        'signer.name': recipient.name,
+        'signer.email': recipient.email,
+        'document.name': envelope.title,
+        link: signDocumentLink,
+      },
+      fallbackBody: `Lembrete: ${recipientActionVerb} o documento "${envelope.title}". Acesse: ${signDocumentLink}`,
     });
 
     await prisma.documentAuditLog.create({

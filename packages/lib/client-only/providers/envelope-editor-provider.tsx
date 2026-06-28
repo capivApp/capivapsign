@@ -557,6 +557,9 @@ const mapLocalRecipientsToRecipients = ({
       envelopeId: envelope.id,
       email: recipient.email,
       name: recipient.name,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      deliveryChannel: (recipient.deliveryChannel ?? 'EMAIL') as 'EMAIL' | 'WHATSAPP',
+      phone: recipient.phone ?? null,
       token: foundRecipient?.token || '',
       documentDeletedAt: foundRecipient?.documentDeletedAt || null,
       expired: foundRecipient?.expired || null,

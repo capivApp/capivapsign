@@ -10,6 +10,9 @@ export const ZSetEnvelopeRecipientSchema = z.object({
   role: z.nativeEnum(RecipientRole),
   signingOrder: z.number().optional(),
   actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
+  // Delivery channel for the signing request; WhatsApp requires a phone.
+  deliveryChannel: z.enum(['EMAIL', 'WHATSAPP']).optional().default('EMAIL'),
+  phone: z.string().max(32).optional().default(''),
 });
 
 export const ZSetEnvelopeRecipientsRequestSchema = z.object({

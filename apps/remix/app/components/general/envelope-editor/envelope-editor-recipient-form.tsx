@@ -24,6 +24,13 @@ import { SigningOrderConfirmation } from '@documenso/ui/primitives/document-flow
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { DragDropContext, Draggable, Droppable, type DropResult, type SensorAPI } from '@hello-pangea/dnd';
@@ -215,6 +222,8 @@ export const EnvelopeEditorRecipientForm = () => {
       email: '',
       role: RecipientRole.SIGNER,
       actionAuth: [],
+      deliveryChannel: 'EMAIL' as const,
+      phone: '',
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
     });
   };
@@ -235,6 +244,8 @@ export const EnvelopeEditorRecipientForm = () => {
           email: recipient.email,
           role: recipient.role,
           actionAuth: [],
+          deliveryChannel: 'EMAIL' as const,
+          phone: '',
           signingOrder: index + 1,
         })),
         {
@@ -261,6 +272,8 @@ export const EnvelopeEditorRecipientForm = () => {
         email: recipient.email,
         role: recipient.role,
         actionAuth: [],
+        deliveryChannel: 'EMAIL' as const,
+        phone: '',
         signingOrder: nextSigningOrder,
       });
 
@@ -330,6 +343,8 @@ export const EnvelopeEditorRecipientForm = () => {
           email: currentEditorEmail ?? '',
           role: RecipientRole.SIGNER,
           actionAuth: [],
+          deliveryChannel: 'EMAIL' as const,
+          phone: '',
           signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
         },
         {
@@ -881,7 +896,11 @@ export const EnvelopeEditorRecipientForm = () => {
                                       <FormControl>
                                         <RecipientAutoCompleteInput
                                           type="email"
-                                          placeholder={t`Email`}
+                                          placeholder={
+                                            form.watch(`signers.${index}.deliveryChannel`) === 'WHATSAPP'
+                                              ? t`E-mail (opcional)`
+                                              : t`Email`
+                                          }
                                           value={field.value}
                                           disabled={
                                             snapshot.isDragging ||
@@ -953,6 +972,67 @@ export const EnvelopeEditorRecipientForm = () => {
                                     </FormItem>
                                   )}
                                 />
+
+                                <FormField
+                                  control={form.control}
+                                  name={`signers.${index}.deliveryChannel`}
+                                  render={({ field }) => (
+                                    <FormItem className="mt-auto w-fit">
+                                      {!showAdvancedSettings && index === 0 && (
+                                        <FormLabel>
+                                          <Trans>Canal</Trans>
+                                        </FormLabel>
+                                      )}
+                                      <Select
+                                        value={field.value}
+                                        onValueChange={field.onChange}
+                                        disabled={
+                                          isSubmitting || !canRecipientBeModified(signer.id) || isDirectRecipient
+                                        }
+                                      >
+                                        <FormControl>
+                                          <SelectTrigger className="w-[130px]">
+                                            <SelectValue />
+                                          </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                          <SelectItem value="EMAIL">{t`E-mail`}</SelectItem>
+                                          <SelectItem value="WHATSAPP">WhatsApp</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </FormItem>
+                                  )}
+                                />
+
+                                {form.watch(`signers.${index}.deliveryChannel`) === 'WHATSAPP' && (
+                                  <FormField
+                                    control={form.control}
+                                    name={`signers.${index}.phone`}
+                                    render={({ field }) => (
+                                      <FormItem className="w-full">
+                                        {!showAdvancedSettings && index === 0 && (
+                                          <FormLabel>
+                                            <Trans>Telefone (WhatsApp)</Trans>
+                                          </FormLabel>
+                                        )}
+                                        <FormControl>
+                                          <Input
+                                            type="tel"
+                                            placeholder={t`5511999999999`}
+                                            {...field}
+                                            value={field.value ?? ''}
+                                            disabled={
+                                              isSubmitting ||
+                                              !canRecipientBeModified(signer.id) ||
+                                              isDirectRecipient
+                                            }
+                                          />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                )}
 
                                 <FormField
                                   control={form.control}

@@ -39,6 +39,7 @@ const PRICING_ITEMS: {
   { key: 'whatsappMessageCents', label: <Trans>Mensagem por WhatsApp</Trans>, icon: MessageCircleIcon },
   { key: 'webhookDeliveryCents', label: <Trans>Entrega de webhook</Trans>, icon: WebhookIcon },
   { key: 'recoverFileCents', label: <Trans>Recuperação de arquivo</Trans>, icon: DownloadIcon },
+  { key: 'embedSessionCents', label: <Trans>Sessão de posicionador (embed)</Trans>, icon: PlugIcon },
 ];
 
 const formatBrl = (cents: number) =>

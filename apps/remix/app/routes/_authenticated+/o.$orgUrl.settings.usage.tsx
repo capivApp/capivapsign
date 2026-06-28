@@ -27,6 +27,7 @@ const CATEGORY_META: { type: BillableEventType; label: string; color: string }[]
   { type: 'EMAIL_MESSAGE', label: 'Email', color: '#3b82f6' },
   { type: 'WHATSAPP_MESSAGE', label: 'WhatsApp', color: '#22c55e' },
   { type: 'WEBHOOK_DELIVERY', label: 'Webhook', color: '#a855f7' },
+  { type: 'EMBED_SESSION', label: 'Embed', color: '#f59e0b' },
 ];
 
 const brl = (cents: number) => (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });

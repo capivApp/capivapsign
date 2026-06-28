@@ -9,6 +9,7 @@ import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
+import { sendWhatsappNotification } from '../../../server-only/whatsapp/send-whatsapp-notification';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -152,6 +153,19 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCancelledEmai
           subject: i18n._(msg`Document "${envelope.title}" Cancelled`),
           html,
           text,
+        });
+
+        // WhatsApp parity: notify the recipient on WhatsApp when they have a phone.
+        await sendWhatsappNotification({
+          teamId: envelope.teamId,
+          event: 'DOCUMENT_CANCELLED',
+          to: recipient.phone,
+          vars: {
+            'signer.name': recipient.name,
+            'signer.email': recipient.email,
+            'document.name': envelope.title,
+          },
+          fallbackBody: `O documento "${envelope.title}" foi cancelado.`,
         });
       }),
     );

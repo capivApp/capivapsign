@@ -11,6 +11,7 @@ import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { DOCUMENSO_INTERNAL_EMAIL } from '../../../constants/email';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { sendWhatsappNotification } from '../../../server-only/whatsapp/send-whatsapp-notification';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -107,6 +108,19 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
         subject: i18n._(msg`Document "${envelope.title}" - Rejection Confirmed`),
         html,
         text,
+      });
+
+      // WhatsApp parity: confirm the rejection to the recipient on WhatsApp.
+      await sendWhatsappNotification({
+        teamId: envelope.teamId,
+        event: 'DOCUMENT_REJECTED',
+        to: recipient.phone,
+        vars: {
+          'signer.name': recipient.name,
+          'signer.email': recipient.email,
+          'document.name': envelope.title,
+        },
+        fallbackBody: `Recusa registrada para o documento "${envelope.title}".`,
       });
     });
   }
