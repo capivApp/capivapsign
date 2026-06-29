@@ -1,3 +1,4 @@
+import LogoIcon from '@documenso/assets/logo_icon.png';
 import type { TClaimFlags, TClaimPricing } from '@documenso/lib/types/subscription';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans } from '@lingui/react/macro';
@@ -50,15 +51,47 @@ type LandingPageProps = {
 // matches `TClaimPricing` so prices flow straight from the claims catalogue.
 const PRICING_ITEMS: {
   key: keyof TClaimPricing;
+  // Matching free-allowance field; usage up to this amount each month is free.
+  quotaKey: keyof TClaimPricing;
   label: ReactNode;
   icon: ComponentType<{ className?: string }>;
 }[] = [
-  { key: 'createDocumentCents', label: <Trans>Criação de documento</Trans>, icon: FileSignatureIcon },
-  { key: 'emailMessageCents', label: <Trans>Envio de e-mail</Trans>, icon: MailIcon },
-  { key: 'whatsappMessageCents', label: <Trans>Mensagem por WhatsApp</Trans>, icon: MessageCircleIcon },
-  { key: 'webhookDeliveryCents', label: <Trans>Entrega de webhook</Trans>, icon: WebhookIcon },
-  { key: 'recoverFileCents', label: <Trans>Recuperação de arquivo</Trans>, icon: DownloadIcon },
-  { key: 'embedSessionCents', label: <Trans>Sessão de posicionador (embed)</Trans>, icon: PlugIcon },
+  {
+    key: 'createDocumentCents',
+    quotaKey: 'createDocumentFreeQuota',
+    label: <Trans>Criação de documento</Trans>,
+    icon: FileSignatureIcon,
+  },
+  {
+    key: 'emailMessageCents',
+    quotaKey: 'emailMessageFreeQuota',
+    label: <Trans>Envio de e-mail</Trans>,
+    icon: MailIcon,
+  },
+  {
+    key: 'whatsappMessageCents',
+    quotaKey: 'whatsappMessageFreeQuota',
+    label: <Trans>Mensagem por WhatsApp</Trans>,
+    icon: MessageCircleIcon,
+  },
+  {
+    key: 'webhookDeliveryCents',
+    quotaKey: 'webhookDeliveryFreeQuota',
+    label: <Trans>Entrega de webhook</Trans>,
+    icon: WebhookIcon,
+  },
+  {
+    key: 'recoverFileCents',
+    quotaKey: 'recoverFileFreeQuota',
+    label: <Trans>Recuperação de arquivo</Trans>,
+    icon: DownloadIcon,
+  },
+  {
+    key: 'embedSessionCents',
+    quotaKey: 'embedSessionFreeQuota',
+    label: <Trans>Sessão de posicionador (embed)</Trans>,
+    icon: PlugIcon,
+  },
 ];
 
 const formatBrl = (cents: number) => (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -505,6 +538,14 @@ export const LandingPage = ({ pricingClaims }: LandingPageProps) => {
           {/* Product mockup */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
             <div aria-hidden className="absolute -top-6 -right-6 h-24 w-24 rounded-2xl bg-emerald-400/20 blur-2xl" />
+
+            {/* Brand mascot peeking over the mockup */}
+            <img
+              src={LogoIcon}
+              alt="CapivaSign"
+              className="absolute -top-12 -right-5 z-10 h-24 w-24 drop-shadow-xl sm:h-28 sm:w-28"
+            />
+
             <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-2xl shadow-emerald-500/5">
               <div className="flex items-center gap-1.5 border-border/60 border-b bg-muted/40 px-4 py-3">
                 <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
@@ -521,8 +562,8 @@ export const LandingPage = ({ pricingClaims }: LandingPageProps) => {
 
                 <div className="mt-6 rounded-2xl border border-emerald-500/30 border-dashed bg-emerald-500/5 p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white">
-                      <FileSignatureIcon className="h-5 w-5" />
+                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-emerald-500/10 ring-1 ring-emerald-500/30">
+                      <img src={LogoIcon} alt="" className="h-8 w-8 object-contain" />
                     </div>
                     <div className="flex-1">
                       <div className="font-medium text-sm">
@@ -712,17 +753,29 @@ export const LandingPage = ({ pricingClaims }: LandingPageProps) => {
                     )}
 
                     <ul className="mt-2 divide-y divide-border/60">
-                      {items.map((item) => (
-                        <li key={item.key} className="flex items-center justify-between gap-3 py-2.5">
-                          <span className="flex items-center gap-2 text-[13px] text-muted-foreground">
-                            <item.icon className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                            {item.label}
-                          </span>
-                          <span className="font-semibold text-[13px] tabular-nums">
-                            {formatBrl(claim.pricing[item.key] as number)}
-                          </span>
-                        </li>
-                      ))}
+                      {items.map((item) => {
+                        const quota = claim.pricing[item.quotaKey];
+                        const freeQuota = typeof quota === 'number' && quota > 0 ? quota : null;
+
+                        return (
+                          <li key={item.key} className="flex items-start justify-between gap-3 py-2.5">
+                            <span className="flex items-center gap-2 text-[13px] text-muted-foreground">
+                              <item.icon className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                              {item.label}
+                            </span>
+                            <span className="flex flex-col items-end">
+                              <span className="font-semibold text-[13px] tabular-nums">
+                                {formatBrl(claim.pricing[item.key] as number)}
+                              </span>
+                              {freeQuota !== null && (
+                                <span className="font-medium text-[11px] text-emerald-600 tabular-nums dark:text-emerald-400">
+                                  <Trans>{freeQuota} grátis/mês</Trans>
+                                </span>
+                              )}
+                            </span>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 );
