@@ -31,6 +31,7 @@
     "prisma:migrate-deploy": "npm run with:env -- npm run prisma:migrate-deploy -w @documenso/prisma",
     "prisma:migrate-reset": "npm run with:env -- npm run prisma:migrate-reset -w @documenso/prisma",
     "prisma:seed": "npm run with:env -- npm run prisma:seed -w @documenso/prisma",
+    "prisma:seed-admin": "npm run with:env -- npm run prisma:seed-admin -w @documenso/prisma",
     "prisma:studio": "npm run with:env -- npm run prisma:studio -w @documenso/prisma",
     "with:env": "dotenv -e .env -e .env.local --",
     "reset:hard": "npm run clean && npm i && npm run prisma:generate",
