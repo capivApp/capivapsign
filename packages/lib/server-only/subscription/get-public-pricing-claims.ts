@@ -1,12 +1,12 @@
 import { prisma } from '@documenso/prisma';
-
-import { ZClaimPricingSchema } from '../../types/subscription';
-import type { TClaimPricing } from '../../types/subscription';
+import type { TClaimFlags, TClaimPricing } from '../../types/subscription';
+import { ZClaimFlagsSchema, ZClaimPricingSchema } from '../../types/subscription';
 
 export type PublicPricingClaim = {
   id: string;
   name: string;
   pricing: TClaimPricing;
+  flags: TClaimFlags;
 };
 
 /**
@@ -18,7 +18,7 @@ export type PublicPricingClaim = {
 export const getPublicPricingClaims = async (): Promise<PublicPricingClaim[]> => {
   const claims = await prisma.subscriptionClaim.findMany({
     orderBy: { name: 'asc' },
-    select: { id: true, name: true, pricing: true },
+    select: { id: true, name: true, pricing: true, flags: true },
   });
 
   return claims
@@ -26,6 +26,7 @@ export const getPublicPricingClaims = async (): Promise<PublicPricingClaim[]> =>
       id: claim.id,
       name: claim.name,
       pricing: ZClaimPricingSchema.parse(claim.pricing ?? {}),
+      flags: ZClaimFlagsSchema.parse(claim.flags ?? {}),
     }))
     .filter((claim) => Object.values(claim.pricing).some((cents) => typeof cents === 'number'));
 };
