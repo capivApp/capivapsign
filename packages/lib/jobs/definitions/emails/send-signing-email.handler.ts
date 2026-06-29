@@ -187,7 +187,10 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     'signer.name': name,
     'signer.email': email,
     'document.name': envelope.title,
+    'team.name': team?.name ?? '',
     subject: emailSubject,
+    link: signDocumentLink,
+    // Aliases kept for backwards compatibility with older templates.
     'document.url': signDocumentLink,
     'signing.link': signDocumentLink,
   };
