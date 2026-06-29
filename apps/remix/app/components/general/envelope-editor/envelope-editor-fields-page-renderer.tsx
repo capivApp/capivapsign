@@ -2,6 +2,7 @@ import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounce
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import {
   type PageRenderData,
   useCurrentEnvelopeRender,
@@ -63,6 +64,11 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   const { t, i18n } = useLingui();
   const { envelope, editorFields, getRecipientColorKey, updateEnvelope } = useCurrentEnvelopeEditor();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
+
+  // Dragging the verification mark to a custom position is a gated feature. When
+  // off, the mark is still shown in its preset position but cannot be dragged.
+  const canDragVerificationMark =
+    useCurrentOrganisation().organisationClaim.flags.draggableVerificationMark ?? false;
 
   const interactiveTransformer = useRef<Transformer | null>(null);
   const verificationMarkRef = useRef<Konva.Group | null>(null);
@@ -797,7 +803,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       name: 'verification-mark',
       x,
       y,
-      draggable: true,
+      draggable: canDragVerificationMark,
       // Konva passes absolute (scaled) coordinates here; clamp in scaled space.
       dragBoundFunc: (pos) => ({
         x: Math.max(0, Math.min(pos.x, (unscaledViewport.width - width) * scale)),

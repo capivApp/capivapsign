@@ -3095,6 +3095,16 @@ msgstr ""
 "assinatura eletrônica em documentos é vinculativa e que aceita os termos "
 "descritos nos documentos que está assinando."
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+msgid ""
+"Cada destinatário é notificado pelo canal escolhido ao adicioná-lo (e-mail "
+"ou WhatsApp). Os campos abaixo se aplicam aos destinatários por e-mail; os "
+"de WhatsApp usam o modelo configurado."
+msgstr ""
+"Cada destinatário é notificado pelo canal escolhido ao adicioná-lo (e-mail "
+"ou WhatsApp). Os campos abaixo se aplicam aos destinatários por e-mail; os "
+"de WhatsApp usam o modelo configurado."
+
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Can prepare"
 msgstr "Pode preparar"
@@ -5787,7 +5797,6 @@ msgstr "Divulgação de Assinatura Eletrônica"
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
@@ -6349,6 +6358,10 @@ msgstr "Título do Envelope"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Envelope updated"
 msgstr "Envelope atualizado"
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+msgid "Enviar"
+msgstr "Enviar"
 
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Envie o documento"
@@ -17758,6 +17771,13 @@ msgstr "Seu código de verificação:"
 msgid "your-domain.com another-domain.com"
 msgstr "seu-dominio.com outro-dominio.com"
 
+#~ msgid ""
+#~ "A solicitação será enviada por WhatsApp aos destinatários com telefone "
+#~ "cadastrado."
+#~ msgstr ""
+#~ "A solicitação será enviada por WhatsApp aos destinatários com telefone "
+#~ "cadastrado."
+
 #~ msgid "Charged per action only when used via the API. Leave blank for free."
 #~ msgstr ""
 #~ "Cobrado por ação apenas quando usado via API. Deixe em branco para gratuito."
@@ -17769,11 +17789,21 @@ msgstr "seu-dominio.com outro-dominio.com"
 #~ "Personalize a mensagem de solicitação de assinatura para e-mail e WhatsApp. "
 #~ "Em branco usa o padrão da CapivaApp."
 
+#~ msgid ""
+#~ "Destinatários sem telefone recebem por e-mail. A mensagem usa o modelo de "
+#~ "WhatsApp da organização (ou o padrão)."
+#~ msgstr ""
+#~ "Destinatários sem telefone recebem por e-mail. A mensagem usa o modelo de "
+#~ "WhatsApp da organização (ou o padrão)."
+
 #~ msgid "Email · Signing request"
 #~ msgstr "E-mail · Solicitação de assinatura"
 
 #~ msgid "Usage pricing (cents, BRL)"
 #~ msgstr "Preços de uso (centavos, BRL)"
+
+#~ msgid "WhatsApp"
+#~ msgstr "WhatsApp"
 
 #~ msgid "WhatsApp · Signing request"
 #~ msgstr "WhatsApp · Solicitação de assinatura"

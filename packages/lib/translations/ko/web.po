@@ -1092,6 +1092,10 @@ msgstr "Documenso에서 {0}이(가) 귀하의 이메일 사용을 요청했습�
 msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso."
 msgstr "Documenso에서 보낸 요청인지 확인할 수 있도록, 귀하의 URL로 전송되는 비밀 값입니다."
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#~ msgid "A solicitação será enviada por WhatsApp aos destinatários com telefone cadastrado."
+#~ msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "A stable internet connection"
 msgstr "안정적인 인터넷 연결"
@@ -2656,6 +2660,10 @@ msgstr "계속 진행함으로써 <0>서비스 이용약관</0>과 <1>개인정�
 msgid "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
 msgstr "전자 서명 기능을 사용함으로써 귀하는 거래를 전자적으로 진행하고, 관련 고지를 전자적으로 수령하는 데 동의하는 것입니다. 또한 문서에 대한 전자 서명이 구속력이 있으며, 서명하는 문서의 약관을 수락한다는 점을 인정합니다."
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+msgid "Cada destinatário é notificado pelo canal escolhido ao adicioná-lo (e-mail ou WhatsApp). Os campos abaixo se aplicam aos destinatários por e-mail; os de WhatsApp usam o modelo configurado."
+msgstr ""
+
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Can prepare"
 msgstr "준비 가능"
@@ -4217,6 +4225,10 @@ msgstr "계정 삭제 중..."
 msgid "Deletion scheduled"
 msgstr "삭제가 예약되었습니다"
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#~ msgid "Destinatários sem telefone recebem por e-mail. A mensagem usa o modelo de WhatsApp da organização (ou o padrão)."
+#~ msgstr ""
+
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Destination"
 msgstr "대상"
@@ -5178,7 +5190,6 @@ msgstr "전자 서명 고지"
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
@@ -5709,6 +5720,10 @@ msgstr "봉투 제목"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Envelope updated"
 msgstr "봉투가 업데이트되었습니다"
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+msgid "Enviar"
+msgstr ""
 
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Envie o documento"
@@ -14265,6 +14280,10 @@ msgstr "이 문서를 편집하려던 것이었나요?"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "What you can do with teams:"
 msgstr "팀으로 할 수 있는 일:"
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#~ msgid "WhatsApp"
+#~ msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 #~ msgid "WhatsApp · Signing request"

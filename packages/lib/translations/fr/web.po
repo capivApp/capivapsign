@@ -1092,6 +1092,10 @@ msgstr "Une demande pour l'utiliser votre e-mail a été initiée par {0} sur Do
 msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso."
 msgstr "Un secret qui sera envoyé à votre URL afin que vous puissiez vérifier que la demande a été envoyée par Documenso."
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#~ msgid "A solicitação será enviada por WhatsApp aos destinatários com telefone cadastrado."
+#~ msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "A stable internet connection"
 msgstr "Une connexion Internet stable"
@@ -2656,6 +2660,10 @@ msgstr "En poursuivant, vous acceptez nos <0>Conditions d'Utilisation</0> et not
 msgid "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
 msgstr "En utilisant la fonctionnalité de signature électronique, vous consentez à effectuer des transactions et à recevoir des divulgations électroniquement. Vous reconnaissez que votre signature électronique sur les documents est contraignante et que vous acceptez les termes énoncés dans les documents que vous signez."
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+msgid "Cada destinatário é notificado pelo canal escolhido ao adicioná-lo (e-mail ou WhatsApp). Os campos abaixo se aplicam aos destinatários por e-mail; os de WhatsApp usam o modelo configurado."
+msgstr ""
+
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Can prepare"
 msgstr "Peut préparer"
@@ -4217,6 +4225,10 @@ msgstr "Suppression du compte..."
 msgid "Deletion scheduled"
 msgstr "Suppression planifiée"
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#~ msgid "Destinatários sem telefone recebem por e-mail. A mensagem usa o modelo de WhatsApp da organização (ou o padrão)."
+#~ msgstr ""
+
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Destination"
 msgstr "Destination"
@@ -5178,7 +5190,6 @@ msgstr "Divulgation de signature électronique"
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
@@ -5709,6 +5720,10 @@ msgstr "Titre de l'enveloppe"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Envelope updated"
 msgstr "Enveloppe mise à jour"
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+msgid "Enviar"
+msgstr ""
 
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Envie o documento"
@@ -14265,6 +14280,10 @@ msgstr "Essayiez-vous d'éditer ce document à la place ?"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "What you can do with teams:"
 msgstr "Ce que vous pouvez faire avec les équipes :"
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#~ msgid "WhatsApp"
+#~ msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 #~ msgid "WhatsApp · Signing request"

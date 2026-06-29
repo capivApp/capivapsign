@@ -731,6 +731,7 @@ model DocumentData {
 
 enum DocumentDistributionMethod {
   EMAIL
+  WHATSAPP
   NONE
 }
 

@@ -290,7 +290,7 @@ export const EnvelopeDistributeDialog = ({
                 >
                   <TabsList className="w-full">
                     <TabsTrigger className="w-full" value={DocumentDistributionMethod.EMAIL}>
-                      <Trans>Email</Trans>
+                      <Trans>Enviar</Trans>
                     </TabsTrigger>
                     <TabsTrigger className="w-full" value={DocumentDistributionMethod.NONE}>
                       <Trans>None</Trans>
@@ -325,6 +325,14 @@ export const EnvelopeDistributeDialog = ({
                             className="mt-2 flex flex-col gap-y-4 rounded-lg"
                             disabled={form.formState.isSubmitting}
                           >
+                            <p className="text-muted-foreground text-xs">
+                              <Trans>
+                                Cada destinatário é notificado pelo canal escolhido ao adicioná-lo (e-mail ou
+                                WhatsApp). Os campos abaixo se aplicam aos destinatários por e-mail; os de WhatsApp
+                                usam o modelo configurado.
+                              </Trans>
+                            </p>
+
                             {organisation.organisationClaim.flags.emailDomains && (
                               <FormField
                                 control={form.control}
