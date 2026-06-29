@@ -20,6 +20,23 @@ export const resolveEmailTransport = async (emailTransportId: string): Promise<R
     where: { id: emailTransportId },
   });
 
+  return buildResolvedEmailTransport(row);
+};
+
+/**
+ * Resolves the global default transport (the single row flagged `isDefault`),
+ * used as a fallback for organisations without an explicit transport on their
+ * claim. Returns null when no default is configured.
+ */
+export const resolveDefaultEmailTransport = async (): Promise<ResolvedEmailTransport | null> => {
+  const row = await prisma.emailTransport.findFirst({
+    where: { isDefault: true },
+  });
+
+  return buildResolvedEmailTransport(row);
+};
+
+const buildResolvedEmailTransport = (row: EmailTransport | null): ResolvedEmailTransport | null => {
   if (!row) {
     return null;
   }
@@ -30,11 +47,10 @@ export const resolveEmailTransport = async (emailTransportId: string): Promise<R
 
     return { row, transporter };
   } catch (err) {
-    // Todo: Logging
     logger.error({
       msg: 'Failed to decrypt or build the configured email transport',
       err,
-      emailTransportId,
+      emailTransportId: row.id,
     });
 
     return null;

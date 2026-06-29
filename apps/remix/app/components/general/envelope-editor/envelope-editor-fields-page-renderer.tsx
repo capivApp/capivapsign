@@ -56,7 +56,18 @@ type MarkPosition = (typeof MARK_POSITIONS)[number];
 
 const MARK_WIDTH_PT = 250;
 const MARK_HEIGHT_PT = 50;
-const MARK_MARGIN_PT = 12;
+
+// Preset positions (FOOTER/HEADER/LEFT/RIGHT) render as a full-edge band — mirror
+// of `BAND_THICKNESS` in `render-page-brand-footer.ts`.
+const BAND_THICKNESS_PT = 40;
+
+// Colours mirror the server stamp: white card, light blue-grey border, muted
+// caption and indigo link/logo. (Server uses rgb() in PDF space.)
+const MARK_FILL = '#ffffff';
+const MARK_BORDER = '#ccd9e6'; // rgb(0.8, 0.85, 0.9)
+const MARK_MUTED = '#737373'; // rgb(0.45, 0.45, 0.45)
+const MARK_LINK = '#3b3bb8'; // rgb(0.23, 0.23, 0.72)
+const MARK_LOGO = 'hsl(243, 75%, 59%)';
 
 const clampPercent = (value: number) => Math.max(0, Math.min(100, value));
 
@@ -713,51 +724,66 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   };
 
   /**
-   * Top-left position + size for the verification mark, in UNSCALED page units
-   * (PDF points) — the Konva stage already applies `scale`, exactly like the
-   * fields. CUSTOM uses the stored percentages; presets mirror the server.
+   * Geometry for the verification mark, in UNSCALED page units (PDF points) — the
+   * Konva stage already applies `scale`, exactly like the fields. Mirrors the
+   * server renderer: CUSTOM / per-page overrides draw the compact 250×50 card;
+   * presets (FOOTER/HEADER/LEFT/RIGHT) draw a full-edge band.
    */
-  const resolveMarkBox = () => {
+  type MarkLayout =
+    | { kind: 'card'; x: number; y: number; width: number; height: number }
+    | { kind: 'band'; orientation: 'horizontal' | 'vertical'; x: number; y: number; width: number; height: number };
+
+  const resolveMarkLayout = (): MarkLayout => {
     const width = MARK_WIDTH_PT;
     const height = MARK_HEIGHT_PT;
-    const margin = MARK_MARGIN_PT;
     const pageWidth = unscaledViewport.width;
     const pageHeight = unscaledViewport.height;
-    const centerX = (pageWidth - width) / 2;
 
-    // This page was dragged individually — use its own stored position.
+    const card = (xPercent: number, yPercent: number): MarkLayout => ({
+      kind: 'card',
+      x: Math.min((xPercent / 100) * pageWidth, pageWidth - width),
+      y: Math.min((yPercent / 100) * pageHeight, pageHeight - height),
+      width,
+      height,
+    });
+
+    // This page was dragged individually — use its own stored position (CUSTOM).
     if (pageOverride) {
-      return {
-        x: Math.min((pageOverride.x / 100) * pageWidth, pageWidth - width),
-        y: Math.min((pageOverride.y / 100) * pageHeight, pageHeight - height),
-        width,
-        height,
-      };
+      return card(pageOverride.x, pageOverride.y);
     }
 
-    if (stampPosition === 'CUSTOM' && stampX !== null && stampY !== null) {
-      return {
-        x: Math.min((stampX / 100) * pageWidth, pageWidth - width),
-        y: Math.min((stampY / 100) * pageHeight, pageHeight - height),
-        width,
-        height,
-      };
+    if (stampPosition === 'CUSTOM') {
+      return card(stampX ?? 35, stampY ?? 90);
     }
 
     if (stampPosition === 'HEADER') {
-      return { x: centerX, y: margin, width, height };
+      return { kind: 'band', orientation: 'horizontal', x: 0, y: 0, width: pageWidth, height: BAND_THICKNESS_PT };
     }
 
     if (stampPosition === 'LEFT') {
-      return { x: margin, y: (pageHeight - height) / 2, width, height };
+      return { kind: 'band', orientation: 'vertical', x: 0, y: 0, width: BAND_THICKNESS_PT, height: pageHeight };
     }
 
     if (stampPosition === 'RIGHT') {
-      return { x: pageWidth - width - margin, y: (pageHeight - height) / 2, width, height };
+      return {
+        kind: 'band',
+        orientation: 'vertical',
+        x: pageWidth - BAND_THICKNESS_PT,
+        y: 0,
+        width: BAND_THICKNESS_PT,
+        height: pageHeight,
+      };
     }
 
     // FOOTER (default).
-    return { x: centerX, y: pageHeight - height - margin, width, height };
+    return {
+      kind: 'band',
+      orientation: 'horizontal',
+      x: 0,
+      y: pageHeight - BAND_THICKNESS_PT,
+      width: pageWidth,
+      height: BAND_THICKNESS_PT,
+    };
   };
 
   const persistMarkPosition = (group: Konva.Group) => {
@@ -781,9 +807,118 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   };
 
   /**
-   * Draw the non-removable, draggable verification mark. Rebuilt on every call so
-   * it stays on top of the freshly rendered fields. Coordinates are in unscaled
-   * page units; the stage's scale converts them to screen pixels.
+   * Fill `group` with the realistic stamp content so the preview matches the
+   * generated PDF: a compact card (CUSTOM / per-page override) or a full-edge
+   * band (presets). Mirrors `render-page-brand-footer.ts`. Text is rendered with
+   * preview placeholders (the verification link, SHA-256 hash and QR code are
+   * only generated when the document is sent).
+   */
+  const drawMarkContent = (group: Konva.Group, layout: MarkLayout) => {
+    const pad = 8;
+
+    if (layout.kind === 'card') {
+      const glyph = layout.height - pad * 2;
+      const textX = pad + glyph + pad;
+      const textWidth = layout.width - glyph - pad * 3;
+
+      group.add(
+        new Konva.Rect({
+          width: layout.width,
+          height: layout.height,
+          fill: MARK_FILL,
+          stroke: MARK_BORDER,
+          strokeWidth: 1,
+        }),
+        new Konva.Rect({ x: pad, y: pad, width: glyph, height: glyph, fill: MARK_LOGO, cornerRadius: 3 }),
+        new Konva.Text({
+          x: textX,
+          y: pad + 1,
+          width: textWidth,
+          text: t`Documento assinado · verificar:`,
+          fontSize: 8,
+          fill: MARK_MUTED,
+        }),
+        new Konva.Text({
+          x: textX,
+          y: layout.height - pad - 9,
+          width: textWidth,
+          text: t`Link e SHA-256 gerados ao enviar`,
+          fontSize: 8,
+          fill: MARK_LINK,
+        }),
+      );
+
+      return;
+    }
+
+    group.add(
+      new Konva.Rect({
+        width: layout.width,
+        height: layout.height,
+        fill: MARK_FILL,
+        stroke: MARK_BORDER,
+        strokeWidth: 1,
+      }),
+    );
+
+    const glyph = BAND_THICKNESS_PT - pad * 2;
+
+    if (layout.orientation === 'horizontal') {
+      const textX = pad + glyph + pad;
+
+      group.add(
+        new Konva.Rect({ x: pad, y: pad, width: glyph, height: glyph, fill: MARK_LOGO, cornerRadius: 3 }),
+        new Konva.Text({
+          x: textX,
+          y: pad - 1,
+          text: t`Documento assinado eletronicamente · verificar:`,
+          fontSize: 7,
+          fill: MARK_MUTED,
+        }),
+        new Konva.Text({
+          x: textX,
+          y: layout.height - pad - 8,
+          text: t`Link de verificação · SHA-256 · QR Code gerados ao enviar`,
+          fontSize: 7,
+          fill: MARK_LINK,
+        }),
+      );
+
+      return;
+    }
+
+    // Vertical band (LEFT / RIGHT): square logo at the bottom, two text lines
+    // rotated 90° (reading upward) running along the strip.
+    const logoY = layout.height - pad - glyph;
+    const textY = logoY - pad;
+
+    group.add(
+      new Konva.Rect({ x: pad, y: logoY, width: glyph, height: glyph, fill: MARK_LOGO, cornerRadius: 3 }),
+      new Konva.Text({
+        x: pad + 8,
+        y: textY,
+        rotation: -90,
+        text: t`Documento assinado · verificar:`,
+        fontSize: 7,
+        fill: MARK_MUTED,
+      }),
+      new Konva.Text({
+        x: pad + 18,
+        y: textY,
+        rotation: -90,
+        text: t`Link · SHA-256 · QR Code ao enviar`,
+        fontSize: 7,
+        fill: MARK_LINK,
+      }),
+    );
+  };
+
+  /**
+   * Draw the non-removable verification mark. Rebuilt on every call so it stays
+   * on top of the freshly rendered fields. Coordinates are in unscaled page
+   * units; the stage's scale converts them to screen pixels. Dragging (gated)
+   * stores a per-page CUSTOM override, so the mark always renders as a card once
+   * moved.
    */
   const renderVerificationMark = () => {
     if (!pageLayer.current) {
@@ -797,58 +932,32 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       return;
     }
 
-    const { x, y, width, height } = resolveMarkBox();
+    const layout = resolveMarkLayout();
+
+    // Only the compact card is draggable: a full-edge band would otherwise
+    // intercept clicks meant for the fields beneath it. Dragging a preset is
+    // done by switching the position to CUSTOM (or via an existing override).
+    const isDraggable = canDragVerificationMark && layout.kind === 'card';
 
     const group = new Konva.Group({
       name: 'verification-mark',
-      x,
-      y,
-      draggable: canDragVerificationMark,
+      x: layout.x,
+      y: layout.y,
+      draggable: isDraggable,
+      // Dragging always produces a CUSTOM card override, so clamp to card bounds.
       // Konva passes absolute (scaled) coordinates here; clamp in scaled space.
       dragBoundFunc: (pos) => ({
-        x: Math.max(0, Math.min(pos.x, (unscaledViewport.width - width) * scale)),
-        y: Math.max(0, Math.min(pos.y, (unscaledViewport.height - height) * scale)),
+        x: Math.max(0, Math.min(pos.x, (unscaledViewport.width - MARK_WIDTH_PT) * scale)),
+        y: Math.max(0, Math.min(pos.y, (unscaledViewport.height - MARK_HEIGHT_PT) * scale)),
       }),
     });
 
-    const pad = 6;
-    const logoSize = height - pad * 2;
+    drawMarkContent(group, layout);
 
-    group.add(
-      new Konva.Rect({
-        width,
-        height,
-        fill: '#ffffff',
-        stroke: 'hsl(243, 75%, 59%)',
-        strokeWidth: 1,
-        cornerRadius: 4,
-      }),
-      new Konva.Rect({
-        x: pad,
-        y: pad,
-        width: logoSize,
-        height: logoSize,
-        fill: 'hsl(243, 75%, 59%)',
-        cornerRadius: 3,
-      }),
-      new Konva.Text({
-        x: pad + logoSize + pad,
-        y: pad + 2,
-        width: width - logoSize - pad * 3,
-        text: t`Verification mark`,
-        fontSize: 9,
-        fontStyle: 'bold',
-        fill: '#334155',
-      }),
-      new Konva.Text({
-        x: pad + logoSize + pad,
-        y: height - pad - 9,
-        width: width - logoSize - pad * 3,
-        text: t`Drag to position`,
-        fontSize: 8,
-        fill: 'hsl(243, 75%, 59%)',
-      }),
-    );
+    // Bands are preview-only; let clicks pass through to the fields beneath.
+    if (!isDraggable) {
+      group.listening(false);
+    }
 
     group.on('mouseenter', () => {
       const container = stage.current?.container();

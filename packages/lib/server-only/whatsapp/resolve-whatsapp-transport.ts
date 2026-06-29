@@ -25,6 +25,23 @@ export const resolveWhatsappTransport = async (
     where: { id: whatsappTransportId },
   });
 
+  return buildResolvedWhatsappTransport(row);
+};
+
+/**
+ * Resolves the global default transport (the single row flagged `isDefault`),
+ * used as a fallback for organisations without an explicit transport on their
+ * claim. Returns null when no default is configured.
+ */
+export const resolveDefaultWhatsappTransport = async (): Promise<ResolvedWhatsappTransport | null> => {
+  const row = await prisma.whatsappTransport.findFirst({
+    where: { isDefault: true },
+  });
+
+  return buildResolvedWhatsappTransport(row);
+};
+
+const buildResolvedWhatsappTransport = (row: WhatsappTransport | null): ResolvedWhatsappTransport | null => {
   if (!row) {
     return null;
   }
@@ -38,7 +55,7 @@ export const resolveWhatsappTransport = async (
     logger.error({
       msg: 'Failed to decrypt or build the configured WhatsApp transport',
       err,
-      whatsappTransportId,
+      whatsappTransportId: row.id,
     });
 
     return null;

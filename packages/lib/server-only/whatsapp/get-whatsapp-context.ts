@@ -5,7 +5,7 @@ import { env } from '../../utils/env';
 import { logger } from '../../utils/logger';
 import type { WhatsappAdapter } from './adapters/whatsapp-adapter';
 import { createZapiAdapter } from './adapters/zapi-adapter';
-import { resolveWhatsappTransport } from './resolve-whatsapp-transport';
+import { resolveDefaultWhatsappTransport, resolveWhatsappTransport } from './resolve-whatsapp-transport';
 
 export type WhatsappContext = {
   organisationId: string;
@@ -59,7 +59,11 @@ export const getWhatsappContext = async (
 
   const whatsappTransportId = organisation.organisationClaim.whatsappTransportId;
 
-  const resolution = whatsappTransportId ? await resolveWhatsappTransport(whatsappTransportId) : null;
+  // Resolution order: the organisation's own transport (claim) → the global
+  // default transport (`isDefault`) → the CapivaApp env default.
+  const resolution = whatsappTransportId
+    ? await resolveWhatsappTransport(whatsappTransportId)
+    : await resolveDefaultWhatsappTransport();
 
   // A configured transport that fails to resolve is an operational problem, not
   // "no transport". Surface it before silently falling back to the env default.

@@ -41,6 +41,7 @@ export const EmailTransportUpdateDialog = ({ transport, trigger }: EmailTranspor
           name: values.name,
           fromName: values.fromName,
           fromAddress: values.fromAddress,
+          isDefault: values.isDefault ?? false,
           config: emailTransportFormToConfig(values),
         },
       });
@@ -83,6 +84,7 @@ export const EmailTransportUpdateDialog = ({ transport, trigger }: EmailTranspor
             name: transport.name,
             fromName: transport.fromName,
             fromAddress: transport.fromAddress,
+            isDefault: transport.isDefault,
             type: transport.type,
           }}
           onFormSubmit={onFormSubmit}

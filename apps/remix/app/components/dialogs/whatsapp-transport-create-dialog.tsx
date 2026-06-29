@@ -50,6 +50,7 @@ export const WhatsappTransportCreateDialog = ({ trigger }: WhatsappTransportCrea
     await createTransport({
       name: values.name,
       fromName: values.fromName,
+      isDefault: values.isDefault ?? false,
       config: whatsappTransportFormToConfig(values),
     });
   };

@@ -1511,6 +1511,10 @@ model EmailTransport {
   name String
   type EmailTransportType
 
+  // When true, this transport is the global fallback used by every organisation
+  // that has no explicit transport on its claim (at most one row is default).
+  isDefault Boolean @default(false)
+
   // Required from-address override (plaintext, non-secret).
   fromName    String
   fromAddress String
@@ -1537,6 +1541,10 @@ model WhatsappTransport {
 
   name String
   type WhatsappTransportType
+
+  // When true, this transport is the global fallback used by every organisation
+  // that has no explicit transport on its claim (at most one row is default).
+  isDefault Boolean @default(false)
 
   // Sender display name (non-secret). Provider sender number lives in `config`.
   fromName String

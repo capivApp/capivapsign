@@ -43,15 +43,28 @@ export const updateEmailTransportRoute = adminProcedure
     }
 
     const config = ZEmailTransportConfigSchema.parse(merged);
+    const isDefault = data.isDefault ?? existing.isDefault;
 
-    await prisma.emailTransport.update({
-      where: { id },
-      data: {
-        name: data.name,
-        type: config.type,
-        fromName: data.fromName,
-        fromAddress: data.fromAddress,
-        config: encryptEmailTransportConfig(config),
-      },
+    await prisma.$transaction(async (tx) => {
+      // Only one transport may be the global default, so clear it elsewhere
+      // before promoting this row.
+      if (isDefault) {
+        await tx.emailTransport.updateMany({
+          where: { isDefault: true, id: { not: id } },
+          data: { isDefault: false },
+        });
+      }
+
+      await tx.emailTransport.update({
+        where: { id },
+        data: {
+          name: data.name,
+          type: config.type,
+          fromName: data.fromName,
+          fromAddress: data.fromAddress,
+          isDefault,
+          config: encryptEmailTransportConfig(config),
+        },
+      });
     });
   });

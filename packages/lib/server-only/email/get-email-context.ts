@@ -21,7 +21,7 @@ import {
   teamGlobalSettingsToBranding,
 } from '../../utils/team-global-settings-to-branding';
 import { extractDerivedTeamSettings } from '../../utils/teams';
-import { resolveEmailTransport } from './resolve-email-transport';
+import { resolveDefaultEmailTransport, resolveEmailTransport } from './resolve-email-transport';
 
 type EmailMetaOption = Partial<Pick<DocumentMeta, 'emailId' | 'emailReplyTo' | 'language'>>;
 
@@ -101,9 +101,11 @@ export const getEmailContext = async (options: GetEmailContextOptions): Promise<
 
   const emailLanguage = meta?.language || emailContext.settings.documentLanguage;
 
+  // Resolution order: the organisation's own transport (claim) → the global
+  // default transport (`isDefault`) → the system mailer + Documenso sender.
   const transportResolution = emailContext.claims.emailTransportId
     ? await resolveEmailTransport(emailContext.claims.emailTransportId)
-    : null;
+    : await resolveDefaultEmailTransport();
 
   // A configured transport that fails to resolve is an operational problem, not
   // "no transport". Surface it (alertable) before silently falling back to the

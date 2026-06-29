@@ -1,34 +1,34 @@
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import type { TEnvelope } from '@documenso/lib/types/envelope';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { formatSigningLink, isRecipientExpired } from '@documenso/lib/utils/recipients';
-import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
-import { SignatureIcon } from '@documenso/ui/icons/signature';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { PopoverHover } from '@documenso/ui/primitives/popover';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
-import { useToast } from '@documenso/ui/primitives/use-toast';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
-import { TooltipArrow } from '@radix-ui/react-tooltip';
+import {RECIPIENT_ROLES_DESCRIPTION} from '@documenso/lib/constants/recipient-roles';
+import type {TEnvelope} from '@documenso/lib/types/envelope';
+import {isDocumentCompleted} from '@documenso/lib/utils/document';
+import {formatSigningLink, isRecipientExpired} from '@documenso/lib/utils/recipients';
+import {CopyTextButton} from '@documenso/ui/components/common/copy-text-button';
+import {SignatureIcon} from '@documenso/ui/icons/signature';
+import {AvatarWithText} from '@documenso/ui/primitives/avatar';
+import {Badge} from '@documenso/ui/primitives/badge';
+import {PopoverHover} from '@documenso/ui/primitives/popover';
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from '@documenso/ui/primitives/tooltip';
+import {useToast} from '@documenso/ui/primitives/use-toast';
+import {msg} from '@lingui/core/macro';
+import {useLingui} from '@lingui/react';
+import {Trans} from '@lingui/react/macro';
+import {DocumentStatus, RecipientDeliveryChannel, RecipientRole, SigningStatus} from '@prisma/client';
+import {TooltipArrow} from '@radix-ui/react-tooltip';
 import {
-  AlertTriangle,
-  CheckIcon,
-  Clock,
-  Clock8Icon,
-  MailIcon,
-  MailOpenIcon,
-  PenIcon,
-  PlusIcon,
-  UserIcon,
+    AlertTriangle,
+    CheckIcon,
+    Clock,
+    Clock8Icon,
+    MailIcon,
+    MailOpenIcon,
+    PenIcon,
+    PlusIcon,
+    UserIcon,
 } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router';
-import { match } from 'ts-pattern';
+import {DateTime} from 'luxon';
+import {useEffect, useState} from 'react';
+import {Link, useSearchParams} from 'react-router';
+import {match} from 'ts-pattern';
 
 export type DocumentPageViewRecipientsProps = {
   envelope: TEnvelope;
@@ -82,11 +82,26 @@ export const DocumentPageViewRecipients = ({ envelope, documentRootPath }: Docum
           </li>
         )}
 
-        {recipients.map((recipient, i) => (
+        {recipients.map((recipient, i) => {
+          // WhatsApp recipients have an optional email, so falling back to the
+          // phone / name keeps the card from collapsing to just the role label.
+          const isWhatsapp = recipient.deliveryChannel === RecipientDeliveryChannel?.WHATSAPP;
+          const recipientContact = (isWhatsapp ? recipient.phone : recipient.email) || '';
+          const recipientName = recipient.name?.trim() ?? '';
+          const recipientLabel = recipientName || recipientContact || _(msg`No contact info`);
+
+          return (
           <li key={recipient.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
             <AvatarWithText
-              avatarFallback={recipient.email.slice(0, 1).toUpperCase()}
-              primaryText={<p className="text-muted-foreground text-sm">{recipient.email}</p>}
+              avatarFallback={recipientLabel.slice(0, 1).toUpperCase()}
+              primaryText={
+                <p className="text-muted-foreground text-sm">
+                  {recipientLabel}
+                  {recipientName && recipientContact && (
+                    <span className="text-muted-foreground/60"> · {recipientContact}</span>
+                  )}
+                </p>
+              }
               secondaryText={
                 <p className="text-muted-foreground/70 text-xs">
                   {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
@@ -223,7 +238,8 @@ export const DocumentPageViewRecipients = ({ envelope, documentRootPath }: Docum
                 )}
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </section>
   );

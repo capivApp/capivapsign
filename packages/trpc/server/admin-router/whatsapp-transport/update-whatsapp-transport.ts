@@ -43,14 +43,27 @@ export const updateWhatsappTransportRoute = adminProcedure
     }
 
     const config = ZWhatsappTransportConfigSchema.parse(merged);
+    const isDefault = data.isDefault ?? existing.isDefault;
 
-    await prisma.whatsappTransport.update({
-      where: { id },
-      data: {
-        name: data.name,
-        type: config.type,
-        fromName: data.fromName,
-        config: encryptWhatsappTransportConfig(config),
-      },
+    await prisma.$transaction(async (tx) => {
+      // Only one transport may be the global default, so clear it elsewhere
+      // before promoting this row.
+      if (isDefault) {
+        await tx.whatsappTransport.updateMany({
+          where: { isDefault: true, id: { not: id } },
+          data: { isDefault: false },
+        });
+      }
+
+      await tx.whatsappTransport.update({
+        where: { id },
+        data: {
+          name: data.name,
+          type: config.type,
+          fromName: data.fromName,
+          isDefault,
+          config: encryptWhatsappTransportConfig(config),
+        },
+      });
     });
   });

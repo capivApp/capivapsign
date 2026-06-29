@@ -13,6 +13,9 @@ export const ZUpdateWhatsappTransportRequestSchema = z.object({
   data: z.object({
     name: z.string().min(1),
     fromName: z.string().min(1),
+    // When true, this becomes the global fallback transport (any previous
+    // default is cleared).
+    isDefault: z.boolean().optional(),
     config: ZUpdateConfigSchema,
   }),
 });

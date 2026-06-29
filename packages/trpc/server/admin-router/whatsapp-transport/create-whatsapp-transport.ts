@@ -12,17 +12,26 @@ export const createWhatsappTransportRoute = adminProcedure
   .input(ZCreateWhatsappTransportRequestSchema)
   .output(ZCreateWhatsappTransportResponseSchema)
   .mutation(async ({ input }) => {
-    const { name, fromName, config } = input;
+    const { name, fromName, isDefault = false, config } = input;
 
-    const transport = await prisma.whatsappTransport.create({
-      data: {
-        id: generateDatabaseId('whatsapp_transport'),
-        name,
-        type: config.type,
-        fromName,
-        config: encryptWhatsappTransportConfig(config),
-      },
-      select: { id: true },
+    const transport = await prisma.$transaction(async (tx) => {
+      // Only one transport may be the global default, so clear the flag on every
+      // other row before promoting this one.
+      if (isDefault) {
+        await tx.whatsappTransport.updateMany({ where: { isDefault: true }, data: { isDefault: false } });
+      }
+
+      return tx.whatsappTransport.create({
+        data: {
+          id: generateDatabaseId('whatsapp_transport'),
+          name,
+          type: config.type,
+          fromName,
+          isDefault,
+          config: encryptWhatsappTransportConfig(config),
+        },
+        select: { id: true },
+      });
     });
 
     return {

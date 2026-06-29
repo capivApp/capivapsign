@@ -40,6 +40,7 @@ export const WhatsappTransportUpdateDialog = ({ transport, trigger }: WhatsappTr
         data: {
           name: values.name,
           fromName: values.fromName,
+          isDefault: values.isDefault ?? false,
           config: whatsappTransportFormToConfig(values),
         },
       });
@@ -81,6 +82,7 @@ export const WhatsappTransportUpdateDialog = ({ transport, trigger }: WhatsappTr
             ...(transport.config ?? {}),
             name: transport.name,
             fromName: transport.fromName,
+            isDefault: transport.isDefault,
             type: transport.type,
           }}
           onFormSubmit={onFormSubmit}

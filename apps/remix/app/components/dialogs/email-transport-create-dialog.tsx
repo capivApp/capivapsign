@@ -51,6 +51,7 @@ export const EmailTransportCreateDialog = ({ trigger }: EmailTransportCreateDial
       name: values.name,
       fromName: values.fromName,
       fromAddress: values.fromAddress,
+      isDefault: values.isDefault ?? false,
       config: emailTransportFormToConfig(values),
     });
   };

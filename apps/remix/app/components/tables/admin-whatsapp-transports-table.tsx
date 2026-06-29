@@ -1,6 +1,7 @@
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
+import { Badge } from '@documenso/ui/primitives/badge';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -55,6 +56,16 @@ export const AdminWhatsappTransportsTable = () => {
       {
         header: t`Name`,
         accessorKey: 'name',
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            <span>{row.original.name}</span>
+            {row.original.isDefault && (
+              <Badge variant="default" size="small">
+                <Trans>Default</Trans>
+              </Badge>
+            )}
+          </div>
+        ),
       },
       {
         header: t`Provider`,

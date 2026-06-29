@@ -10,6 +10,7 @@ export const ZFindEmailTransportsResponseSchema = ZFindResultResponse.extend({
     id: true,
     name: true,
     type: true,
+    isDefault: true,
     fromName: true,
     fromAddress: true,
     createdAt: true,

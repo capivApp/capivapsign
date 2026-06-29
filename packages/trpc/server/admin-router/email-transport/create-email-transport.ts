@@ -12,18 +12,27 @@ export const createEmailTransportRoute = adminProcedure
   .input(ZCreateEmailTransportRequestSchema)
   .output(ZCreateEmailTransportResponseSchema)
   .mutation(async ({ input }) => {
-    const { name, fromName, fromAddress, config } = input;
+    const { name, fromName, fromAddress, isDefault = false, config } = input;
 
-    const transport = await prisma.emailTransport.create({
-      data: {
-        id: generateDatabaseId('email_transport'),
-        name,
-        type: config.type,
-        fromName,
-        fromAddress,
-        config: encryptEmailTransportConfig(config),
-      },
-      select: { id: true },
+    const transport = await prisma.$transaction(async (tx) => {
+      // Only one transport may be the global default, so clear the flag on every
+      // other row before promoting this one.
+      if (isDefault) {
+        await tx.emailTransport.updateMany({ where: { isDefault: true }, data: { isDefault: false } });
+      }
+
+      return tx.emailTransport.create({
+        data: {
+          id: generateDatabaseId('email_transport'),
+          name,
+          type: config.type,
+          fromName,
+          fromAddress,
+          isDefault,
+          config: encryptEmailTransportConfig(config),
+        },
+        select: { id: true },
+      });
     });
 
     return {

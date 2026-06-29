@@ -10,6 +10,7 @@ export const ZFindWhatsappTransportsResponseSchema = ZFindResultResponse.extend(
     id: true,
     name: true,
     type: true,
+    isDefault: true,
     fromName: true,
     createdAt: true,
     updatedAt: true,

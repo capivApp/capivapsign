@@ -9,6 +9,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { Switch } from '@documenso/ui/primitives/switch';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
@@ -18,6 +19,7 @@ const ZEmailTransportFormSchema = z.object({
   name: z.string().min(1),
   fromName: z.string().min(1),
   fromAddress: z.string().email(),
+  isDefault: z.boolean().optional(),
   type: z.enum(['SMTP_AUTH', 'SMTP_API', 'RESEND', 'MAILCHANNELS']),
   host: z.string().optional(),
   port: z.coerce.number().int().positive().optional(),
@@ -57,6 +59,7 @@ export const EmailTransportForm = ({
       type: 'SMTP_AUTH',
       secure: false,
       ignoreTLS: false,
+      isDefault: false,
       ...defaultValues,
     },
   });
@@ -272,6 +275,30 @@ export const EmailTransportForm = ({
               )}
             />
           )}
+
+          <FormField
+            control={form.control}
+            name="isDefault"
+            render={({ field }) => (
+              <FormItem className="rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <FormLabel>
+                    <Trans>Use as default for all organisations</Trans>
+                  </FormLabel>
+                  <FormControl>
+                    <Switch checked={field.value ?? false} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </div>
+                <FormDescription>
+                  <Trans>
+                    Organisations without their own transport will send through this one. Only one transport can be the
+                    default.
+                  </Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {formSubmitTrigger}
         </fieldset>
