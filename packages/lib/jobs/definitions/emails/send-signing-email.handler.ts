@@ -18,8 +18,8 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
-import { buildEnvelopeEmailHeaders } from '../../../server-only/email/build-envelope-email-headers';
 import { recordUsage } from '../../../server-only/billing/record-usage';
+import { buildEnvelopeEmailHeaders } from '../../../server-only/email/build-envelope-email-headers';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { resolveMessageTemplate } from '../../../server-only/messaging/resolve-message-template';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
@@ -30,6 +30,7 @@ import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
+import { renderFullHtmlMessageTemplate } from '../../../utils/render-message-template-html';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningEmailJobDefinition } from './send-signing-email';
 
@@ -178,15 +179,22 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     }
   }
 
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+  const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
+  const reportUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}`;
+
   const customEmailTemplate = {
     'signer.name': name,
     'signer.email': email,
     'document.name': envelope.title,
+    subject: emailSubject,
+    'document.url': signDocumentLink,
+    'signing.link': signDocumentLink,
   };
 
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-  const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
-  const reportUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}`;
+  // When the org/admin template is a full HTML document, render it verbatim as
+  // the email instead of embedding it inside the default Documenso layout.
+  const fullHtmlEmail = orgTemplate ? renderFullHtmlMessageTemplate(orgTemplate.body, customEmailTemplate) : null;
 
   const template = createElement(DocumentInviteEmailTemplate, {
     documentName: envelope.title,
@@ -226,14 +234,16 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     }
 
     await io.runTask('send-signing-email', async () => {
-      const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-        renderEmailWithI18N(template, {
-          lang: emailLanguage,
-          branding,
-          plainText: true,
-        }),
-      ]);
+      const [html, text] = fullHtmlEmail
+        ? [fullHtmlEmail.html, fullHtmlEmail.text]
+        : await Promise.all([
+            renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+            renderEmailWithI18N(template, {
+              lang: emailLanguage,
+              branding,
+              plainText: true,
+            }),
+          ]);
 
       await emailTransport.sendMail({
         to: {

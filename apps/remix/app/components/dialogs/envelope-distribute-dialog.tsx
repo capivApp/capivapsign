@@ -327,9 +327,9 @@ export const EnvelopeDistributeDialog = ({
                           >
                             <p className="text-muted-foreground text-xs">
                               <Trans>
-                                Cada destinatário é notificado pelo canal escolhido ao adicioná-lo (e-mail ou
-                                WhatsApp). Os campos abaixo se aplicam aos destinatários por e-mail; os de WhatsApp
-                                usam o modelo configurado.
+                                Cada destinatário é notificado pelo canal escolhido ao adicioná-lo (e-mail ou WhatsApp).
+                                Os campos abaixo se aplicam aos destinatários por e-mail; os de WhatsApp usam o modelo
+                                configurado.
                               </Trans>
                             </p>
 
@@ -359,7 +359,7 @@ export const EnvelopeDistributeDialog = ({
                                             </SelectItem>
                                           ))}
 
-                                          <SelectItem value={'-1'}>Documenso</SelectItem>
+                                          <SelectItem value={'-1'}>CapivaSign</SelectItem>
                                         </SelectContent>
                                       </Select>
                                     </FormControl>

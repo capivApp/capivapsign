@@ -49,6 +49,10 @@ export const signPdf = async ({ pdf }: SignOptions) => {
     timestampAuthority: tsa ?? undefined,
     longTermValidation: !!tsa,
     archivalTimestamp: !!tsa,
+    // The @libpdf/core default (12KB) is too small once the full certificate
+    // chain + TSA timestamp + LTV/revocation data are embedded. Reserve a much
+    // larger buffer so signing doesn't fail with PLACEHOLDER_TOO_SMALL.
+    estimatedSize: 131072,
   });
 
   return bytes;

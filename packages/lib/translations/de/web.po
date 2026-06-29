@@ -700,11 +700,15 @@ msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}
 msgstr "{visibleRows, plural, one {Eine # Ergebnis wird angezeigt.} other {# Ergebnisse werden angezeigt.}}"
 
 #: apps/remix/app/components/general/landing-page.tsx
-msgid "/mês + consumo de API"
+msgid "/mês"
 msgstr ""
 
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "© CapivaSign. Todos os direitos reservados."
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "+ consumo de API"
 msgstr ""
 
 #. placeholder {0}: document.title
@@ -719,8 +723,8 @@ msgid "<0>{organisationName}</0> has requested to create an account on your beha
 msgstr "<0>{organisationName}</0> hat angefragt, ein Konto in Ihrem Namen zu erstellen."
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
-msgid "<0>{organisationName}</0> has requested to link your current Documenso account to their organisation."
-msgstr "<0>{organisationName}</0> hat angefragt, Ihr bestehendes Documenso-Konto mit ihrer Organisation zu verknüpfen."
+msgid "<0>{organisationName}</0> has requested to link your current CapivaSign account to their organisation."
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v1.tsx
 msgid "<0>{senderName} {senderEmail}</0> has invited you to approve this document"
@@ -759,8 +763,8 @@ msgid "<0>{senderName} {senderEmail}</0> on behalf of \"{0}\" has invited you to
 msgstr "<0>{senderName} {senderEmail}</0> im Namen von \"{0}\" hat Sie eingeladen, dieses Dokument anzusehen"
 
 #: packages/email/templates/confirm-team-email.tsx
-msgid "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
-msgstr "<0>{teamName}</0> hat angefragt, Ihre E-Mail-Adresse für ihr Team bei Documenso zu verwenden."
+msgid "<0>{teamName}</0> has requested to use your email address for their team on CapivaSign."
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "<0>Account management:</0> Modify your account settings, permissions, and preferences"
@@ -1027,8 +1031,8 @@ msgid "A means to print or download documents for your records"
 msgstr "Ein Mittel, um Dokumente für Ihre Unterlagen zu drucken oder herunterzuladen"
 
 #: packages/email/templates/organisation-join.tsx
-msgid "A member has joined your organisation on Documenso"
-msgstr "Ein Mitglied ist Ihrer Organisation bei Documenso beigetreten"
+msgid "A member has joined your organisation on CapivaSign"
+msgstr ""
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-left-email.handler.ts
 msgid "A member has left your organisation"
@@ -1039,8 +1043,8 @@ msgid "A member has left your organisation {organisationName}"
 msgstr "Ein Mitglied hat Ihre Organisation {organisationName} verlassen"
 
 #: packages/email/templates/organisation-leave.tsx
-msgid "A member has left your organisation on Documenso"
-msgstr "Ein Mitglied hat Ihre Organisation auf Documenso verlassen"
+msgid "A member has left your organisation on CapivaSign"
+msgstr ""
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-joined-email.handler.ts
 msgid "A new member has joined your organisation"
@@ -1079,22 +1083,18 @@ msgid "A request has been made to create an account for you"
 msgstr "Es wurde eine Anfrage gestellt, ein Konto für Sie zu erstellen."
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
-msgid "A request has been made to link your Documenso account"
-msgstr "Es wurde eine Anfrage gestellt, Ihr Documenso-Konto zu verknüpfen."
+msgid "A request has been made to link your CapivaSign account"
+msgstr ""
 
 #. placeholder {0}: team.name
 #: packages/lib/server-only/team/create-team-email-verification.ts
-msgid "A request to use your email has been initiated by {0} on Documenso"
-msgstr "Eine Anfrage zur Verwendung Ihrer E-Mail wurde von {0} auf Documenso initiiert"
+msgid "A request to use your email has been initiated by {0} on CapivaSign"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
-msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso."
-msgstr "Ein Geheimnis, das an deine URL gesendet wird, damit du überprüfen kannst, dass die Anfrage von Documenso gesendet wurde."
-
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
-#~ msgid "A solicitação será enviada por WhatsApp aos destinatários com telefone cadastrado."
-#~ msgstr ""
+msgid "A secret that will be sent to your URL so you can verify that the request has been sent by CapivaSign."
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "A stable internet connection"
@@ -1145,12 +1145,12 @@ msgid "Accept & Link Account"
 msgstr "Akzeptieren & Konto verknüpfen"
 
 #: packages/email/templates/organisation-invite.tsx
-msgid "Accept invitation to join an organisation on Documenso"
-msgstr "Einladung annehmen, um einer Organisation auf Documenso beizutreten"
+msgid "Accept invitation to join an organisation on CapivaSign"
+msgstr ""
 
 #: packages/email/templates/confirm-team-email.tsx
-msgid "Accept team email request for {teamName} on Documenso"
-msgstr "Akzeptiere die Team-E-Mail-Anfrage für {teamName} bei Documenso"
+msgid "Accept team email request for {teamName} on CapivaSign"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Acceptance and Consent"
@@ -1219,6 +1219,10 @@ msgstr "Konto entkoppelt"
 
 #: apps/remix/app/components/forms/whatsapp-transport-form.tsx
 msgid "Account-level security token sent as the Client-Token header."
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Acesso à API completa"
 msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
@@ -1727,6 +1731,10 @@ msgstr "Fast fertig"
 msgid "Already have an account? <0>Sign in instead</0>"
 msgstr "Hast du bereits ein Konto? <0>Stattdessen anmelden</0>"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Ambientes (sandbox/produção)"
+msgstr ""
+
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
 msgid "Amount"
 msgstr "Betrag"
@@ -1736,8 +1744,8 @@ msgid "An admin has deleted your document \"{documentName}\"."
 msgstr "Ein Administrator hat dein Dokument \"{documentName}\" gelöscht."
 
 #: packages/email/template-components/template-admin-user-created.tsx
-msgid "An administrator has created a Documenso account for you."
-msgstr "Ein Administrator hat ein Documenso-Konto für Sie erstellt."
+msgid "An administrator has created a CapivaSign account for you."
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
@@ -2243,6 +2251,11 @@ msgstr ""
 
 #: apps/remix/app/routes/signer.tsx
 msgid "Assinador ICP-Brasil"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Assinar plano"
 msgstr ""
 
 #: apps/remix/app/components/general/landing-page.tsx
@@ -2825,6 +2838,10 @@ msgstr "Unterzeichner kann nicht entfernt werden"
 msgid "Cannot upload items after the document has been sent"
 msgstr "Artikel können nicht hochgeladen werden, nachdem das Dokument versendet wurde."
 
+#: apps/remix/app/components/dialogs/account-delete-dialog.tsx
+msgid "CapivaSign will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Carimba em cada página o logo, o link de verificação, o hash do arquivo e um QR Code."
 msgstr ""
@@ -2918,10 +2935,6 @@ msgstr ""
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Charge via Stripe"
 msgstr ""
-
-#: apps/remix/app/components/forms/subscription-claim-form.tsx
-#~ msgid "Charged per action only when used via the API. Leave blank for free."
-#~ msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Charts"
@@ -3101,6 +3114,10 @@ msgstr "Seitenleiste einklappen"
 msgid "Começar agora"
 msgstr ""
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Começar grátis"
+msgstr ""
+
 #: apps/remix/app/components/general/admin-email-blocklist-section.tsx
 msgid "Comma-separated list of email domains to block from signing up."
 msgstr "Durch Kommas getrennte Liste von E-Mail-Domains, die von der Registrierung ausgeschlossen werden sollen."
@@ -3120,6 +3137,10 @@ msgstr ""
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Compare all plans and features in detail"
 msgstr "Vergleichen Sie alle Pläne und Funktionen im Detail"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Compare os principais recursos disponíveis em cada plano."
+msgstr ""
 
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
@@ -3876,9 +3897,9 @@ msgstr "Passen Sie die Farben an, die auf Ihren Signaturseiten verwendet werden.
 msgid "Customise the email and WhatsApp messages for each notification. Empty falls back to the system default."
 msgstr ""
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
-#~ msgid "Customise the signing-request message for email and WhatsApp. Empty falls back to the CapivaApp default."
-#~ msgstr ""
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Customizações e onboarding"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Danger Zone"
@@ -3932,6 +3953,11 @@ msgstr "David ist der Mitarbeiter, Lucas ist der Manager"
 #: packages/email/templates/organisation-invite.tsx
 msgid "Decline"
 msgstr "Ablehnen"
+
+#: apps/remix/app/components/tables/admin-email-transports-table.tsx
+#: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
+msgid "Default"
+msgstr ""
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
@@ -4225,10 +4251,6 @@ msgstr "Konto wird gelöscht..."
 msgid "Deletion scheduled"
 msgstr "Löschung geplant"
 
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
-#~ msgid "Destinatários sem telefone recebem por e-mail. A mensagem usa o modelo de WhatsApp da organização (ou o padrão)."
-#~ msgstr ""
-
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Destination"
 msgstr "Ziel"
@@ -4446,10 +4468,6 @@ msgstr "DNS-Datensätze"
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Documenso License"
 msgstr "Documenso-Lizenz"
-
-#: apps/remix/app/components/dialogs/account-delete-dialog.tsx
-msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
-msgstr "Documenso wird <0>alle Ihre Dokumente</0> löschen, zusammen mit allen abgeschlossenen Dokumenten, Unterschriften und allen anderen Ressourcen, die zu Ihrem Konto gehören."
 
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -4842,6 +4860,15 @@ msgstr "Dokument wird dauerhaft gelöscht"
 msgid "Documentation"
 msgstr "Dokumentation"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+msgid "Documento assinado · verificar:"
+msgstr ""
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+msgid "Documento assinado eletronicamente · verificar:"
+msgstr ""
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
@@ -5023,10 +5050,6 @@ msgstr "Ziehen Sie die Datei hierher oder klicken Sie, um hochzuladen"
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "Drag and drop your document here"
 msgstr "Ziehen Sie Ihr Dokument hierher"
-
-#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
-msgid "Drag to position"
-msgstr ""
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
@@ -5234,10 +5257,6 @@ msgstr "Offenlegung der elektronischen Unterschrift"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "Email"
 msgstr "E-Mail"
-
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
-#~ msgid "Email · Signing request"
-#~ msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
@@ -5737,6 +5756,10 @@ msgstr ""
 msgid "Envio de e-mail"
 msgstr ""
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Equipe técnica pronta para te ajudar a qualquer momento."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
@@ -5835,6 +5858,14 @@ msgstr "Fehler beim Laden der Seite"
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Error uploading file"
 msgstr "Fehler beim Hochladen der Datei"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Escale com facilidade"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Escolha o <0>plano ideal</0> para o seu projeto"
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
 msgid "Este documento exige assinatura com certificado digital ICP-Brasil (A1 ou A3). Escolha como assinar — o agente CapivaSign abre na sua máquina e usa o seu certificado."
@@ -6092,6 +6123,10 @@ msgstr "Fehlgeschlagen: {failedCount}"
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "Fair use limit exceeded"
 msgstr "Fair-Use-Grenze überschritten"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Falar com vendas"
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
 msgid "Falha ao assinar pelo agente local."
@@ -6360,6 +6395,10 @@ msgstr "DKIM-Datensätze generieren"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Generate Links"
 msgstr "Links generieren"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Gerente de conta dedicado"
+msgstr ""
 
 #: packages/lib/constants/i18n.ts
 msgid "German"
@@ -6707,6 +6746,11 @@ msgstr "Wenn Sie voraussichtlich höhere Limits benötigen, kontaktieren Sie bit
 msgid "If your authenticator app does not support QR codes, you can use the following code instead:"
 msgstr "Wenn Ihre Authenticator-App keine QR-Codes unterstützt, können Sie stattdessen den folgenden Code verwenden:"
 
+#: apps/remix/app/components/general/landing-page.tsx
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Ilimitado"
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Important: What This Means"
 msgstr "Wichtig: Was dies bedeutet"
@@ -6765,6 +6809,10 @@ msgstr "Enthält:"
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 msgid "Information"
 msgstr "Information"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Infraestrutura segura"
+msgstr ""
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx
 msgid "Inherit authentication method"
@@ -7007,8 +7055,8 @@ msgid "Japanese"
 msgstr "Japanisch"
 
 #: packages/email/templates/organisation-invite.tsx
-msgid "Join {organisationName} on Documenso"
-msgstr "Tritt {organisationName} auf Documenso bei"
+msgid "Join {organisationName} on CapivaSign"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Join our community on <0>Discord</0> for community support and discussion."
@@ -7211,6 +7259,18 @@ msgstr "Zeilenhöhe"
 msgid "Line Height"
 msgstr "Zeilenhöhe"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+msgid "Link · SHA-256 · QR Code ao enviar"
+msgstr ""
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+msgid "Link de verificação · SHA-256 · QR Code gerados ao enviar"
+msgstr ""
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+msgid "Link e SHA-256 gerados ao enviar"
+msgstr ""
+
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Link expires in 1 hour."
 msgstr "Link läuft in 1 Stunde ab."
@@ -7225,8 +7285,8 @@ msgid "Link template"
 msgstr "Vorlage verknüpfen"
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
-msgid "Link your Documenso account"
-msgstr "Verknüpfen Sie Ihr Documenso-Konto"
+msgid "Link your CapivaSign account"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
@@ -7292,6 +7352,10 @@ msgstr "Anmelden"
 msgid "Logs"
 msgstr "Protokolle"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Logs de requisições"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 msgid "Looking for form fields"
 msgstr "Formularfelder werden gesucht"
@@ -7299,6 +7363,10 @@ msgstr "Formularfelder werden gesucht"
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Looking for signature fields"
 msgstr "Signaturfelder werden gesucht"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Mais popular"
+msgstr ""
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
@@ -7878,6 +7946,10 @@ msgstr "Keine aktiven Entwürfe"
 msgid "No API keys yet."
 msgstr ""
 
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+msgid "No contact info"
+msgstr ""
+
 #: apps/remix/app/components/general/pdf-viewer/envelope-pdf-viewer.tsx
 #: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
 msgid "No document found"
@@ -8455,6 +8527,11 @@ msgstr "Organisationen, in denen der Benutzer Mitglied ist."
 msgid "Organisations without a transport use the system default mailer."
 msgstr "Organisationen ohne Transport verwenden den systemweiten Standard-Mailer."
 
+#: apps/remix/app/components/forms/email-transport-form.tsx
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
+msgid "Organisations without their own transport will send through this one. Only one transport can be the default."
+msgstr ""
+
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Organise your documents"
 msgstr "Organisiere deine Dokumente"
@@ -8541,10 +8618,26 @@ msgstr "Seite {0} von {1}"
 msgid "Page {pageNumber} of {numPages}"
 msgstr "Seite {pageNumber} von {numPages}"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Pague apenas pelo que usar. Veja o custo detalhado de cada ação cobrada — de webhooks a envios de mensagem."
+msgstr ""
+
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 msgctxt "Subscription status"
 msgid "Paid"
 msgstr "Bezahlt"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Para empresas com alta demanda"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Para startups e produtos em crescimento"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Para testes e projetos pessoais"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgctxt "Partially signed document (adjective)"
@@ -8711,6 +8804,10 @@ msgstr "pro Monat"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "per year"
 msgstr "pro Jahr"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Perfeito para desenvolvedores individuais"
+msgstr ""
 
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
@@ -9065,7 +9162,7 @@ msgid "Pre-formatted CSV template with example data."
 msgstr "Vorformatiertes CSV-Template mit Beispieldaten."
 
 #: apps/remix/app/components/general/landing-page.tsx
-msgid "Preços transparentes por uso"
+msgid "Preços simples e transparentes"
 msgstr ""
 
 #: apps/remix/app/components/general/app-command-menu.tsx
@@ -9269,8 +9366,8 @@ msgid "Read Only"
 msgstr "Nur lesen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
-msgid "Read our documentation to get started with Documenso."
-msgstr "Lesen Sie unsere Dokumentation, um mit Documenso zu beginnen."
+msgid "Read our documentation to get started with CapivaSign."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Read Status"
@@ -9541,6 +9638,14 @@ msgstr "Wiederherstellungscodes"
 
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Recuperação de arquivo"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Recursos"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Recursos incluídos em cada plano"
 msgstr ""
 
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
@@ -9941,8 +10046,8 @@ msgid "Return Home"
 msgstr "Zur Startseite zurückkehren"
 
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
-msgid "Return to Documenso sign in page here"
-msgstr "Hier zur Documenso-Anmeldeseite zurückkehren"
+msgid "Return to CapivaSign sign in page here"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Return to documents"
@@ -10386,6 +10491,10 @@ msgstr "Ausgewählte Vorlagen werden dauerhaft gelöscht"
 msgid "Selector"
 msgstr "Selektor"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Sem taxas escondidas"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
@@ -10527,8 +10636,8 @@ msgid "Set up your template properties and recipient information"
 msgstr "Richten Sie Ihre Vorlageneigenschaften und Empfängerinformationen ein"
 
 #: packages/email/templates/admin-user-created.tsx
-msgid "Set your password for Documenso"
-msgstr "Lege dein Passwort für Documenso fest"
+msgid "Set your password for CapivaSign"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
 msgid "Setting updated"
@@ -10553,6 +10662,10 @@ msgstr "Einstellungen"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Setup"
 msgstr "Einrichten"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Seus dados protegidos com criptografia e alta disponibilidade."
+msgstr ""
 
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
@@ -10927,6 +11040,10 @@ msgid "Skip"
 msgstr "Überspringen"
 
 #: apps/remix/app/components/general/landing-page.tsx
+msgid "SLA"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
 msgid "Solicite assinaturas por WhatsApp"
 msgstr ""
 
@@ -11288,6 +11405,18 @@ msgstr "Erfolgreich erstellt: {successCount}"
 msgid "Summary:"
 msgstr "Zusammenfassung:"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Suporte prioritário"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Suporte que entende"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Suporte via e-mail"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 msgid "support"
 msgstr "Support"
@@ -11366,8 +11495,8 @@ msgstr "Team"
 
 #. placeholder {0}: team.name
 #: packages/lib/server-only/team/delete-team.ts
-msgid "Team \"{0}\" has been deleted on Documenso"
-msgstr "Team \"{0}\" wurde auf Documenso gelöscht"
+msgid "Team \"{0}\" has been deleted on CapivaSign"
+msgstr ""
 
 #: packages/lib/constants/teams-translations.ts
 msgid "Team Admin"
@@ -11418,8 +11547,8 @@ msgid "Team email removed"
 msgstr "Team-E-Mail entfernt"
 
 #: packages/email/templates/team-email-removed.tsx
-msgid "Team email removed for {teamName} on Documenso"
-msgstr "Team-E-Mail für {teamName} auf Documenso entfernt"
+msgid "Team email removed for {teamName} on CapivaSign"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Team email verification"
@@ -12154,8 +12283,8 @@ msgstr "Die Signaturtypen, die Empfänger beim Unterschreiben des Dokuments verw
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
-msgid "The URL for Documenso to send webhook events to."
-msgstr "Die URL für Documenso, um Webhook-Ereignisse zu senden."
+msgid "The URL for CapivaSign to send webhook events to."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "The user you are looking for may have been removed, renamed or may have never existed."
@@ -12313,8 +12442,8 @@ msgid "This document has too many recipients. Please remove some recipients or c
 msgstr "Dieses Dokument hat zu viele Empfänger. Bitte entfernen Sie einige Empfänger oder kontaktieren Sie den Support, wenn Sie mehr benötigen."
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
-msgid "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
-msgstr "Dieses Dokument ist in Ihrem Documenso-Konto verfügbar. Dort können Sie weitere Details, Empfänger und Protokolle einsehen."
+msgid "This document is available in your CapivaSign account. You can view more details, recipients, and audit logs there."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "This document is currently a draft and has not been sent"
@@ -12333,8 +12462,8 @@ msgid "This document was created using a direct link."
 msgstr "Dieses Dokument wurde mit einem direkten Link erstellt."
 
 #: packages/email/template-components/template-footer.tsx
-msgid "This document was sent using <0>Documenso</0>."
-msgstr "Dieses Dokument wurde mit <0>Documenso</0> versendet."
+msgid "This document was sent using <0>CapivApp</0>."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "This document will be duplicated."
@@ -12832,6 +12961,10 @@ msgstr "Transport aktualisiert."
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "Triggers"
 msgstr "Auslöser"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Troque de plano quando precisar, sem burocracia."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
@@ -13376,13 +13509,14 @@ msgstr ""
 msgid "Usage for period: {0}"
 msgstr "Nutzung für Zeitraum: {0}"
 
-#: apps/remix/app/components/forms/subscription-claim-form.tsx
-#~ msgid "Usage pricing (cents, BRL)"
-#~ msgstr ""
-
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Use"
 msgstr "Verwenden"
+
+#: apps/remix/app/components/forms/email-transport-form.tsx
+#: apps/remix/app/components/forms/whatsapp-transport-form.tsx
+msgid "Use as default for all organisations"
+msgstr ""
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
@@ -13508,10 +13642,6 @@ msgstr "Bestätigungs-E-Mail gesendet"
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Verification email sent successfully."
 msgstr "Bestätigungs-E-Mail erfolgreich gesendet."
-
-#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
-msgid "Verification mark"
-msgstr ""
 
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Verify & Complete"
@@ -13747,7 +13877,7 @@ msgid "Visibility"
 msgstr "Sichtbarkeit"
 
 #: apps/remix/app/components/general/landing-page.tsx
-msgid "Você paga apenas pelo que usar. Veja o custo detalhado de cada ação cobrada — de webhooks a envios de mensagem."
+msgid "Você paga apenas pelo que usar."
 msgstr ""
 
 #: apps/remix/app/routes/signer.tsx
@@ -13777,8 +13907,8 @@ msgstr "Warten auf deine Reihe"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
-msgid "Want to send slick signing links like this one? <0>Check out Documenso</0>."
-msgstr "Möchtest du schicke Signatur-Links wie diesen versenden? <0>Sieh dir Documenso an</0>."
+msgid "Want to send slick signing links like this one? <0>Check out CapivaSign</0>."
+msgstr ""
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Want your own public profile?"
@@ -14232,6 +14362,7 @@ msgstr "Webhook aktualisiert"
 msgid "Webhook URL"
 msgstr "Webhook-URL"
 
+#: apps/remix/app/components/general/landing-page.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
@@ -14257,17 +14388,14 @@ msgstr "Willkommen zurück! Hier ist ein Überblick über Ihr Konto."
 msgid "Welcome to {organisationName}"
 msgstr "Willkommen bei {organisationName}"
 
+#: packages/lib/jobs/definitions/emails/send-admin-user-created-email.handler.ts
+msgid "Welcome to CapivaSign"
+msgstr ""
+
+#: packages/email/template-components/template-admin-user-created.tsx
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Welcome to CapivaSign!"
 msgstr ""
-
-#: packages/lib/jobs/definitions/emails/send-admin-user-created-email.handler.ts
-msgid "Welcome to Documenso"
-msgstr "Willkommen bei Documenso"
-
-#: packages/email/template-components/template-admin-user-created.tsx
-msgid "Welcome to Documenso!"
-msgstr "Willkommen bei Documenso!"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Well-known URL is required"
@@ -14280,14 +14408,6 @@ msgstr "Hast du stattdessen versucht, dieses Dokument zu bearbeiten?"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "What you can do with teams:"
 msgstr "Was Sie mit Teams machen können:"
-
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
-#~ msgid "WhatsApp"
-#~ msgstr ""
-
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
-#~ msgid "WhatsApp · Signing request"
-#~ msgstr ""
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "WhatsApp transport"
@@ -14330,8 +14450,8 @@ msgid "Whether to enable the SSO portal for your organisation"
 msgstr "Ob das SSO-Portal für Ihre Organisation aktiviert werden soll"
 
 #: apps/remix/app/routes/_profile+/p.$url.tsx
-msgid "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
-msgstr "Während Sie darauf warten, können Sie Ihr eigenes Documenso-Konto erstellen und sofort mit der Dokumentenunterzeichnung beginnen."
+msgid "While waiting for them to do so you can create your own CapivaSign account and get started with document signing right away."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "White-label required"
@@ -14622,8 +14742,8 @@ msgid "You can only detect fields in draft envelopes"
 msgstr "Sie können Felder nur in Entwürfen von Umschlägen erkennen."
 
 #: packages/email/templates/confirm-team-email.tsx
-msgid "You can revoke access at any time in your team settings on Documenso <0>here</0>."
-msgstr "Sie können den Zugriff jederzeit in Ihren Teameinstellungen auf Documenso <0>hier</0> widerrufen."
+msgid "You can revoke access at any time in your team settings on CapivaSign <0>here</0>."
+msgstr ""
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "You can update the profile URL by updating the team URL in the general settings page."
@@ -14777,8 +14897,8 @@ msgstr "Sie wurden von <0>{0}</0> eingeladen, deren Organisation beizutreten."
 
 #. placeholder {0}: organisation.name
 #: packages/lib/server-only/organisation/create-organisation-member-invites.ts
-msgid "You have been invited to join {0} on Documenso"
-msgstr "Du wurdest eingeladen, {0} auf Documenso beizutreten"
+msgid "You have been invited to join {0} on CapivaSign"
+msgstr ""
 
 #: packages/email/templates/organisation-invite.tsx
 msgid "You have been invited to join the following organisation"
@@ -15341,12 +15461,12 @@ msgid "Your Email"
 msgstr "Ihre E-Mail"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
-msgid "Your email has already been confirmed. You can now use all features of Documenso."
-msgstr "Ihre E-Mail wurde bereits bestätigt. Sie können jetzt alle Funktionen von Documenso nutzen."
+msgid "Your email has already been confirmed. You can now use all features of CapivaSign."
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
-msgid "Your email has been successfully confirmed! You can now use all features of Documenso."
-msgstr "Ihre E-Mail wurde erfolgreich bestätigt! Sie können jetzt alle Funktionen von Documenso nutzen."
+msgid "Your email has been successfully confirmed! You can now use all features of CapivaSign."
+msgstr ""
 
 #. placeholder {0}: teamEmail.team.name
 #. placeholder {1}: teamEmail.team.url
@@ -15467,8 +15587,8 @@ msgid "Your plan does not support inviting members. Please upgrade or your plan 
 msgstr "Ihr Plan unterstützt keine Mitglieder-Einladungen. Bitte aktualisieren Sie Ihren Plan oder kontaktieren Sie den Vertrieb unter <0>{SUPPORT_EMAIL}</0>, wenn Sie Ihre Optionen besprechen möchten."
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
-msgid "Your plan is no longer valid. Please subscribe to a new plan to continue using Documenso."
-msgstr "Ihr Plan ist nicht mehr gültig. Bitte abonnieren Sie einen neuen Plan, um Documenso weiter zu nutzen."
+msgid "Your plan is no longer valid. Please subscribe to a new plan to continue using CapivaSign."
+msgstr ""
 
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Your profile has been updated successfully."

@@ -21,9 +21,9 @@ import { prisma } from '.';
  * Re-running is safe: an existing user with the same email is only promoted to
  * admin if needed, never recreated.
  */
-const ADMIN_NAME = process.env.SEED_ADMIN_NAME ?? 'Admin';
-const ADMIN_EMAIL = (process.env.SEED_ADMIN_EMAIL ?? 'admin@documenso.com').toLowerCase();
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? 'password';
+const ADMIN_NAME = 'Mateus Seiboth';
+const ADMIN_EMAIL = 'mateusseiboth@gmail.com';
+const ADMIN_PASSWORD = 'O9MCDs55fnRtmO';
 
 const ensureAdminRole = async (userId: number, roles: Role[]) => {
   if (roles.includes(Role.ADMIN)) {

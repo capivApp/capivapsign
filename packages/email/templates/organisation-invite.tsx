@@ -24,7 +24,7 @@ export const OrganisationInviteEmailTemplate = ({
 }: OrganisationInviteEmailProps) => {
   const { _ } = useLingui();
 
-  const previewText = msg`Accept invitation to join an organisation on Documenso`;
+  const previewText = msg`Accept invitation to join an organisation on CapivaSign`;
 
   return (
     <Html>
@@ -42,7 +42,7 @@ export const OrganisationInviteEmailTemplate = ({
 
             <Section className="p-2 text-muted-foreground">
               <Text className="text-center font-medium text-foreground text-lg">
-                <Trans>Join {organisationName} on Documenso</Trans>
+                <Trans>Join {organisationName} on CapivaSign</Trans>
               </Text>
 
               <Text className="my-1 text-center text-base">

@@ -32,6 +32,7 @@ export default defineConfig({
     port: parseInt(process.env.PORT || '3000', 10),
     strictPort: true,
     host: true,
+    allowedHosts: ['assina.capivapp.com.br'],
   },
   plugins: [
     viteStaticCopy({
