@@ -46,15 +46,29 @@ interface RawDigestSigner {
     };
   }
 
-  /** Windows-MY path: sign DigestInfo via NONEwithRSA (no internal hashing). */
+  /**
+   * Windows-MY path: sign the RAW digest via NONEwithRSA.
+   *
+   * SunMSCAPI's {@code NONEwithRSA} is not a generic "sign these bytes verbatim"
+   * primitive: it takes the bare hash, infers the digest algorithm from its
+   * length (20/32/48/64 → SHA-1/256/384/512) and builds the {@code DigestInfo}
+   * plus PKCS#1 v1.5 padding itself inside CryptoAPI. Handing it an already
+   * wrapped {@code DigestInfo} makes it see an unrecognised length and fail with
+   * "Message digest length is not supported", so we must pass {@code digest}
+   * straight through — NOT {@link DigestInfo#wrap}. The resulting signature is
+   * the identical RSASSA-PKCS1-v1_5 value the cipher path produces.
+   */
   static RawDigestSigner noneWithRsa(PrivateKey key, Provider provider) {
     assertRsa(key);
     return (digest, digestAlgo) -> {
+      // Reject digests we don't support up front, so an unknown algo fails the
+      // same way the cipher path does instead of producing a wrong signature.
+      DigestInfo.jcaName(digestAlgo);
       Signature s = provider == null
           ? Signature.getInstance("NONEwithRSA")
           : Signature.getInstance("NONEwithRSA", provider);
       s.initSign(key);
-      s.update(DigestInfo.wrap(digestAlgo, digest));
+      s.update(digest);
       return s.sign();
     };
   }

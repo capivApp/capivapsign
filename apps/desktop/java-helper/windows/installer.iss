@@ -18,6 +18,10 @@
 #define AppVersion "1.0.0"
 #define AppPublisher "Documenso"
 #define AppExeName "IcpAgent.exe"
+; Windowed (no-console) launcher used for the always-on tray serve agent, so the
+; auto-started agent leaves no lingering console window. Built by
+; package-windows.bat via --add-launcher IcpAgentTray.
+#define TrayExeName "IcpAgentTray.exe"
 #define Protocol "documenso-icp"
 
 ; Origin the agent is allowed to talk to. Override at compile time:
@@ -68,17 +72,20 @@ Root: HKLM; Subkey: "Software\Classes\{#Protocol}\shell\open\command"; ValueType
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "ICP_ALLOWED_ORIGIN"; ValueData: "{#AllowedOrigin}"; Flags: preservestringtype uninsdeletevalue
 
 ; --- auto-start the tray serve agent at every user logon --------------------
-Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "DocumensoIcpAgent"; ValueData: """{app}\{#AppExeName}"" serve --no-gui"; Flags: uninsdeletevalue
+; Uses the windowed launcher (no console window pops up at logon).
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "DocumensoIcpAgent"; ValueData: """{app}\{#TrayExeName}"""; Flags: uninsdeletevalue
 
 [Icons]
-Name: "{group}\Iniciar assinador (serve)"; Filename: "{app}\{#AppExeName}"; Parameters: "serve --no-gui"
+Name: "{group}\Iniciar assinador (serve)"; Filename: "{app}\{#TrayExeName}"
 Name: "{group}\Listar certificados"; Filename: "{app}\{#AppExeName}"; Parameters: "list --source windows-my"
 Name: "{group}\Desinstalar {#AppName}"; Filename: "{uninstallexe}"
 
 [Run]
-; Start it now so signing works immediately (no logoff/reboot needed).
-Filename: "{app}\{#AppExeName}"; Parameters: "serve --no-gui"; Description: "Iniciar o assinador agora"; Flags: nowait postinstall skipifsilent
+; Start it now so signing works immediately (no logoff/reboot needed). Windowed
+; launcher → no console window.
+Filename: "{app}\{#TrayExeName}"; Description: "Iniciar o assinador agora"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-; Stop a running agent before files are removed.
+; Stop a running agent before files are removed (both launchers).
+Filename: "{sys}\taskkill.exe"; Parameters: "/f /im {#TrayExeName}"; Flags: runhidden; RunOnceId: "StopTrayAgent"
 Filename: "{sys}\taskkill.exe"; Parameters: "/f /im {#AppExeName}"; Flags: runhidden; RunOnceId: "StopAgent"

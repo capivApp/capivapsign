@@ -227,19 +227,34 @@ final class ServeMode {
     if (GraphicsEnvironment.isHeadless()) {
       return;
     }
+    String allowed = System.getenv("ICP_ALLOWED_ORIGIN");
+    String originLine = allowed == null || allowed.isBlank()
+        ? "<p style='color:#b45309;'>⚠ Aceitando qualquer site (ICP_ALLOWED_ORIGIN não definido).</p>"
+        : "<p>Site autorizado: <b>" + escapeHtml(allowed) + "</b></p>";
+
     SwingUtilities.invokeLater(() -> {
       JFrame frame = new JFrame("CapivaSign — Assinador ICP-Brasil");
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       JLabel label = new JLabel(
-          "<html><div style='padding:24px;text-align:center;font-family:sans-serif;'>"
-              + "<h2>Aguardando pedido de assinatura…</h2>"
-              + "<p>Deixe esta janela aberta. Ao assinar no navegador,<br/>"
-              + "o pedido chega aqui (porta 3231) e o seu certificado é usado.</p></div></html>",
+          "<html><div style='padding:24px;text-align:center;font-family:sans-serif;width:380px;'>"
+              + "<h2 style='margin-bottom:4px;'>Assinador ativo</h2>"
+              + "<p style='color:#16a34a;margin-top:0;'>● Aguardando pedido de assinatura…</p>"
+              + "<p>Deixe esta janela aberta. Ao confirmar a assinatura no navegador,"
+              + " o pedido chega aqui e o seu certificado ICP-Brasil é usado para assinar.</p>"
+              + originLine
+              + "<p style='color:#6b7280;font-size:11px;'>Escutando em http://127.0.0.1:" + PORT
+              + " · Para encerrar, feche esta janela.</p>"
+              + "</div></html>",
           SwingConstants.CENTER);
       frame.add(label);
-      frame.setSize(440, 210);
+      frame.setSize(460, 280);
       frame.setLocationRelativeTo(null);
       frame.setVisible(true);
     });
+  }
+
+  /** Minimal HTML escaping so an origin can't break the Swing HTML label. */
+  private static String escapeHtml(String s) {
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
   }
 }

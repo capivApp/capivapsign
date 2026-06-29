@@ -98,8 +98,11 @@ const formatBrl = (cents: number) => (cents / 100).toLocaleString('pt-BR', { sty
 
 // Presentation metadata for the customer-facing plans. Prices flow from the
 // claims catalogue (DB); copy, icons and comparison values live here. Plans are
-// keyed by their lowercased claim `name` and rendered in `PLAN_ORDER`. Internal
-// claims (e.g. Platform/Teams) without an entry here stay off the public page.
+// keyed by their lowercased claim `name` and rendered in `PLAN_ORDER` first,
+// then any remaining priced claim is appended with `FALLBACK_PLAN_META` — so a
+// claim added in admin shows up on the page as soon as it has a price, even
+// without a curated entry here. Visibility is controlled by setting a price
+// (see `getPublicPricingClaims`), not by this map.
 type PlanFeatureValue = boolean | ReactNode;
 
 type PlanMeta = {
@@ -110,7 +113,7 @@ type PlanMeta = {
   features: Record<string, PlanFeatureValue>;
 };
 
-const PLAN_ORDER = ['free', 'individual', 'early adopter', 'enterprise'];
+const PLAN_ORDER = ['free', 'individual', 'early adopter', 'plataforma', 'enterprise'];
 
 const PLAN_META: Record<string, PlanMeta> = {
   free: {
@@ -162,6 +165,22 @@ const PLAN_META: Record<string, PlanMeta> = {
       onboarding: false,
     },
   },
+  plataforma: {
+    icon: LayersIcon,
+    tagline: <Trans>Para plataformas que assinam em escala</Trans>,
+    cta: { label: <Trans>Assinar plano</Trans>, to: '/signup', variant: 'outline' },
+    features: {
+      apiFull: true,
+      emailSupport: true,
+      webhooks: '2.000/mês',
+      environments: '10',
+      logs: '60 dias',
+      sla: '99,9%',
+      prioritySupport: true,
+      accountManager: true,
+      onboarding: false,
+    },
+  },
   enterprise: {
     icon: Building2Icon,
     tagline: <Trans>Para empresas com alta demanda</Trans>,
@@ -178,6 +197,16 @@ const PLAN_META: Record<string, PlanMeta> = {
       onboarding: true,
     },
   },
+};
+
+// Used for any priced claim that has no curated `PLAN_META` entry (e.g. a plan
+// freshly added in admin). It still renders a real card from the DB price/flags;
+// it just has no hand-written tagline or marketing-tier comparison values.
+const FALLBACK_PLAN_META: PlanMeta = {
+  icon: LayersIcon,
+  tagline: null,
+  cta: { label: <Trans>Assinar plano</Trans>, to: '/signup', variant: 'outline' },
+  features: {},
 };
 
 // Comparison rows backed by the curated `PLAN_META.features` map (marketing
@@ -440,14 +469,19 @@ const FeatureCarousel = () => {
 };
 
 export const LandingPage = ({ pricingClaims }: LandingPageProps) => {
-  // Curate the public, customer-facing plans in display order. Claims without a
-  // `PLAN_META` entry (internal/legacy) are intentionally excluded.
-  const curatedPlans = PLAN_ORDER.flatMap((key) => {
-    const claim = pricingClaims.find((item) => item.name.trim().toLowerCase() === key);
-    const meta = PLAN_META[key];
+  // All priced claims, in display order: curated `PLAN_ORDER` first, then any
+  // remaining claim appended (alphabetical, as returned by the loader). Every
+  // priced claim is shown — curated ones get their rich `PLAN_META`, the rest
+  // fall back to `FALLBACK_PLAN_META`.
+  const claimKey = (claim: PublicPricingClaim) => claim.name.trim().toLowerCase();
+  const orderIndex = (key: string) => {
+    const index = PLAN_ORDER.indexOf(key);
+    return index === -1 ? PLAN_ORDER.length : index;
+  };
 
-    return claim && meta ? [{ claim, meta }] : [];
-  });
+  const curatedPlans = [...pricingClaims]
+    .sort((a, b) => orderIndex(claimKey(a)) - orderIndex(claimKey(b)))
+    .map((claim) => ({ claim, meta: PLAN_META[claimKey(claim)] ?? FALLBACK_PLAN_META }));
 
   // Only show flag rows that at least one curated plan actually enables, so the
   // comparison never lists capabilities nobody offers.
@@ -671,7 +705,11 @@ export const LandingPage = ({ pricingClaims }: LandingPageProps) => {
               </p>
             </div>
 
-            <div className="mt-14 grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div
+              className={`mt-14 grid items-stretch gap-6 sm:grid-cols-2 ${
+                curatedPlans.length >= 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'
+              }`}
+            >
               {curatedPlans.map(({ claim, meta }) => {
                 const items = PRICING_ITEMS.filter((item) => typeof claim.pricing[item.key] === 'number');
                 // Capabilities (non-metered flags) this plan unlocks, e.g.

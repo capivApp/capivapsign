@@ -25,9 +25,14 @@ if errorlevel 1 (echo jlink failed & exit /b 1)
 
 REM 3) Package an app-image .exe around the jar + runtime.
 if exist "%ROOT%\dist" rmdir /s /q "%ROOT%\dist"
-REM --win-console is REQUIRED: without it jpackage builds a windowed (GUI)
-REM launcher that is NOT attached to the console, so stdout/stderr vanish and
-REM the agent appears to print nothing. This is a console tool — keep it.
+REM --win-console is REQUIRED on the MAIN launcher: without it jpackage builds a
+REM windowed (GUI) launcher that is NOT attached to the console, so stdout/stderr
+REM vanish and the CLI (list/sign) appears to print nothing.
+REM
+REM --add-launcher IcpAgentTray adds a SECOND, WINDOWED launcher (no console)
+REM that runs `serve --no-gui`. The installer auto-starts THIS one at logon, so
+REM the tray agent leaves no lingering console window (and AWT stops logging
+REM "GetMessage() failed. System error 1400" into a console with no message pump).
 jpackage ^
   --type app-image ^
   --name IcpAgent ^
@@ -36,10 +41,12 @@ jpackage ^
   --main-class com.documenso.icp.Main ^
   --runtime-image "%ROOT%\build\runtime" ^
   --win-console ^
+  --add-launcher IcpAgentTray="%HERE%tray-launcher.properties" ^
   --dest "%ROOT%\dist"
 if errorlevel 1 (echo jpackage failed & exit /b 1)
 
 echo.
-echo Built: %ROOT%\dist\IcpAgent\IcpAgent.exe
+echo Built: %ROOT%\dist\IcpAgent\IcpAgent.exe        (console — CLI: list/sign)
+echo        %ROOT%\dist\IcpAgent\IcpAgentTray.exe    (windowed — tray serve)
 echo Test:  "%ROOT%\dist\IcpAgent\IcpAgent.exe" list --source windows-my
 endlocal
