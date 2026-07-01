@@ -61,9 +61,16 @@ export const ClaimDeleteDialog = ({ claimId, claimName, claimLocked, trigger }: 
           </DialogDescription>
         </DialogHeader>
 
-        <Alert variant="neutral">
+        <Alert variant={claimLocked ? 'warning' : 'neutral'}>
           <AlertDescription className="text-center font-semibold">
-            {claimLocked ? <Trans>This claim is locked and cannot be deleted.</Trans> : claimName}
+            {claimLocked ? (
+              <Trans>
+                "{claimName}" is a locked default plan. Deleting it won't affect organisations already using it, but it
+                will no longer be available to assign.
+              </Trans>
+            ) : (
+              claimName
+            )}
           </AlertDescription>
         </Alert>
 
@@ -72,16 +79,14 @@ export const ClaimDeleteDialog = ({ claimId, claimName, claimLocked, trigger }: 
             <Trans>Cancel</Trans>
           </Button>
 
-          {!claimLocked && (
-            <Button
-              type="submit"
-              variant="destructive"
-              loading={isPending}
-              onClick={async () => deleteClaim({ id: claimId })}
-            >
-              <Trans>Delete</Trans>
-            </Button>
-          )}
+          <Button
+            type="submit"
+            variant="destructive"
+            loading={isPending}
+            onClick={async () => deleteClaim({ id: claimId })}
+          >
+            <Trans>Delete</Trans>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

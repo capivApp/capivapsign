@@ -1,11 +1,12 @@
-import { mailer } from '@documenso/email/mailer';
 import { ResetPasswordTemplate } from '@documenso/email/templates/reset-password';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
 import { createElement } from 'react';
 
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { getAuthEmailTransport } from '../email/get-auth-email-transport';
 
 export interface SendResetPasswordOptions {
   userId: number;
@@ -31,16 +32,17 @@ export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) =>
     renderEmailWithI18N(template, { plainText: true }),
   ]);
 
-  return await mailer.sendMail({
+  const i18n = await getI18nInstance();
+
+  const { transporter, senderEmail } = await getAuthEmailTransport();
+
+  return await transporter.sendMail({
     to: {
       address: user.email,
       name: user.name || '',
     },
-    from: {
-      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'CapivaSign',
-      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
-    },
-    subject: 'Password Reset Success!',
+    from: senderEmail,
+    subject: i18n._(msg`Password Reset Success!`),
     html,
     text,
   });

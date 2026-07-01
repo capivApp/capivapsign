@@ -21,17 +21,20 @@ export async function dynamicActivate(locale: string) {
 }
 
 const parseLanguageFromLocale = (locale: string): SupportedLanguageCodes | null => {
-  const [language, _country] = locale.split('-');
+  const normalized = locale.trim().toLowerCase();
+  const [language] = normalized.split('-');
 
-  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
-    (lang): lang is SupportedLanguageCodes => lang === language,
-  );
+  // Match the full locale first (e.g. "pt-BR"), then fall back to the language
+  // subtag (e.g. "en-US" -> "en"). Comparing on the language subtag alone broke
+  // region-qualified supported codes: "pt-BR" was stripped to "pt", which is NOT
+  // in supportedLangs, so Brazilian browsers silently fell back to English.
+  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find((lang): lang is SupportedLanguageCodes => {
+    const [supportedLanguage] = lang.toLowerCase().split('-');
 
-  if (!foundSupportedLanguage) {
-    return null;
-  }
+    return lang.toLowerCase() === normalized || supportedLanguage === language;
+  });
 
-  return foundSupportedLanguage;
+  return foundSupportedLanguage ?? null;
 };
 
 /**

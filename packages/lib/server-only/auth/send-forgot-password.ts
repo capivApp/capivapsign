@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import { ForgotPasswordTemplate } from '@documenso/email/templates/forgot-password';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
@@ -6,8 +5,8 @@ import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { getAuthEmailTransport } from '../email/get-auth-email-transport';
 
 export interface SendForgotPasswordOptions {
   userId: number;
@@ -51,15 +50,14 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
 
   const i18n = await getI18nInstance();
 
-  return await mailer.sendMail({
+  const { transporter, senderEmail } = await getAuthEmailTransport();
+
+  return await transporter.sendMail({
     to: {
       address: user.email,
       name: user.name || '',
     },
-    from: {
-      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'CapivaSign',
-      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
-    },
+    from: senderEmail,
     subject: i18n._(msg`Forgot Password?`),
     html,
     text,

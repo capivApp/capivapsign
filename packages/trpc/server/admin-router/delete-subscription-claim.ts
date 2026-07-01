@@ -29,12 +29,10 @@ export const deleteSubscriptionClaimRoute = adminProcedure
       throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Subscription claim not found' });
     }
 
-    if (existingClaim.locked) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'Cannot delete locked subscription claim',
-      });
-    }
-
+    // Locked claims are the built-in plans (Free, Individual, …). They are safe
+    // to delete — organisations keep their own OrganisationClaim copy and there
+    // is no FK back to SubscriptionClaim — so the `locked` flag is only a UI
+    // warning, not a hard block, letting admins remove plans they don't offer.
     await prisma.subscriptionClaim.delete({
       where: {
         id,
