@@ -51,7 +51,7 @@ export default function SupportPage() {
             <h2 className="flex items-center gap-2 font-bold text-lg">
               <BookIcon className="h-5 w-5 text-muted-foreground" />
               <Link
-                to="https://docs.documenso.com"
+                to="https://docs.capivapp.com.br"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
@@ -67,7 +67,7 @@ export default function SupportPage() {
             <h2 className="flex items-center gap-2 font-bold text-lg">
               <Link2Icon className="h-5 w-5 text-muted-foreground" />
               <Link
-                to="https://documen.so/discord"
+                to="https://capivapp.com.br/suporte"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
@@ -79,7 +79,7 @@ export default function SupportPage() {
               <Trans>
                 Join our community on{' '}
                 <Link
-                  to="https://documen.so/discord"
+                  to="https://capivapp.com.br/suporte"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:underline"

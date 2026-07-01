@@ -240,7 +240,7 @@ export const SubscriptionClaimForm = ({
                   <span>¹&nbsp;</span>
                   <Trans>Your current license does not include these features.</Trans>{' '}
                   <Link
-                    to="https://docs.documenso.com/users/licenses/enterprise-edition"
+                    to="https://docs.capivapp.com.br/users/licenses/enterprise-edition"
                     target="_blank"
                     className="text-foreground underline hover:opacity-80"
                   >
@@ -327,8 +327,8 @@ export const SubscriptionClaimForm = ({
             </FormLabel>
             <FormDescription>
               <Trans>
-                Monthly price is charged every month. Per-action prices are billed only for API usage
-                beyond the free quota. Leave blank for free.
+                Monthly price is charged every month. Per-action prices are billed only for API usage beyond the free
+                quota. Leave blank for free.
               </Trans>
             </FormDescription>
 
@@ -381,9 +381,7 @@ export const SubscriptionClaimForm = ({
                           min={0}
                           {...field}
                           value={field.value ?? ''}
-                          onChange={(e) =>
-                            field.onChange(e.target.value === '' ? null : e.target.valueAsNumber)
-                          }
+                          onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.valueAsNumber)}
                         />
                       </FormControl>
                       <FormMessage />

@@ -3,7 +3,7 @@ import { i18n, type MessageDescriptor } from '@lingui/core';
 
 export const appMetaTags = (title?: MessageDescriptor) => {
   const description =
-    'CapivaSign — assinatura eletrônica e digital com certificado ICP-Brasil (A1/A3, PAdES). Um fork open source do Documenso, com uma experiência de assinatura rápida, simples e segura.';
+    'CapivaSign — assinatura eletrônica e digital com certificado ICP-Brasil (A1/A3, PAdES), com uma experiência de assinatura rápida, simples e segura.';
 
   return [
     {
@@ -16,7 +16,7 @@ export const appMetaTags = (title?: MessageDescriptor) => {
     {
       name: 'keywords',
       content:
-        'CapivaSign, ICP-Brasil, assinatura digital, certificado digital, A1, A3, PAdES, assinatura eletrônica, Documenso, open source',
+        'CapivaSign, ICP-Brasil, assinatura digital, certificado digital, A1, A3, PAdES, assinatura eletrônica, open source',
     },
     {
       name: 'author',

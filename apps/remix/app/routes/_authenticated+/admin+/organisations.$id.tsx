@@ -860,7 +860,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                 <span>¹&nbsp;</span>
                 <Trans>Your current license does not include these features.</Trans>{' '}
                 <Link
-                  to="https://docs.documenso.com/users/licenses/enterprise-edition"
+                  to="https://docs.capivapp.com.br/users/licenses/enterprise-edition"
                   target="_blank"
                   className="text-foreground underline hover:opacity-80"
                 >
@@ -917,8 +917,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
   );
 };
 
-const brlFromCents = (cents: number) =>
-  (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const brlFromCents = (cents: number) => (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 const AdminChargeMonthSection = ({ organisationId }: { organisationId: string }) => {
   const { t } = useLingui();
@@ -960,9 +959,7 @@ const AdminChargeMonthSection = ({ organisationId }: { organisationId: string })
           <Trans>Monthly billing</Trans>
         </AlertTitle>
         <AlertDescription>
-          <Trans>
-            Charge the fixed plan price + metered usage for a month via Stripe. Idempotent per month.
-          </Trans>
+          <Trans>Charge the fixed plan price + metered usage for a month via Stripe. Idempotent per month.</Trans>
         </AlertDescription>
       </div>
 

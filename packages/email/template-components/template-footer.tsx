@@ -34,7 +34,7 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
           <Trans>
             This document was sent using{' '}
             <Link className="text-primary" href="https://capivapp.com.br/mail-footer">
-              CapivApp
+              CapivaSign
             </Link>
             .
           </Trans>
@@ -64,7 +64,7 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
 
       {!branding.brandingEnabled && (
         <Text className="my-8 text-muted-foreground text-sm">
-          CapivApp LTDA.
+          CapivaSign LTDA.
           <br />
         </Text>
       )}

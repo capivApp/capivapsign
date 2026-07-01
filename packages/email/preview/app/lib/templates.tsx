@@ -94,7 +94,7 @@ export const templates: Record<string, TemplateDefinition> = {
     component: DocumentInviteEmailTemplate,
     fields: {
       inviterName: { type: 'text', label: 'Inviter name', default: 'Lucas Smith' },
-      inviterEmail: { type: 'text', label: 'Inviter email', default: 'lucas@documenso.com' },
+      inviterEmail: { type: 'text', label: 'Inviter email', default: 'lucas@capivapp.com.br' },
       documentName: documentNameField,
       role: roleField,
       customBody: {
@@ -163,7 +163,7 @@ export const templates: Record<string, TemplateDefinition> = {
     fields: {
       recipientName: recipientNameField,
       documentName: documentNameField,
-      documentUrl: { type: 'text', label: 'Document URL', default: 'https://documenso.com' },
+      documentUrl: { type: 'text', label: 'Document URL', default: 'https://capivapp.com.br' },
       rejectionReason: {
         type: 'textarea',
         label: 'Rejection reason',
@@ -325,7 +325,7 @@ export const templates: Record<string, TemplateDefinition> = {
     component: TeamEmailRemovedTemplate,
     fields: {
       teamName: { type: 'text', label: 'Team name', default: 'CapivaSign' },
-      teamEmail: { type: 'text', label: 'Team email', default: 'team@documenso.com' },
+      teamEmail: { type: 'text', label: 'Team email', default: 'team@capivapp.com.br' },
     },
   },
 
@@ -338,7 +338,7 @@ export const templates: Record<string, TemplateDefinition> = {
       confirmationLink: {
         type: 'text',
         label: 'Confirmation link',
-        default: 'https://documenso.com/confirm',
+        default: 'https://capivapp.com.br/confirm',
       },
     },
   },
@@ -350,7 +350,7 @@ export const templates: Record<string, TemplateDefinition> = {
       resetPasswordLink: {
         type: 'text',
         label: 'Reset link',
-        default: 'https://documenso.com/reset',
+        default: 'https://capivapp.com.br/reset',
       },
     },
   },
@@ -360,7 +360,7 @@ export const templates: Record<string, TemplateDefinition> = {
     component: ResetPasswordTemplate,
     fields: {
       userName: { type: 'text', label: 'User name', default: 'Lucas Smith' },
-      userEmail: { type: 'text', label: 'User email', default: 'lucas@documenso.com' },
+      userEmail: { type: 'text', label: 'User email', default: 'lucas@capivapp.com.br' },
     },
   },
   'access-auth-2fa': {
@@ -370,7 +370,7 @@ export const templates: Record<string, TemplateDefinition> = {
     fields: {
       documentTitle: { type: 'text', label: 'Document title', default: 'Open Source Pledge.pdf' },
       code: { type: 'text', label: 'Code', default: '123456' },
-      userEmail: { type: 'text', label: 'User email', default: 'lucas@documenso.com' },
+      userEmail: { type: 'text', label: 'User email', default: 'lucas@capivapp.com.br' },
       userName: { type: 'text', label: 'User name', default: 'Lucas Smith' },
       expiresInMinutes: { type: 'number', label: 'Expires in (min)', default: 10 },
     },
@@ -385,7 +385,7 @@ export const templates: Record<string, TemplateDefinition> = {
       resetPasswordLink: {
         type: 'text',
         label: 'Reset link',
-        default: 'https://documenso.com/reset',
+        default: 'https://capivapp.com.br/reset',
       },
     },
   },

@@ -18,7 +18,7 @@ export type ConfirmTeamEmailProps = {
 
 export const ConfirmTeamEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
-  baseUrl = 'https://documenso.com',
+  baseUrl = 'https://capivapp.com.br',
   teamName = 'Team Name',
   teamUrl = 'demo',
   token = '',
