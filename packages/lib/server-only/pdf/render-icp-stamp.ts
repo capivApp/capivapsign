@@ -15,7 +15,7 @@ import { ensureFontLibrary } from './helpers';
  *
  * The stamp is a boxed card placed at each SIGNATURE field's rect: the brand /
  * white-label logo on the left, then the holder name, the recipient role and
- * the signing date. Field geometry is the Documenso convention — positionX/Y/
+ * the signing date. Field geometry is the CapivaSign convention — positionX/Y/
  * width/height as percentages (0–100) of the page, Konva top-left origin.
  */
 export type IcpStampFieldRect = {

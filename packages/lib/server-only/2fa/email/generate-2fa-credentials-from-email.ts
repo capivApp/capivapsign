@@ -2,7 +2,7 @@ import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import { createTOTPKeyURI } from 'oslo/otp';
 
-import { DOCUMENSO_ENCRYPTION_KEY } from '../../../constants/crypto';
+import { CAPIVASIGN_ENCRYPTION_KEY } from '../../../constants/crypto';
 
 const ISSUER = 'CapivaSign Email 2FA';
 
@@ -21,13 +21,13 @@ export const generateTwoFactorCredentialsFromEmail = ({
   envelopeId,
   email,
 }: GenerateTwoFactorCredentialsFromEmailOptions) => {
-  if (!DOCUMENSO_ENCRYPTION_KEY) {
-    throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
+  if (!CAPIVASIGN_ENCRYPTION_KEY) {
+    throw new Error('Missing CAPIVASIGN_ENCRYPTION_KEY');
   }
 
   const identity = `email-2fa|v1|email:${email}|id:${envelopeId}`;
 
-  const secret = hmac(sha256, DOCUMENSO_ENCRYPTION_KEY, identity);
+  const secret = hmac(sha256, CAPIVASIGN_ENCRYPTION_KEY, identity);
 
   const uri = createTOTPKeyURI(ISSUER, email, secret);
 

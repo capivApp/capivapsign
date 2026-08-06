@@ -1,7 +1,17 @@
 import cors from '@/lib/cors';
+import { githubApiUrl, noRepoConfiguredBody } from '@/lib/github-repo';
 
 export async function GET(request: Request) {
-  const res = await fetch('https://api.github.com/repos/documenso/documenso');
+  const url = githubApiUrl('');
+
+  if (!url) {
+    return cors(
+      request,
+      new Response(noRepoConfiguredBody, { status: 200, headers: { 'content-type': 'application/json' } }),
+    );
+  }
+
+  const res = await fetch(url);
   const { forks_count } = await res.json();
 
   return cors(

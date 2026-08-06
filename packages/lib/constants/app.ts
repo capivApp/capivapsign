@@ -37,7 +37,7 @@ export const NEXT_PRIVATE_USE_PLAYWRIGHT_PDF = () => env('NEXT_PRIVATE_USE_PLAYW
 export const NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY = () => env('NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY');
 
 /**
- * Whether this Documenso instance is running in CSC (Cloud Signature Consortium) mode.
+ * Whether this CapivaSign instance is running in CSC (Cloud Signature Consortium) mode.
  *
  * CSC mode routes signing through a third-party Trust Service Provider for
  * Advanced and Qualified Electronic Signatures (AES/QES). It is instance-wide

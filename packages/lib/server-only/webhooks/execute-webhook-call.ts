@@ -5,6 +5,16 @@ import { assertNotPrivateUrl } from './assert-webhook-url';
 
 const WEBHOOK_TIMEOUT_MS = 10_000;
 
+/**
+ * Header carrying the per-webhook shared secret, which the receiver compares
+ * against its stored copy to authenticate the call.
+ *
+ * Part of the public integration contract: changing it breaks every subscriber
+ * that verifies it, so it must stay in sync with the webhook docs under
+ * `apps/docs/content/docs/developers/webhooks/`.
+ */
+export const WEBHOOK_SECRET_HEADER = 'X-CapivaSign-Secret';
+
 export type WebhookCallResult = {
   success: boolean;
   responseCode: number;
@@ -37,7 +47,7 @@ export const executeWebhookCall = async (options: {
       timeoutMs: WEBHOOK_TIMEOUT_MS,
       headers: {
         'Content-Type': 'application/json',
-        'X-Documenso-Secret': secret ?? '',
+        [WEBHOOK_SECRET_HEADER]: secret ?? '',
       },
     });
 

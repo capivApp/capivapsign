@@ -23,7 +23,7 @@ test('[TEAMS]: explains why an inherited organisation member cannot be removed',
   // Team created with member inheritance OFF.
   const { user: owner, organisation, team } = await seedUser({ inheritMembers: false });
 
-  const inheritedAdminEmail = `inherited-admin-${team.url}@test.documenso.com`;
+  const inheritedAdminEmail = `inherited-admin-${team.url}@test.capivapp.com.br`;
 
   // A second organisation admin is inherited into the team as a team admin (source "Group").
   await seedOrganisationMembers({

@@ -61,19 +61,29 @@ export function AutoSizedText({ children, className, maxHeight, useRem = false }
       return;
     }
 
-    let newFontSize: number;
-
     const targetHeight = maxHeight && maxHeight < parentDimensions.height ? maxHeight : parentDimensions.height;
 
     const isElementTooBig = childDimensions.width > parentDimensions.width || childDimensions.height > targetHeight;
 
+    const isElementTooSmall =
+      childDimensions.width < parentDimensions.width || childDimensions.height < parentDimensions.height;
+
+    // Exactly filling the box on both axes: the binary search has converged, so
+    // there is no new size to apply. Falling through here used to leave
+    // `newFontSize` undefined and write `"undefinedpx"` onto the element.
+    if (!isElementTooBig && !isElementTooSmall) {
+      return;
+    }
+
+    const newFontSize = isElementTooBig
+      ? // Scale down if element is bigger than target
+        (fontSizeLowerBound.current + fontSize.current) / 2
+      : // Scale up if element is smaller than target
+        (fontSizeUpperBound.current + fontSize.current) / 2;
+
     if (isElementTooBig) {
-      // Scale down if element is bigger than target
-      newFontSize = (fontSizeLowerBound.current + fontSize.current) / 2;
       fontSizeUpperBound.current = fontSize.current;
-    } else if (childDimensions.width < parentDimensions.width || childDimensions.height < parentDimensions.height) {
-      // Scale up if element is smaller than target
-      newFontSize = (fontSizeUpperBound.current + fontSize.current) / 2;
+    } else {
       fontSizeLowerBound.current = fontSize.current;
     }
 

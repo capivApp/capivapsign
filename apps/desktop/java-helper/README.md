@@ -7,31 +7,31 @@ PKCS#11 token, or the Windows certificate store.
 
 **No desktop UI needed.** The same jar runs in two modes:
 
-1. **Standalone agent** (`sign`/`list` args, or a `documenso-icp://` deep link) —
+1. **Standalone agent** (`sign`/`list` args, or a `capivasign-icp://` deep link) —
    does the whole remote flow itself. This is the shipping path; it replaces a
    Tauri/Electron app.
 2. **NDJSON crypto helper** (no args) — `list`/`sign` over stdin/stdout, for
    embedding behind another process.
 
-## How Documenso invokes it
+## How CapivaSign invokes it
 
 The browser cannot launch a local exe directly. Two mechanisms; the agent
 supports both with one binary:
 
-- **Deep link (recommended for prod):** register `documenso-icp://` (see
+- **Deep link (recommended for prod):** register `capivasign-icp://` (see
   `windows/register-protocol.reg`). The signing page navigates to
-  `documenso-icp://sign?baseUrl=…&token=<recipientToken>&source=windows-my`.
+  `capivasign-icp://sign?baseUrl=…&token=<recipientToken>&source=windows-my`.
   Windows hands the URI to the agent.
-- **CMD (for testing now):** `IcpAgent.exe sign --base-url … --token … --source …`
+- **CMD (for testing now):** `CapivaSignCli.exe sign --base-url … --token … --source …`
 
 Either way the agent: **selects the cert → POST `/api/icp/sign/prepare` (sends the
 chain, gets digests) → signs each digest locally → POST `/api/icp/sign/complete`
-(sends signatures).** It never downloads the PDF. `complete` runs Documenso's
+(sends signatures).** It never downloads the PDF. `complete` runs CapivaSign's
 normal server-side notifications, so there's no separate callback URL — the web
 page just watches the document status. Auth is by the **recipient token**
 (capability, same trust as the signing link); no device pairing required.
 
-> **Security:** set `ICP_ALLOWED_ORIGIN=https://your.documenso` so the agent
+> **Security:** set `ICP_ALLOWED_ORIGIN=https://app.capivapp.com.br` so the agent
 > refuses any other host (a deep link is invokable by any page). Never put a
 > password/PIN in the URL — secrets are prompted interactively.
 
@@ -57,22 +57,22 @@ signer to run scripts. On a Windows machine with **JDK 17+** and **[Inno Setup
 
 ```bat
 windows\build-installer.bat https://app.suaempresa.com
-REM -> dist\installer\IcpAgent-Setup.exe
+REM -> dist\installer\CapivaSign-Setup.exe
 ```
 
-`IcpAgent-Setup.exe` (admin) is fully self-contained (bundles a JRE) and:
+`CapivaSign-Setup.exe` (admin) is fully self-contained (bundles a JRE) and:
 
-1. installs the agent under `C:\Program Files\IcpAgent`;
-2. registers the **`documenso-icp://` deep link** per-machine (HKLM);
+1. installs the agent under `C:\Program Files\CapivaSign`;
+2. registers the **`capivasign-icp://` deep link** per-machine (HKLM);
 3. sets **`ICP_ALLOWED_ORIGIN`** (the origin passed to `build-installer.bat`) as a
    system env var, so the agent refuses any other host;
 4. **auto-starts the serve agent at every user logon** via the HKLM `Run` key
-   as `IcpAgent.exe serve --no-gui` — it lives in the **system tray** (no
+   as `CapivaSign.exe` — it lives in the **system tray** (no
    "Aguardando…" window), keeps `http://127.0.0.1:3231/ping` answering, and only
    pops the **certificate/PIN selector** when a sign request actually arrives.
 
 So the signing page works through either path with zero per-signer setup: the
-loopback `serve` agent (tray) **or** the `documenso-icp://` deep link.
+loopback `serve` agent (tray) **or** the `capivasign-icp://` deep link.
 
 > The Windows **service** route (Session 0) is deliberately avoided: a true
 > service can't show the certificate/PIN dialogs to the user. Logon auto-start
@@ -83,15 +83,33 @@ loopback `serve` agent (tray) **or** the `documenso-icp://` deep link.
 
 ```bash
 ./build.sh                      # Linux/macOS: javac -> build/icp-helper.jar (no Gradle/deps)
-windows\build.bat               # Windows equivalent
-windows\package-windows.bat     # Windows: self-contained IcpAgent.exe (jlink+jpackage, bundles a JRE)
-windows\build-installer.bat     # Windows: one-click IcpAgent-Setup.exe (protocol + logon auto-start)
+build.bat                       # Windows equivalent
+windows\package-windows.bat     # Windows: self-contained app-image (jlink+jpackage, bundles a JRE)
+windows\build-installer.bat     # Windows: one-click CapivaSign-Setup.exe (protocol + logon auto-start)
 ```
 
-> The packaged exe is built with `--win-console` so stdout/stderr show in cmd —
-> a windowed jpackage launcher silently swallows console output. To inspect the
-> agent without rebuilding, run the bundled JRE on the jar directly:
-> `dist\IcpAgent\runtime\bin\java.exe -jar dist\IcpAgent\app\icp-helper.jar list --source windows-my`
+`package-windows.bat` produces **two** launchers, and which one you wire up
+matters:
+
+| Binary              | Subsystem | Default args     | Used for                                              |
+| ------------------- | --------- | ---------------- | ----------------------------------------------------- |
+| `CapivaSign.exe`    | windowed  | `serve --no-gui` | everything user-facing — logon, Start menu, deep link |
+| `CapivaSignCli.exe` | console   | none             | support/debugging (`list`, `sign`)                    |
+
+**The main launcher is windowed on purpose.** jpackage's `--win-console` builds a
+console-subsystem binary, so Windows allocates and shows a cmd window on *every*
+launch — at logon, from the Start menu, and on each `capivasign-icp://` deep link
+the browser fires. That stray console next to the agent is exactly the bug this
+split removes: the exe users actually run is a GUI-subsystem binary, and with no
+arguments it goes straight to the system tray.
+
+Because a windowed process has no console, stderr is teed to a log file instead:
+`%LOCALAPPDATA%\CapivaSign\agent.log` (openable from the tray menu). Ask for that
+file first when signing misbehaves. For interactive poking, use the CLI binary:
+
+```bat
+dist\CapivaSign\CapivaSignCli.exe list --source windows-my
+```
 
 ```bash
 # list certs
@@ -99,14 +117,14 @@ java -jar build/icp-helper.jar list --source p12 --p12 cert.p12 --password test
 java -jar build/icp-helper.jar list --source windows-my
 
 # sign (full remote flow)
-java -jar build/icp-helper.jar sign --base-url https://app.documenso.com \
+java -jar build/icp-helper.jar sign --base-url https://app.capivapp.com.br \
      --token <RECIPIENT_TOKEN> --source pkcs11 --module C:\path\token.dll
 ```
 
 ## Tests (need `openssl` + network for the RFC3161 TSA)
 
 - `cli-agent.e2e.mjs` — drives the jar in `sign` CLI mode against a mock
-  Documenso (real libpdf capture/embed) and verifies the agent's signature with
+  CapivaSign server (real libpdf capture/embed) and verifies the agent's signature with
   openssl. Proves the deep-link/CMD flow end to end.
 - `e2e-java.mjs` — drives the NDJSON helper through capture → sign → embed (B-T)
   → B-LTA seal.

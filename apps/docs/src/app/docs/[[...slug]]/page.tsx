@@ -6,8 +6,8 @@ import { getPageImage, source } from '@/lib/source';
 import { getMDXComponents } from '@/mdx-components';
 
 const gitConfig = {
-  user: 'documenso',
-  repo: 'documenso',
+  user: 'capivasign',
+  repo: 'capivasign',
   branch: 'main',
   contentPath: 'apps/docs/content/docs',
 };

@@ -9,7 +9,7 @@ import { bytesToHex, hexToBytes } from '@noble/ciphers/utils';
  * - `CscCredential.serviceTokenCiphertext` — service-scope OAuth access token.
  * - `CscSession.encryptedSad` — credential-scope SAD.
  *
- * Both use the primary `DOCUMENSO_ENCRYPTION_KEY` (same key family as 2FA
+ * Both use the primary `CAPIVASIGN_ENCRYPTION_KEY` (same key family as 2FA
  * secrets, OIDC client secrets, DKIM private keys). The underlying cipher
  * returns hex; we round-trip through `bytesToHex` / `hexToBytes` so the
  * persisted bytes are the raw XChaCha20-Poly1305 ciphertext (nonce + tag +

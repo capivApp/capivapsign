@@ -6,12 +6,12 @@ description: Configure Cloud Signature Consortium signing for Advanced and Quali
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-The `csc` signing transport routes signatures through a third-party Trust Service Provider (TSP) using the [Cloud Signature Consortium API v1.0.4.0](https://cloudsignatureconsortium.org/). Each recipient authenticates directly with the TSP (Strong Customer Authentication) and the TSP returns a per-recipient signature bound to the document hash. Documenso assembles the resulting PAdES signature inside the PDF.
+The `csc` signing transport routes signatures through a third-party Trust Service Provider (TSP) using the [Cloud Signature Consortium API v1.0.4.0](https://cloudsignatureconsortium.org/). Each recipient authenticates directly with the TSP (Strong Customer Authentication) and the TSP returns a per-recipient signature bound to the document hash. CapivaSign assembles the resulting PAdES signature inside the PDF.
 
 This transport enables **Advanced Electronic Signatures (AES)** and **Qualified Electronic Signatures (QES)** under eIDAS. See [Signature Levels](/docs/compliance/signature-levels) for the legal framework.
 
 <Callout type="warn">
-  CSC mode is **instance-wide**: one CSC provider per Documenso install. All envelopes created
+  CSC mode is **instance-wide**: one CSC provider per CapivaSign install. All envelopes created
   while the instance runs in `csc` mode use AES or QES. Switching `NEXT_PRIVATE_SIGNING_TRANSPORT`
   is a one-way operational migration — see [Switching Transports](#switching-transports).
 </Callout>
@@ -36,13 +36,13 @@ Establish a relationship with a CSC-compatible Trust Service Provider. The TSP i
 
 ### OAuth client credentials
 
-Register Documenso as an OAuth client with the TSP. You will receive a client ID and client secret, and must supply Documenso's callback URL when registering:
+Register CapivaSign as an OAuth client with the TSP. You will receive a client ID and client secret, and must supply CapivaSign's callback URL when registering:
 
 ```
 ${NEXT_PUBLIC_WEBAPP_URL}/api/csc/oauth/callback
 ```
 
-The callback URL is fixed — Documenso derives it from `NEXT_PUBLIC_WEBAPP_URL` and the route mount path. There is no env var to override it; ensuring the registered URL matches your instance's webapp URL exactly is the operator's responsibility.
+The callback URL is fixed — CapivaSign derives it from `NEXT_PUBLIC_WEBAPP_URL` and the route mount path. There is no env var to override it; ensuring the registered URL matches your instance's webapp URL exactly is the operator's responsibility.
 
 </Step>
 <Step>
@@ -83,7 +83,7 @@ CSC produces multiple `DocumentData` rows per envelope item (one per recipient s
 ```bash
 NEXT_PRIVATE_SIGNING_TRANSPORT=csc
 NEXT_PRIVATE_SIGNING_CSC_PROVIDER_BASE_URL=https://api.example-tsp.com/csc/v1
-NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_ID=documenso-prod
+NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_ID=capivasign-prod
 NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_SECRET=...
 NEXT_PRIVATE_SIGNING_CSC_SIGNATURE_LEVEL=QES
 NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY=http://timestamp.example.com
@@ -154,7 +154,7 @@ Both features modify the recipient set after the envelope is sent, which is inco
 
 ### Sidecar PDFs at download
 
-The signed PDF must remain byte-identical to what each recipient's TSP signature authorised — Documenso cannot decorate it after signing. Audit logs and the Certificate of Completion are generated on demand and delivered as separate PDFs:
+The signed PDF must remain byte-identical to what each recipient's TSP signature authorised — CapivaSign cannot decorate it after signing. Audit logs and the Certificate of Completion are generated on demand and delivered as separate PDFs:
 
 - `GET /sign/{token}/download` returns the signed PDF only (or a ZIP for multi-item envelopes).
 - `GET /sign/{token}/download?version=bundle` returns a ZIP containing the signed PDFs, audit log PDF, and Certificate of Completion.
@@ -165,10 +165,10 @@ The signed PDF must remain byte-identical to what each recipient's TSP signature
 For context when supporting end users, here is what a recipient experiences on an AES/QES envelope:
 
 1. Opens the email link, lands on the signing page.
-2. Documenso redirects to the TSP for Strong Customer Authentication (first visit only; cached for the session lifetime).
+2. CapivaSign redirects to the TSP for Strong Customer Authentication (first visit only; cached for the session lifetime).
 3. Fills fields as normal.
 4. Clicks Sign → redirected to the TSP for a second authentication round (issues a per-document Signature Activation Data token).
-5. Returns to Documenso; the signing call completes within ~15 seconds.
+5. Returns to CapivaSign; the signing call completes within ~15 seconds.
 6. Sees the standard completion screen.
 
 If the TSP returns no eligible credentials for the recipient (e.g. they have not enrolled), they see a blocking page directing them to enrol with the TSP and retry.
@@ -194,7 +194,7 @@ CSC-specific error codes surfaced through the standard error channels:
 
 ## Algorithm Policy
 
-Documenso refuses TSP credentials that do not meet the following minimums, at the OAuth callback boundary and again at sign time:
+CapivaSign refuses TSP credentials that do not meet the following minimums, at the OAuth callback boundary and again at sign time:
 
 | Class | Allowed                            | Refused                                                |
 | ----- | ---------------------------------- | ------------------------------------------------------ |

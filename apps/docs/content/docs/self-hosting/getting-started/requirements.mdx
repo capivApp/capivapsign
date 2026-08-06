@@ -1,13 +1,13 @@
 ---
 title: Requirements
-description: System requirements and prerequisites for self-hosting Documenso.
+description: System requirements and prerequisites for self-hosting CapivaSign.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
 ## What You Need
 
-Documenso requires the following items and external services:
+CapivaSign requires the following items and external services:
 
 | Service       | Purpose                      | Minimum Version |
 | ------------- | ---------------------------- | --------------- |
@@ -20,7 +20,7 @@ Documenso requires the following items and external services:
 ### Signing Certificate
 
 <Callout type="error">
-  Documenso does not ship with a signing certificate. Without one, the application starts normally
+  CapivaSign does not ship with a signing certificate. Without one, the application starts normally
   but all document signing will fail. You must generate or provide a `.p12` certificate before going
   to production.
 </Callout>
@@ -32,9 +32,9 @@ Every completed document is digitally signed using an X.509 certificate. You can
 
 ### PostgreSQL Database
 
-Documenso uses PostgreSQL for all data storage including documents, users, and audit logs. You cannot use MySQL, SQLite, or other databases.
+CapivaSign uses PostgreSQL for all data storage including documents, users, and audit logs. You cannot use MySQL, SQLite, or other databases.
 
-Documenso requires two connection strings:
+CapivaSign requires two connection strings:
 
 - **Pooled connection** (`NEXT_PRIVATE_DATABASE_URL`) - For general application queries
 - **Direct connection** (`NEXT_PRIVATE_DIRECT_DATABASE_URL`) - For migrations and operations that require a direct connection
@@ -43,7 +43,7 @@ If you're not using a connection pooler (like PgBouncer), both can point to the 
 
 ### Email Server
 
-Documenso sends transactional emails for:
+CapivaSign sends transactional emails for:
 
 - Document signing requests
 - Signing reminders
@@ -66,7 +66,7 @@ Supported transports:
 
 ### Reverse Proxy
 
-For production deployments, place Documenso behind a reverse proxy such as:
+For production deployments, place CapivaSign behind a reverse proxy such as:
 
 - nginx
 - Caddy
@@ -74,7 +74,7 @@ For production deployments, place Documenso behind a reverse proxy such as:
 - HAProxy
 - Cloud load balancers (AWS ALB, GCP Load Balancer, etc.)
 
-The reverse proxy handles SSL/TLS termination and forwards requests to Documenso on port 3000.
+The reverse proxy handles SSL/TLS termination and forwards requests to CapivaSign on port 3000.
 
 ---
 
@@ -88,7 +88,7 @@ These services are not required but improve functionality or scalability:
 
 ### Document Storage
 
-By default, Documenso stores documents in the PostgreSQL database. For production deployments with significant document volume, use S3-compatible storage:
+By default, CapivaSign stores documents in the PostgreSQL database. For production deployments with significant document volume, use S3-compatible storage:
 
 - Amazon S3
 - MinIO
@@ -100,9 +100,9 @@ See [Storage Configuration](/docs/self-hosting/configuration/storage) for setup 
 
 ### Background Jobs
 
-Documenso processes background jobs (email delivery, document processing) using a PostgreSQL-based queue by default. No additional services are required: the job queue is built into the application and uses your existing database.
+CapivaSign processes background jobs (email delivery, document processing) using a PostgreSQL-based queue by default. No additional services are required: the job queue is built into the application and uses your existing database.
 
-For production deployments that need higher throughput or more reliable job processing, Documenso supports [BullMQ](https://docs.bullmq.io/) as an alternative provider. BullMQ requires a **Redis** instance (v6.2+). Set `NEXT_PRIVATE_JOBS_PROVIDER=bullmq` and configure `NEXT_PRIVATE_REDIS_URL`.
+For production deployments that need higher throughput or more reliable job processing, CapivaSign supports [BullMQ](https://docs.bullmq.io/) as an alternative provider. BullMQ requires a **Redis** instance (v6.2+). Set `NEXT_PRIVATE_JOBS_PROVIDER=bullmq` and configure `NEXT_PRIVATE_REDIS_URL`.
 
 For managed/cloud deployments, [Inngest](https://www.inngest.com/) is also supported as a job provider. Set `NEXT_PRIVATE_JOBS_PROVIDER=inngest` and configure `INNGEST_EVENT_KEY` and `INNGEST_SIGNING_KEY`.
 
@@ -148,7 +148,7 @@ If building from source (not using Docker images):
 
 ## Supported Platforms
 
-Documenso runs on:
+CapivaSign runs on:
 
 - **Linux** - Any modern distribution (Ubuntu, Debian, CentOS, Alpine)
 - **Docker** - Official images available on DockerHub and GitHub Container Registry
@@ -180,7 +180,7 @@ Before proceeding to deployment, confirm you have:
 - [ ] PostgreSQL 14+ database accessible
 - [ ] SMTP credentials or email provider API key
 - [ ] Signing certificate (`.p12`) for document signing — see [Tips](/docs/self-hosting/getting-started/tips)
-- [ ] Domain name for your Documenso instance
+- [ ] Domain name for your CapivaSign instance
 - [ ] SSL certificate (or reverse proxy that handles SSL)
 - [ ] Server meeting minimum hardware requirements
 
@@ -188,6 +188,6 @@ Before proceeding to deployment, confirm you have:
 
 ## See Also
 
-- [Quick Start](/docs/self-hosting/getting-started/quick-start) - Deploy Documenso with Docker in 5 minutes
+- [Quick Start](/docs/self-hosting/getting-started/quick-start) - Deploy CapivaSign with Docker in 5 minutes
 - [Docker Compose](/docs/self-hosting/deployment/docker-compose) - Production setup with Docker Compose
 - [Environment Variables](/docs/self-hosting/configuration/environment) - Full configuration reference

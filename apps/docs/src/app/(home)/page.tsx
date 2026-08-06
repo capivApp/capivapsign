@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Documenso Docs',
+  title: 'CapivaSign Docs',
   description:
-    'The official documentation for Documenso, the open-source document signing platform. Send documents for signatures, integrate with the API, or self-host with full control.',
+    'The official documentation for CapivaSign, the open-source document signing platform. Send documents for signatures, integrate with the API, or self-host with full control.',
 };
 
 export default function HomePage() {
@@ -13,7 +13,7 @@ export default function HomePage() {
     <main className="mx-auto max-w-4xl px-4 py-12">
       {/* Hero */}
       <div className="mb-16 pt-6 text-center">
-        <h1 className="mb-4 font-bold text-4xl tracking-tight">Documenso Documentation</h1>
+        <h1 className="mb-4 font-bold text-4xl tracking-tight">CapivaSign Documentation</h1>
         <p className="mx-auto mb-8 max-w-2xl text-fd-muted-foreground text-lg">
           The open-source document signing platform. Send documents for signatures, integrate with your apps, or
           self-host with full control.
@@ -21,12 +21,12 @@ export default function HomePage() {
         <div className="flex flex-wrap justify-center gap-3">
           <Link
             href="/docs/users"
-            className="inline-flex items-center gap-2 rounded-lg bg-documenso px-5 py-2.5 font-medium text-fd-primary-foreground text-sm transition-colors hover:bg-documenso-dark/90"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 font-medium text-fd-primary-foreground text-sm transition-colors hover:bg-brand-dark/90"
           >
             Get Started
           </Link>
           <a
-            href="https://github.com/documenso/documenso"
+            href="https://github.com/capivapp/capiva-sign"
             className="inline-flex items-center gap-2 rounded-lg border bg-fd-background px-5 py-2.5 font-medium text-sm transition-colors hover:bg-fd-accent"
           >
             <GithubIcon className="size-4" />
@@ -74,7 +74,7 @@ export default function HomePage() {
           </div>
           <h2 className="mb-2 font-semibold text-lg">Self-Hosting Guide</h2>
           <p className="mb-4 flex-1 text-fd-muted-foreground text-sm">
-            Deploy your own Documenso instance with Docker, Kubernetes, or Railway.
+            Deploy your own CapivaSign instance with Docker, Kubernetes, or Railway.
           </p>
           <span className="font-medium text-fd-primary text-sm">Deploy now →</span>
         </Link>
@@ -226,11 +226,11 @@ export default function HomePage() {
       <div className="rounded-xl border bg-gradient-to-r from-fd-primary/5 to-fd-primary/10 p-8 text-center">
         <h3 className="mb-2 font-semibold text-lg">Join the Community</h3>
         <p className="mb-6 text-fd-muted-foreground text-sm">
-          Documenso is open source. Contribute, ask questions, or share feedback.
+          CapivaSign is open source. Contribute, ask questions, or share feedback.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <a
-            href="https://github.com/documenso/documenso"
+            href="https://github.com/capivapp/capiva-sign"
             className="inline-flex items-center gap-2 rounded-lg border bg-fd-background px-4 py-2 font-medium text-sm transition-colors hover:bg-fd-accent"
           >
             <GithubIcon className="size-4" />
@@ -246,10 +246,10 @@ export default function HomePage() {
             Discord
           </a>
           <a
-            href="https://app.documenso.com/signup"
-            className="inline-flex items-center gap-2 rounded-lg bg-documenso px-4 py-2 font-medium text-fd-primary-foreground text-sm transition-colors hover:bg-documenso/90"
+            href="https://app.capivapp.com.br/signup"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 font-medium text-fd-primary-foreground text-sm transition-colors hover:bg-brand/90"
           >
-            Try Documenso
+            Try CapivaSign
           </a>
         </div>
       </div>

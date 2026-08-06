@@ -9,6 +9,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 SRC_DIR="src/main/java"
+RES_DIR="src/main/resources"
 OUT_DIR="build/classes"
 JAR="build/icp-helper.jar"
 
@@ -23,5 +24,9 @@ JAVA_RELEASE="${JAVA_RELEASE:-17}"
 find "$SRC_DIR" -name '*.java' > build/sources.txt
 javac --release "$JAVA_RELEASE" -d "$OUT_DIR" @build/sources.txt
 
-jar --create --file "$JAR" --main-class com.documenso.icp.Main -C "$OUT_DIR" .
+# Resources (the tray icon) travel inside the jar, so the agent has its brand
+# mark available with no install-time file layout to get wrong.
+cp -r "$RES_DIR/." "$OUT_DIR/"
+
+jar --create --file "$JAR" --main-class br.com.capivapp.icp.Main -C "$OUT_DIR" .
 echo "Built $JAR"

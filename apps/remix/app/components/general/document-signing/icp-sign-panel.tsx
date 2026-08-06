@@ -15,7 +15,7 @@ import { Link, useParams } from 'react-router';
  *   1. Local HTTP agent (server mode) on http://localhost:3231 — works on any
  *      OS (incl. Linux) without registering a protocol handler. When reachable
  *      we POST the sign request straight to it.
- *   2. `documenso-icp://` deep link (protocol handler) — used when the local
+ *   2. `capivasign-icp://` deep link (protocol handler) — used when the local
  *      server isn't running.
  *
  * Either way the agent runs prepare → sign → complete against `/api/icp/sign/*`;
@@ -60,7 +60,7 @@ export const IcpSignPanel = () => {
   }, [pingAgent]);
 
   const buildDeepLink = (source: SignSource) =>
-    `documenso-icp://sign?baseUrl=${encodeURIComponent(baseUrl)}` +
+    `capivasign-icp://sign?baseUrl=${encodeURIComponent(baseUrl)}` +
     `&token=${encodeURIComponent(recipientToken)}&source=${source}`;
 
   const startSigning = async (source: SignSource) => {
@@ -114,10 +114,10 @@ export const IcpSignPanel = () => {
 
       {agentOnline === false && (
         <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/10 p-3">
-          <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
+          <p className="font-medium text-amber-700 text-xs dark:text-amber-300">
             <Trans>Não detectamos o assinador na sua máquina.</Trans>
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-muted-foreground text-xs">
             <Trans>Baixe e instale o programa para conseguir assinar com o seu certificado.</Trans>
           </p>
           <div className="mt-2 flex gap-2">
@@ -136,7 +136,7 @@ export const IcpSignPanel = () => {
       )}
 
       {agentOnline === true && (
-        <p className="mt-3 text-xs text-emerald-600 dark:text-emerald-400">
+        <p className="mt-3 text-emerald-600 text-xs dark:text-emerald-400">
           <Trans>Assinador detectado na sua máquina.</Trans>
         </p>
       )}
@@ -169,8 +169,8 @@ export const IcpSignPanel = () => {
 
       <p className="mt-3 text-muted-foreground text-xs">
         <Trans>
-          O agente CapivaSign precisa estar em execução (porta 3231) ou com o protocolo documenso-icp:// registrado. Sua
-          chave privada nunca sai da sua máquina.
+          O agente CapivaSign precisa estar em execução (porta 3231) ou com o protocolo capivasign-icp:// registrado.
+          Sua chave privada nunca sai da sua máquina.
         </Trans>
         <span className="text-muted-foreground/70">{t`Origem: ${baseUrl}`}</span>
       </p>

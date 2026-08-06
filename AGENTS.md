@@ -1,4 +1,4 @@
-# Agent Guidelines for Documenso
+# Agent Guidelines for CapivaSign
 
 ## Build/Test/Lint Commands
 

@@ -377,7 +377,7 @@ export const SignInForm = ({
             />
           )}
 
-          <Button type="submit" size="lg" loading={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
+          <Button type="submit" size="lg" loading={isSubmitting} className="dark:bg-brand dark:hover:opacity-90">
             {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
           </Button>
 

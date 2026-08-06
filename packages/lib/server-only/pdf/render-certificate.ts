@@ -595,7 +595,7 @@ const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n:
 
   // Logo rendered ~3x the text height for legibility, vertically centred on it.
   const logoHeight = brandingHeight * 3;
-  const documensoImage = new Konva.Image({
+  const brandLogoImage = new Konva.Image({
     image: img,
     height: logoHeight,
     width: logoHeight * (img.width / img.height),
@@ -609,7 +609,7 @@ const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n:
     y: qrSize + 16,
   });
   logoGroup.add(text);
-  logoGroup.add(documensoImage);
+  logoGroup.add(brandLogoImage);
 
   branding.add(logoGroup);
 

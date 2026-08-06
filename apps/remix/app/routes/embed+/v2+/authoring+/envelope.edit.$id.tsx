@@ -17,7 +17,7 @@ import type { TUpdateEmbeddingEnvelopePayload } from '@documenso/trpc/server/emb
 import { Spinner } from '@documenso/ui/primitives/spinner';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType, RecipientDeliveryChannel } from '@prisma/client';
 import { CheckCircle2Icon } from 'lucide-react';
 import { useLayoutEffect, useMemo, useState } from 'react';
 import { redirect, type ShouldRevalidateFunctionArgs } from 'react-router';
@@ -210,6 +210,11 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
         signingOrder: recipient.signingOrder ?? undefined,
         accessAuth: recipient.authOptions?.accessAuth ?? [],
         actionAuth: recipient.authOptions?.actionAuth ?? [],
+        // Preserve however the recipient is already being reached. Embedded
+        // authoring can't edit the channel, so defaulting to EMAIL here would
+        // silently downgrade a WhatsApp recipient on every save.
+        deliveryChannel: recipient.deliveryChannel ?? RecipientDeliveryChannel.EMAIL,
+        phone: recipient.phone ?? '',
         fields,
       };
     });

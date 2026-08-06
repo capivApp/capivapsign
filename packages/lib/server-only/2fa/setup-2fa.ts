@@ -4,7 +4,7 @@ import { base32 } from '@scure/base';
 import crypto from 'crypto';
 import { createTOTPKeyURI } from 'oslo/otp';
 
-import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
+import { CAPIVASIGN_ENCRYPTION_KEY } from '../../constants/crypto';
 import { symmetricEncrypt } from '../../universal/crypto';
 
 type SetupTwoFactorAuthenticationOptions = {
@@ -14,7 +14,7 @@ type SetupTwoFactorAuthenticationOptions = {
 const ISSUER = 'CapivaSign';
 
 export const setupTwoFactorAuthentication = async ({ user }: SetupTwoFactorAuthenticationOptions) => {
-  const key = DOCUMENSO_ENCRYPTION_KEY;
+  const key = CAPIVASIGN_ENCRYPTION_KEY;
 
   if (!key) {
     throw new Error('MISSING_ENCRYPTION_KEY');

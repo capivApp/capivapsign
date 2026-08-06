@@ -1,6 +1,6 @@
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { INTERNAL_CLAIM_ID, type InternalClaim, internalClaims } from '@documenso/lib/types/subscription';
-import { toHumanPrice } from '@documenso/lib/universal/stripe/to-human-price';
+import { formatStripePrice } from '@documenso/lib/universal/stripe/to-human-price';
 import { clone } from 'remeda';
 import type Stripe from 'stripe';
 
@@ -20,7 +20,7 @@ export type InternalClaimPlans = {
 };
 
 /**
- * Returns the main Documenso plans from Stripe.
+ * Returns the main CapivaSign plans from Stripe.
  */
 export const getInternalClaimPlans = async (): Promise<InternalClaimPlans> => {
   const { data: prices } = await stripe.prices.search({
@@ -44,33 +44,30 @@ export const getInternalClaimPlans = async (): Promise<InternalClaimPlans> => {
       return;
     }
 
-    let usdPrice = toHumanPrice(price.unit_amount ?? 0);
+    // Seat-based plans quote the per-seat rate, since the total depends on how
+    // many members the organisation ends up with. Stripe's `unit_amount` on a
+    // per-seat price already IS that rate, so it needs no special casing —
+    // reading it from the price keeps the displayed number tied to what Stripe
+    // will actually charge.
+    const friendlyPrice = formatStripePrice(price.unit_amount ?? 0, price.currency);
 
     if (price.recurring?.interval === 'month') {
-      if (product.metadata['isSeatBased'] === 'true') {
-        usdPrice = '50';
-      }
-
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       plans[productClaimId].monthlyPrice = {
         ...price,
         isVisibleInApp,
         product,
-        friendlyPrice: `$${usdPrice} ${price.currency.toUpperCase()}`.replace('.00', ''),
+        friendlyPrice,
       };
     }
 
     if (price.recurring?.interval === 'year') {
-      if (product.metadata['isSeatBased'] === 'true') {
-        usdPrice = '480';
-      }
-
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       plans[productClaimId].yearlyPrice = {
         ...price,
         isVisibleInApp,
         product,
-        friendlyPrice: `$${usdPrice} ${price.currency.toUpperCase()}`.replace('.00', ''),
+        friendlyPrice,
       };
     }
   });

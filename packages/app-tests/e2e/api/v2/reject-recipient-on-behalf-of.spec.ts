@@ -51,7 +51,7 @@ test.describe('Reject recipient on behalf of', () => {
   });
 
   test('should reject a recipient and record an external rejection audit log', async ({ request }) => {
-    const envelope = await seedPendingDocument(user, team.id, ['recipient@test.documenso.com']);
+    const envelope = await seedPendingDocument(user, team.id, ['recipient@test.capivapp.com.br']);
     const recipient = envelope.recipients[0];
 
     const res = await rejectRecipient(request, token, envelope.id, recipient.id, 'Declined out of band');
@@ -92,7 +92,7 @@ test.describe('Reject recipient on behalf of', () => {
   test('should attribute the rejection to the elected team member when actAsEmail is supplied', async ({ request }) => {
     const member = await seedTeamMember({ teamId: team.id });
 
-    const envelope = await seedPendingDocument(user, team.id, ['recipient@test.documenso.com']);
+    const envelope = await seedPendingDocument(user, team.id, ['recipient@test.capivapp.com.br']);
     const recipient = envelope.recipients[0];
 
     const res = await rejectRecipient(request, token, envelope.id, recipient.id, 'Declined out of band', member.email);
@@ -122,7 +122,7 @@ test.describe('Reject recipient on behalf of', () => {
     // A user that exists but belongs to a different team.
     const { user: outsider } = await seedUser();
 
-    const envelope = await seedPendingDocument(user, team.id, ['recipient@test.documenso.com']);
+    const envelope = await seedPendingDocument(user, team.id, ['recipient@test.capivapp.com.br']);
     const recipient = envelope.recipients[0];
 
     const res = await rejectRecipient(
@@ -147,7 +147,7 @@ test.describe('Reject recipient on behalf of', () => {
   });
 
   test('should deny rejecting a recipient that has already actioned the document', async ({ request }) => {
-    const envelope = await seedPendingDocument(user, team.id, ['recipient@test.documenso.com']);
+    const envelope = await seedPendingDocument(user, team.id, ['recipient@test.capivapp.com.br']);
     const recipient = envelope.recipients[0];
 
     // Reject once - succeeds.
@@ -172,7 +172,7 @@ test.describe('Reject recipient on behalf of', () => {
     // Seed a separate team/user that owns the document.
     const { user: otherUser, team: otherTeam } = await seedUser();
 
-    const envelope = await seedPendingDocument(otherUser, otherTeam.id, ['recipient@test.documenso.com']);
+    const envelope = await seedPendingDocument(otherUser, otherTeam.id, ['recipient@test.capivapp.com.br']);
     const recipient = envelope.recipients[0];
 
     // Use the original team's token - it must not be able to reject.
@@ -191,7 +191,7 @@ test.describe('Reject recipient on behalf of', () => {
   });
 
   test('should return 404 for a non-existent recipient', async ({ request }) => {
-    const envelope = await seedPendingDocument(user, team.id, ['recipient@test.documenso.com']);
+    const envelope = await seedPendingDocument(user, team.id, ['recipient@test.capivapp.com.br']);
 
     const res = await rejectRecipient(request, token, envelope.id, 999999999, 'No such recipient');
 
@@ -200,8 +200,8 @@ test.describe('Reject recipient on behalf of', () => {
   });
 
   test('should return 404 when the recipient does not belong to the supplied envelope', async ({ request }) => {
-    const targetEnvelope = await seedPendingDocument(user, team.id, ['recipient@test.documenso.com']);
-    const otherEnvelope = await seedPendingDocument(user, team.id, ['other-recipient@test.documenso.com']);
+    const targetEnvelope = await seedPendingDocument(user, team.id, ['recipient@test.capivapp.com.br']);
+    const otherEnvelope = await seedPendingDocument(user, team.id, ['other-recipient@test.capivapp.com.br']);
 
     const recipient = targetEnvelope.recipients[0];
 
@@ -233,7 +233,7 @@ test.describe('Reject recipient on behalf of', () => {
     });
 
     // ADMIN-visibility document owned by the team owner.
-    const envelope = await seedPendingDocument(owner, visTeam.id, ['recipient@test.documenso.com'], {
+    const envelope = await seedPendingDocument(owner, visTeam.id, ['recipient@test.capivapp.com.br'], {
       createDocumentOptions: { visibility: DocumentVisibility.ADMIN },
     });
     const recipient = envelope.recipients[0];

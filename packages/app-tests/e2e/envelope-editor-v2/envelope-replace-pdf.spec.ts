@@ -270,7 +270,7 @@ const assertBasicReplaceInDatabase = async ({
 
 const TEST_FIELD_VALUES = {
   embeddedRecipient: {
-    email: 'embedded-replace-recipient@documenso.com',
+    email: 'embedded-replace-recipient@capivapp.com.br',
     name: 'Embedded Replace Recipient',
   },
 };

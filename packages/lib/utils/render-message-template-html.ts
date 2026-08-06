@@ -5,7 +5,7 @@ import { renderCustomEmailTemplate } from './render-custom-email-template';
  * document (i.e. it starts with a `<!DOCTYPE html>` or `<html>` tag) rather
  * than a short plain-text snippet.
  *
- * Full HTML templates are meant to *replace* the built-in Documenso email
+ * Full HTML templates are meant to *replace* the built-in CapivaSign email
  * layout, so callers should send them verbatim instead of embedding them as
  * escaped text inside the default template.
  */

@@ -196,7 +196,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
   };
 
   // When the org/admin template is a full HTML document, render it verbatim as
-  // the email instead of embedding it inside the default Documenso layout.
+  // the email instead of embedding it inside the default CapivaSign layout.
   const fullHtmlEmail = orgTemplate ? renderFullHtmlMessageTemplate(orgTemplate.body, customEmailTemplate) : null;
 
   const template = createElement(DocumentInviteEmailTemplate, {

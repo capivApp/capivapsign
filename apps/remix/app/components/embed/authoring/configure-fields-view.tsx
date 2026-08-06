@@ -21,7 +21,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { EnvelopeItem, FieldType } from '@prisma/client';
-import { ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
+import { ReadStatus, RecipientDeliveryChannel, SendStatus, SigningStatus } from '@prisma/client';
 import { ChevronsUpDown } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -124,6 +124,10 @@ export const ConfigureFieldsView = ({
       readStatus: signer.disabled ? ReadStatus.OPENED : ReadStatus.NOT_OPENED,
       signingStatus: signer.disabled ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
       envelopeId: '',
+      // Embedded authoring only collects email signers; WhatsApp delivery is
+      // configured from the full editor, so there is no phone to carry here.
+      deliveryChannel: RecipientDeliveryChannel.EMAIL,
+      phone: null,
     }));
   }, [configData.signers]);
 

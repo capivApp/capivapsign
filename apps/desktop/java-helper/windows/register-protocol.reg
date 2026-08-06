@@ -1,20 +1,27 @@
 Windows Registry Editor Version 5.00
 
-; Registers the `documenso-icp://` deep link so the Documenso web page can launch
-; the local signing agent. EDIT the path below to where IcpAgent.exe is installed,
-; then double-click this file (per-user; no admin needed).
+; Registers the `capivasign-icp://` deep link so the CapivaSign web page can
+; launch the local signing agent. EDIT the path below to where CapivaSign.exe is
+; installed, then double-click this file (per-user; no admin needed).
+;
+; Only needed for a manual/portable install — the installer (installer.iss)
+; writes the per-machine equivalent for you.
 ;
 ; The web page triggers e.g.:
-;   documenso-icp://sign?baseUrl=https%3A%2F%2Fapp.documenso.com&token=<RECIPIENT_TOKEN>&source=windows-my
+;   capivasign-icp://sign?baseUrl=https%3A%2F%2Fapp.capivapp.com.br&token=<RECIPIENT_TOKEN>&source=windows-my
 ; Windows passes the full URI as %1 to the agent, which prompts for cert/PIN,
-; signs, and calls back into Documenso via /complete.
+; signs, and calls back into CapivaSign via /complete.
 ;
-; SECURITY: also set ICP_ALLOWED_ORIGIN (system env) to your Documenso origin so
+; NOTE: point this at CapivaSign.exe (the WINDOWED launcher), never at
+; CapivaSignCli.exe. The CLI build is a console binary, so using it here makes a
+; cmd window pop up on every signature request.
+;
+; SECURITY: also set ICP_ALLOWED_ORIGIN (system env) to your CapivaSign origin so
 ; the agent refuses to talk to any other host.
 
-[HKEY_CURRENT_USER\Software\Classes\documenso-icp]
-@="URL:Documenso ICP-Brasil Signing"
+[HKEY_CURRENT_USER\Software\Classes\capivasign-icp]
+@="URL:CapivaSign ICP-Brasil Signing"
 "URL Protocol"=""
 
-[HKEY_CURRENT_USER\Software\Classes\documenso-icp\shell\open\command]
-@="\"C:\\Program Files\\IcpAgent\\IcpAgent.exe\" \"%1\""
+[HKEY_CURRENT_USER\Software\Classes\capivasign-icp\shell\open\command]
+@="\"C:\\Program Files\\CapivaSign\\CapivaSign.exe\" \"%1\""

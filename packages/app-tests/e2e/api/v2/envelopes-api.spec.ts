@@ -191,7 +191,7 @@ test.describe('API V2 Envelopes', () => {
           distributionMethod: DocumentDistributionMethod.NONE,
           signingOrder: DocumentSigningOrder.SEQUENTIAL,
           allowDictateNextSigner: true,
-          redirectUrl: 'https://documenso.com',
+          redirectUrl: 'https://capivasign.com',
           language: 'de',
           typedSignatureEnabled: true,
           uploadSignatureEnabled: false,
@@ -212,7 +212,7 @@ test.describe('API V2 Envelopes', () => {
         attachments: [
           {
             label: 'Test Attachment',
-            data: 'https://documenso.com',
+            data: 'https://capivasign.com',
             type: 'link',
           },
         ],

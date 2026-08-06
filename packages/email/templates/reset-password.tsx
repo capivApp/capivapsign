@@ -11,7 +11,7 @@ import { TemplateResetPassword } from '../template-components/template-reset-pas
 export type ResetPasswordTemplateProps = Partial<TemplateResetPasswordProps>;
 
 export const ResetPasswordTemplate = ({
-  userName = 'Lucas Smith',
+  userName = 'Ana Souza',
   userEmail = 'lucas@capivapp.com.br',
   assetBaseUrl = 'http://localhost:3002',
 }: ResetPasswordTemplateProps) => {

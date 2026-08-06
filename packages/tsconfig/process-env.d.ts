@@ -2,7 +2,14 @@ declare namespace NodeJS {
   export interface ProcessEnv {
     PORT?: string;
     NEXT_PUBLIC_WEBAPP_URL?: string;
-    NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY?: string;
+    /**
+     * Licensing. `NEXT_PRIVATE_LICENSE_MODE` selects how entitlements are
+     * resolved: `self` (default — the operator grants their own instance),
+     * `server` (POST the key to `NEXT_PRIVATE_LICENSE_SERVER_URL`), or `none`.
+     */
+    NEXT_PRIVATE_LICENSE_MODE?: 'self' | 'server' | 'none';
+    NEXT_PRIVATE_LICENSE_KEY?: string;
+    NEXT_PRIVATE_LICENSE_SERVER_URL?: string;
 
     NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;

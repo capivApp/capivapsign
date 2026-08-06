@@ -1,5 +1,5 @@
 import { CreateEmailIdentityCommand, SESv2Client } from '@aws-sdk/client-sesv2';
-import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
+import { CAPIVASIGN_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
@@ -61,13 +61,18 @@ type DomainRecord = {
 };
 
 export const createEmailDomain = async ({ domain, organisationId }: CreateEmailDomainOptions) => {
-  const encryptionKey = DOCUMENSO_ENCRYPTION_KEY;
+  const encryptionKey = CAPIVASIGN_ENCRYPTION_KEY;
 
   if (!encryptionKey) {
-    throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
+    throw new Error('Missing CAPIVASIGN_ENCRYPTION_KEY');
   }
 
-  const selector = `documenso-${organisationId}`.replace(/[_.]/g, '-');
+  // Becomes a public DNS record in the customer's own zone
+  // (`<selector>._domainkey.<domain>`), so the prefix is brand-visible. Existing
+  // domains keep whatever selector they were created with — it is persisted on
+  // the row and reused on re-registration, since changing it would invalidate
+  // the DKIM record the customer already published.
+  const selector = `capivasign-${organisationId}`.replace(/[_.]/g, '-');
   const recordName = `${selector}._domainkey.${domain}`;
 
   // Check if domain already exists

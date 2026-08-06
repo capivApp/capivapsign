@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    host: 'https://docs.documenso.com',
-    sitemap: 'https://docs.documenso.com/sitemap.xml',
+    host: 'https://docs.capivapp.com.br',
+    sitemap: 'https://docs.capivapp.com.br/sitemap.xml',
   };
 }

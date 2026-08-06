@@ -1,4 +1,5 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { BRAND_SOCIAL_HANDLE } from '@documenso/lib/constants/brand';
 import { i18n, type MessageDescriptor } from '@lingui/core';
 
 export const appMetaTags = (title?: MessageDescriptor) => {
@@ -48,7 +49,7 @@ export const appMetaTags = (title?: MessageDescriptor) => {
     },
     {
       name: 'twitter:site',
-      content: '@documenso',
+      content: BRAND_SOCIAL_HANDLE(),
     },
     {
       name: 'twitter:description',

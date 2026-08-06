@@ -13,7 +13,12 @@ rem with a newer JDK (avoids UnsupportedClassVersionError on Java 17).
 javac --release 17 -d build\classes @build\sources.txt
 if errorlevel 1 (echo javac failed & exit /b 1)
 
-jar --create --file build\icp-helper.jar --main-class com.documenso.icp.Main -C build\classes .
+rem Resources (the tray icon) travel inside the jar, so the agent has its brand
+rem mark available with no install-time file layout to get wrong.
+xcopy /e /i /y /q src\main\resources build\classes >nul
+if errorlevel 1 (echo resource copy failed & exit /b 1)
+
+jar --create --file build\icp-helper.jar --main-class br.com.capivapp.icp.Main -C build\classes .
 if errorlevel 1 (echo jar failed & exit /b 1)
 
 echo Built build\icp-helper.jar

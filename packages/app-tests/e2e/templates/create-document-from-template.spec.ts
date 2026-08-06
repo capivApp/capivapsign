@@ -51,16 +51,16 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
 
   await page.locator('.time-zone-field').click();
   await page.getByRole('option', { name: 'Etc/UTC' }).click();
-  await page.getByLabel('Redirect URL').fill('https://documenso.com');
+  await page.getByLabel('Redirect URL').fill('https://capivasign.com');
   await page.getByRole('button', { name: 'Continue' }).click();
 
   await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
   // Add 2 signers.
-  await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient1@capivapp.com.br');
   await page.getByPlaceholder('Name').fill('Recipient 1');
   await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
-  await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+  await page.getByPlaceholder('Email').nth(1).fill('recipient2@capivapp.com.br');
   await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -97,7 +97,7 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
 
   expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy HH:mm');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
-  expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
+  expect(document.documentMeta?.redirectUrl).toEqual('https://capivasign.com');
   expect(document.documentMeta?.subject).toEqual('SUBJECT');
   expect(document.documentMeta?.timezone).toEqual('Etc/UTC');
 
@@ -154,16 +154,16 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 
   await page.locator('.time-zone-field').click();
   await page.getByRole('option', { name: 'Etc/UTC' }).click();
-  await page.getByLabel('Redirect URL').fill('https://documenso.com');
+  await page.getByLabel('Redirect URL').fill('https://capivasign.com');
   await page.getByRole('button', { name: 'Continue' }).click();
 
   await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
   // Add 2 signers.
-  await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient1@capivapp.com.br');
   await page.getByPlaceholder('Name').fill('Recipient 1');
   await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
-  await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+  await page.getByPlaceholder('Email').nth(1).fill('recipient2@capivapp.com.br');
   await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -201,7 +201,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
   expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy HH:mm');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
-  expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
+  expect(document.documentMeta?.redirectUrl).toEqual('https://capivasign.com');
   expect(document.documentMeta?.subject).toEqual('SUBJECT');
   expect(document.documentMeta?.timezone).toEqual('Etc/UTC');
 
@@ -243,7 +243,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
   // Add a signer
-  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient@capivapp.com.br');
   await page.getByPlaceholder('Name').fill('Recipient');
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -338,7 +338,7 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
   await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
   // Add a signer
-  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient@capivapp.com.br');
   await page.getByPlaceholder('Name').fill('Recipient');
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -433,7 +433,7 @@ test('[TEMPLATE]: should create a document from a template using template docume
   await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
   // Add a signer
-  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient@capivapp.com.br');
   await page.getByPlaceholder('Name').fill('Recipient');
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -513,7 +513,7 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
   // Add a signer
-  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient@capivapp.com.br');
   await page.getByPlaceholder('Name').fill('Recipient');
 
   await page.getByRole('button', { name: 'Continue' }).click();

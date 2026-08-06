@@ -51,9 +51,9 @@ export type CscTransport = {
 
 declare global {
   // eslint-disable-next-line no-var
-  var __documenso_csc_transport__: CscTransport | undefined;
+  var __capivasign_csc_transport__: CscTransport | undefined;
   // eslint-disable-next-line no-var
-  var __documenso_csc_transport_promise__: Promise<CscTransport> | undefined;
+  var __capivasign_csc_transport_promise__: Promise<CscTransport> | undefined;
 }
 
 /**
@@ -69,22 +69,22 @@ declare global {
  * awaits the same promise instead of starting a duplicate request.
  */
 export const getCscTransport = async (): Promise<CscTransport> => {
-  if (globalThis.__documenso_csc_transport__) {
-    return globalThis.__documenso_csc_transport__;
+  if (globalThis.__capivasign_csc_transport__) {
+    return globalThis.__capivasign_csc_transport__;
   }
 
-  if (!globalThis.__documenso_csc_transport_promise__) {
-    globalThis.__documenso_csc_transport_promise__ = buildCscTransport()
+  if (!globalThis.__capivasign_csc_transport_promise__) {
+    globalThis.__capivasign_csc_transport_promise__ = buildCscTransport()
       .then((transport) => {
-        globalThis.__documenso_csc_transport__ = transport;
+        globalThis.__capivasign_csc_transport__ = transport;
         return transport;
       })
       .finally(() => {
-        globalThis.__documenso_csc_transport_promise__ = undefined;
+        globalThis.__capivasign_csc_transport_promise__ = undefined;
       });
   }
 
-  return await globalThis.__documenso_csc_transport_promise__;
+  return await globalThis.__capivasign_csc_transport_promise__;
 };
 
 /**
@@ -93,8 +93,8 @@ export const getCscTransport = async (): Promise<CscTransport> => {
  * full build pipeline (license + env + discovery).
  */
 export const resetCscTransport = (): void => {
-  globalThis.__documenso_csc_transport__ = undefined;
-  globalThis.__documenso_csc_transport_promise__ = undefined;
+  globalThis.__capivasign_csc_transport__ = undefined;
+  globalThis.__capivasign_csc_transport_promise__ = undefined;
 };
 
 const buildCscTransport = async (): Promise<CscTransport> => {

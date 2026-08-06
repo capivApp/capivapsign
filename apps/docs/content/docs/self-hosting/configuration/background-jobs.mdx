@@ -1,6 +1,6 @@
 ---
 title: Background Jobs
-description: Configure how Documenso processes background tasks like email delivery, document processing, and webhook dispatch.
+description: Configure how CapivaSign processes background tasks like email delivery, document processing, and webhook dispatch.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
@@ -8,7 +8,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Overview
 
-Documenso processes background jobs for email delivery, document sealing, webhook dispatch, and scheduled maintenance tasks. Three providers are available:
+CapivaSign processes background jobs for email delivery, document sealing, webhook dispatch, and scheduled maintenance tasks. Three providers are available:
 
 | Provider | Backend    | Best For                                        | Infrastructure |
 | -------- | ---------- | ----------------------------------------------- | -------------- |
@@ -66,7 +66,7 @@ INNGEST_SIGNING_KEY=your-signing-key
 
 ## BullMQ
 
-[BullMQ](https://docs.bullmq.io/) is a Redis-backed job queue that runs inside the Documenso process. It provides higher throughput than the local provider, configurable concurrency, and a built-in dashboard for monitoring jobs.
+[BullMQ](https://docs.bullmq.io/) is a Redis-backed job queue that runs inside the CapivaSign process. It provides higher throughput than the local provider, configurable concurrency, and a built-in dashboard for monitoring jobs.
 
 ### Requirements
 
@@ -84,7 +84,7 @@ NEXT_PRIVATE_REDIS_URL=redis://localhost:6379
 | Variable                           | Description                                                                | Default     |
 | ---------------------------------- | -------------------------------------------------------------------------- | ----------- |
 | `NEXT_PRIVATE_REDIS_URL`           | Redis connection URL                                                       | _(required)_ |
-| `NEXT_PRIVATE_REDIS_PREFIX`        | Key prefix for Redis queues (useful when sharing an instance)              | `documenso` |
+| `NEXT_PRIVATE_REDIS_PREFIX`        | Key prefix for Redis queues (useful when sharing an instance)              | `capivasign` |
 | `NEXT_PRIVATE_BULLMQ_CONCURRENCY` | Number of concurrent jobs to process                                       | `10`        |
 
 ### Dashboard
@@ -110,7 +110,7 @@ volumes:
   redis_data:
 ```
 
-Then set `NEXT_PRIVATE_REDIS_URL=redis://redis:6379` in your Documenso environment.
+Then set `NEXT_PRIVATE_REDIS_URL=redis://redis:6379` in your CapivaSign environment.
 
 ### Advantages
 
@@ -124,7 +124,7 @@ Then set `NEXT_PRIVATE_REDIS_URL=redis://redis:6379` in your Documenso environme
 
 ## Local
 
-The local provider uses your PostgreSQL database as a job queue. Jobs are stored in the `BackgroundJob` table and processed via internal HTTP requests that Documenso sends to itself.
+The local provider uses your PostgreSQL database as a job queue. Jobs are stored in the `BackgroundJob` table and processed via internal HTTP requests that CapivaSign sends to itself.
 
 ### Setup
 
@@ -137,7 +137,7 @@ NEXT_PRIVATE_JOBS_PROVIDER=local
 
 ### Internal URL
 
-Background jobs in the local provider work by Documenso sending HTTP requests to itself. If your reverse proxy or network setup causes issues with the app reaching its own public URL, set the internal URL:
+Background jobs in the local provider work by CapivaSign sending HTTP requests to itself. If your reverse proxy or network setup causes issues with the app reaching its own public URL, set the internal URL:
 
 ```bash
 NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000

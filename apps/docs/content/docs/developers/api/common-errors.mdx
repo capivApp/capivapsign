@@ -1,9 +1,9 @@
 ---
 title: Common Errors
-description: A comprehensive troubleshooting matrix for Documenso API and Webhook integration errors.
+description: A comprehensive troubleshooting matrix for CapivaSign API and Webhook integration errors.
 ---
 
-This guide provides a comprehensive troubleshooting matrix for the standard error codes returned by the Documenso API. Use this reference to diagnose and resolve integration issues related to envelopes, recipients, and webhooks.
+This guide provides a comprehensive troubleshooting matrix for the standard error codes returned by the CapivaSign API. Use this reference to diagnose and resolve integration issues related to envelopes, recipients, and webhooks.
 
 ## Application Error Codes
 
@@ -26,7 +26,7 @@ This guide provides a comprehensive troubleshooting matrix for the standard erro
 | `SCHEMA_FAILED` | Strict data schema validation failed. | Verify that the data types sent (string, number, boolean) exactly match the OpenAPI specification. |
 | `TOO_MANY_REQUESTS` | Rate limit exceeded (429). | Reduce the frequency of your API calls. Implement rate-limiting handling based on the response headers. |
 | `TWO_FACTOR_AUTH_FAILED` | Two-factor authentication (2FA) failed. | Verify the provided 2FA code. Ensure it was entered correctly and has not expired. |
-| `WEBHOOK_INVALID_REQUEST` | The webhook-related request is invalid. | Check your receiving endpoint configuration. Ensure the URL is correct and that your server accepts `POST` requests from Documenso. |
+| `WEBHOOK_INVALID_REQUEST` | The webhook-related request is invalid. | Check your receiving endpoint configuration. Ensure the URL is correct and that your server accepts `POST` requests from CapivaSign. |
 
 ## Envelope State Errors
 

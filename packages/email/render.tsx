@@ -29,7 +29,7 @@ const DEFAULT_EMAIL_BRANDING_COLORS: EmailBrandingColors =
 /**
  * Map the resolved colour set to flat semantic Tailwind tokens. Templates use
  * these directly (`bg-primary`, `text-muted-foreground`, `border-border`, …),
- * mirroring the app's shadcn tokens, instead of bespoke `slate-*`/`documenso-*`
+ * mirroring the app's shadcn tokens, instead of bespoke `slate-*`/`brand-*`
  * scale classes.
  *
  * Always defined: falls back to `DEFAULT_EMAIL_BRANDING_COLORS` when no tenant

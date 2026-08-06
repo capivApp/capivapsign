@@ -919,7 +919,7 @@ test.describe('Find Documents API - Team with Team Email', () => {
   }) => {
     const { team, owner } = await seedTeam();
 
-    const teamEmail = `team-email-${team.id}@test.documenso.com`;
+    const teamEmail = `team-email-${team.id}@test.capivapp.com.br`;
     await seedTeamEmail({ email: teamEmail, teamId: team.id });
 
     const { user: externalUser, team: externalTeam } = await seedUser();
@@ -968,7 +968,7 @@ test.describe('Find Documents API - Team with Team Email', () => {
   test('team email documents should respect visibility rules with adequate controls', async ({ request }) => {
     const { team } = await seedTeam();
 
-    const teamEmail = `team-vis-email-${team.id}@test.documenso.com`;
+    const teamEmail = `team-vis-email-${team.id}@test.capivapp.com.br`;
     await seedTeamEmail({ email: teamEmail, teamId: team.id });
 
     const admin = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.ADMIN });

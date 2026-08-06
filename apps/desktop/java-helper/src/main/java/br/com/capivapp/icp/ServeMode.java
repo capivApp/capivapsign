@@ -1,0 +1,351 @@
+package br.com.capivapp.icp;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
+import java.awt.AWTException;
+import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.RenderingHints;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.BindException;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
+/**
+ * Local HTTP server mode for the CapivaSign agent.
+ *
+ * Listens on http://127.0.0.1:3231 and lives in the system tray. The CapivaSign
+ * signing page probes `/ping` and, when the agent is running, POSTs the sign
+ * request to `/sign` instead of relying on the `capivasign-icp://` deep link.
+ * This makes A1/A3 signing work on any OS (notably Linux) without registering a
+ * custom URI scheme.
+ *
+ * CORS is open (`*`) because the request originates from the CapivaSign web
+ * origin; the actual authorisation is the unguessable recipient token in the
+ * body, and the private key never leaves the machine.
+ */
+final class ServeMode {
+  static final int PORT = 3231;
+
+  private ServeMode() {}
+
+  /**
+   * @param tray when true (the default for the shipped launcher), run silently
+   *     in the system tray: no window, results shown as tray balloons. When
+   *     false, show the foreground waiting window instead — useful when
+   *     debugging on a desktop with no working tray.
+   */
+  static void start(boolean tray) throws IOException {
+    HttpServer server;
+
+    try {
+      server = HttpServer.create(new InetSocketAddress("127.0.0.1", PORT), 0);
+    } catch (BindException e) {
+      // Port taken. Either our own agent is already up — the common case, since
+      // the installer auto-starts it at logon and the user then launches it
+      // again from the Start menu — or something else owns 3231. Neither is a
+      // crash, and a windowed launcher would otherwise die with no explanation.
+      onPortUnavailable();
+      return;
+    }
+
+    server.createContext("/ping", ServeMode::handlePing);
+    server.createContext("/sign", ServeMode::handleSign);
+    // A pool (not a single thread): a signing request blocks its thread for as
+    // long as the user takes at the certificate/PIN dialogs, so the server must
+    // stay responsive for /ping and retries meanwhile.
+    server.setExecutor(Executors.newCachedThreadPool());
+    server.start();
+
+    // Tray first; the waiting window is the fallback when the desktop has no
+    // tray at all, so a silent launch never ends up with zero visible affordance.
+    boolean installed = tray && installTray();
+
+    if (!installed) {
+      showWaitingWindow();
+    }
+
+    System.err.println(Brand.NAME + " agent listening on http://127.0.0.1:" + PORT
+        + (installed ? " (tray)" : " (window)"));
+  }
+
+  /**
+   * Another process already holds the port. Tell the user which case it is and
+   * exit 0 — a second launch of an always-on agent is a no-op, not an error.
+   */
+  private static void onPortUnavailable() {
+    boolean shown;
+
+    if (isOurAgent()) {
+      System.err.println(Brand.NAME + " agent already running on port " + PORT + "; nothing to do.");
+      shown = Feedback.success("O assinador já está em execução na bandeja do sistema.");
+    } else {
+      System.err.println("Port " + PORT + " is in use by another application.");
+      shown = Feedback.failure("A porta " + PORT + " já está sendo usada por outro programa.\n"
+          + "Encerre esse programa e abra o assinador novamente.");
+    }
+
+    // The dialog is dispatched onto the EDT; exiting immediately would kill it
+    // before anyone sees it. Only wait when there is actually something to see.
+    if (shown) {
+      sleepQuietly(8000);
+    }
+  }
+
+  /** True when whatever holds the port answers /ping as a CapivaSign agent. */
+  private static boolean isOurAgent() {
+    try {
+      HttpResponse<String> response = HttpClient.newBuilder()
+          .connectTimeout(Duration.ofSeconds(2))
+          .build()
+          .send(
+              HttpRequest.newBuilder()
+                  .uri(URI.create("http://127.0.0.1:" + PORT + "/ping"))
+                  .timeout(Duration.ofSeconds(2))
+                  .GET()
+                  .build(),
+              HttpResponse.BodyHandlers.ofString());
+
+      return response.statusCode() == 200 && response.body().contains("capivasign");
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  private static void handlePing(HttpExchange exchange) throws IOException {
+    if (isPreflight(exchange)) {
+      respond(exchange, 204, "");
+      return;
+    }
+    respond(exchange, 200, Json.write(Map.of("ok", Boolean.TRUE, "agent", "capivasign")));
+  }
+
+  private static void handleSign(HttpExchange exchange) throws IOException {
+    if (isPreflight(exchange)) {
+      respond(exchange, 204, "");
+      return;
+    }
+    if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+      respond(exchange, 405, Json.write(error("POST only")));
+      return;
+    }
+
+    // Catch Throwable (not just Exception): an uncaught Error here would kill the
+    // worker thread WITHOUT sending a response, leaving the browser request
+    // hanging "pending" forever with no feedback. Always respond and always
+    // surface the outcome to the user so signing is never silent.
+    try {
+      String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+      Map<String, Object> request = Json.asObject(Json.parse(body));
+
+      Map<String, String> opts = CliAgent.optsFromRequest(
+          Json.str(request, "baseUrl"), Json.str(request, "token"), Json.str(request, "source"));
+
+      System.err.println("→ /sign request: baseUrl=" + opts.get("base-url") + " source=" + opts.get("source"));
+
+      // GUI prompts for cert selection / PIN / .p12 file + password.
+      Map<String, Object> result = CliAgent.performSign(opts, Ui.create(true));
+
+      System.err.println("✓ /sign done: " + result);
+      respond(exchange, 200, Json.write(result));
+      Feedback.success("Assinatura concluída com sucesso.");
+    } catch (Throwable e) {
+      String message = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
+      System.err.println("✗ /sign failed: " + message);
+      e.printStackTrace();
+      respond(exchange, 500, Json.write(error(message)));
+      Feedback.failure("Falha ao assinar:\n" + message);
+    }
+  }
+
+  // ---- system tray ----------------------------------------------------------
+
+  /**
+   * Install the tray icon with a "Sair" menu so the silently-running agent is
+   * discoverable and quittable.
+   *
+   * @return false when the platform has no usable tray, so the caller can fall
+   *     back to the waiting window rather than leaving the user with nothing.
+   */
+  private static boolean installTray() {
+    if (GraphicsEnvironment.isHeadless() || !SystemTray.isSupported()) {
+      System.err.println("System tray unavailable; falling back to the waiting window.");
+      return false;
+    }
+
+    SystemTray tray = SystemTray.getSystemTray();
+
+    MenuItem status = new MenuItem("Assinador ativo · porta " + PORT);
+    status.setEnabled(false);
+    MenuItem openLog = new MenuItem("Abrir registro de eventos");
+    MenuItem quit = new MenuItem("Sair");
+
+    PopupMenu menu = new PopupMenu();
+    menu.add(status);
+    menu.add(openLog);
+    menu.addSeparator();
+    menu.add(quit);
+
+    TrayIcon icon = new TrayIcon(trayImage(), Brand.AGENT_NAME, menu);
+    icon.setImageAutoSize(true);
+    openLog.addActionListener((e) -> openLogFile());
+    quit.addActionListener((e) -> {
+      tray.remove(icon);
+      System.exit(0);
+    });
+
+    try {
+      tray.add(icon);
+    } catch (AWTException e) {
+      System.err.println("Tray unavailable: " + e.getMessage());
+      return false;
+    }
+
+    Feedback.useTray(icon);
+    icon.displayMessage(Brand.NAME, "Assinador ICP-Brasil em execução.", TrayIcon.MessageType.INFO);
+    return true;
+  }
+
+  private static void openLogFile() {
+    Path log = Log.file();
+
+    if (log == null || !Desktop.isDesktopSupported()) {
+      return;
+    }
+
+    try {
+      Desktop.getDesktop().open(log.toFile());
+    } catch (Exception e) {
+      System.err.println("Could not open log file: " + e.getMessage());
+    }
+  }
+
+  /**
+   * The CapivaSign mark, loaded from the jar. Falls back to a drawn glyph so a
+   * packaging slip degrades to a plain icon instead of no tray icon at all.
+   */
+  private static Image trayImage() {
+    try (InputStream stream = ServeMode.class.getResourceAsStream("/br/com/capivapp/icp/tray-icon.png")) {
+      if (stream != null) {
+        BufferedImage image = ImageIO.read(stream);
+        if (image != null) {
+          return image;
+        }
+      }
+    } catch (IOException e) {
+      System.err.println("Tray icon resource unreadable: " + e.getMessage());
+    }
+
+    return fallbackTrayImage();
+  }
+
+  /** A tiny rounded "C" glyph, used only if the packaged icon is missing. */
+  private static Image fallbackTrayImage() {
+    int size = 16;
+    BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = image.createGraphics();
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g.setColor(new Color(0x63, 0x66, 0xF1));
+    g.fillRoundRect(0, 0, size, size, 6, 6);
+    g.setColor(Color.WHITE);
+    g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
+    g.drawString("C", 4, 12);
+    g.dispose();
+    return image;
+  }
+
+  // ---- helpers --------------------------------------------------------------
+
+  private static boolean isPreflight(HttpExchange exchange) {
+    return "OPTIONS".equalsIgnoreCase(exchange.getRequestMethod());
+  }
+
+  private static void respond(HttpExchange exchange, int status, String body) throws IOException {
+    exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+    exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "content-type");
+    exchange.getResponseHeaders().add("Content-Type", "application/json; charset=utf-8");
+
+    byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+    // 204 must not carry a body length.
+    exchange.sendResponseHeaders(status, status == 204 ? -1 : bytes.length);
+    if (status != 204) {
+      exchange.getResponseBody().write(bytes);
+    }
+    exchange.close();
+  }
+
+  private static Map<String, Object> error(String message) {
+    Map<String, Object> map = new LinkedHashMap<>();
+    map.put("ok", Boolean.FALSE);
+    map.put("error", message);
+    return map;
+  }
+
+  private static void sleepQuietly(long millis) {
+    try {
+      Thread.sleep(millis);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
+  private static void showWaitingWindow() {
+    if (GraphicsEnvironment.isHeadless()) {
+      return;
+    }
+    String allowed = System.getenv("ICP_ALLOWED_ORIGIN");
+    String originLine = allowed == null || allowed.isBlank()
+        ? "<p style='color:#b45309;'>⚠ Aceitando qualquer site (ICP_ALLOWED_ORIGIN não definido).</p>"
+        : "<p>Site autorizado: <b>" + escapeHtml(allowed) + "</b></p>";
+
+    SwingUtilities.invokeLater(() -> {
+      JFrame frame = new JFrame(Brand.AGENT_NAME);
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      JLabel label = new JLabel(
+          "<html><div style='padding:24px;text-align:center;font-family:sans-serif;width:380px;'>"
+              + "<h2 style='margin-bottom:4px;'>Assinador ativo</h2>"
+              + "<p style='color:#16a34a;margin-top:0;'>● Aguardando pedido de assinatura…</p>"
+              + "<p>Deixe esta janela aberta. Ao confirmar a assinatura no navegador,"
+              + " o pedido chega aqui e o seu certificado ICP-Brasil é usado para assinar.</p>"
+              + originLine
+              + "<p style='color:#6b7280;font-size:11px;'>Escutando em http://127.0.0.1:" + PORT
+              + " · Para encerrar, feche esta janela.</p>"
+              + "</div></html>",
+          SwingConstants.CENTER);
+      frame.add(label);
+      frame.setSize(460, 280);
+      frame.setLocationRelativeTo(null);
+      frame.setVisible(true);
+    });
+  }
+
+  /** Minimal HTML escaping so an origin can't break the Swing HTML label. */
+  private static String escapeHtml(String s) {
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+  }
+}

@@ -101,7 +101,7 @@ const buildAndDistributeEnvelopeWithRecipients = async ({
 
   // Create N SIGNER recipients in a single request.
   const recipientData = Array.from({ length: recipientCount }).map((_, index) => ({
-    email: `recipient-${index}-${Date.now()}-${Math.random().toString(36).slice(2)}@test.documenso.com`,
+    email: `recipient-${index}-${Date.now()}-${Math.random().toString(36).slice(2)}@test.capivapp.com.br`,
     name: `Recipient ${index}`,
     role: RecipientRole.SIGNER,
     accessAuth: [],

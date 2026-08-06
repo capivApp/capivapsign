@@ -27,22 +27,23 @@ const SYNCED_EVENT_TYPES: string[] = [
 
 export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
   try {
-    const isBillingEnabled = IS_BILLING_ENABLED();
+    // Acknowledge with 2xx when this instance simply isn't the one handling
+    // billing. A 5xx would put Stripe into its retry schedule and redeliver the
+    // same event for days against an endpoint that will never process it.
+    if (!IS_BILLING_ENABLED()) {
+      return Response.json(
+        {
+          success: true,
+          message: 'Billing is disabled, event ignored',
+        } satisfies StripeWebhookResponse,
+        { status: 200 },
+      );
+    }
 
     const webhookSecret = env('NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET');
 
     if (!webhookSecret) {
       throw new Error('Missing Stripe webhook secret');
-    }
-
-    if (!isBillingEnabled) {
-      return Response.json(
-        {
-          success: false,
-          message: 'Billing is disabled',
-        } satisfies StripeWebhookResponse,
-        { status: 500 },
-      );
     }
 
     const signature =
@@ -70,7 +71,24 @@ export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+    let event: Stripe.Event;
+
+    try {
+      event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+    } catch (err) {
+      // A bad signature can never become valid on redelivery, so answer 400 to
+      // take it out of Stripe's retry schedule instead of letting it fall into
+      // the 500 path below.
+      console.error('Stripe webhook signature verification failed:', err);
+
+      return Response.json(
+        {
+          success: false,
+          message: 'Invalid signature',
+        } satisfies StripeWebhookResponse,
+        { status: 400 },
+      );
+    }
 
     if (!SYNCED_EVENT_TYPES.includes(event.type)) {
       return Response.json(

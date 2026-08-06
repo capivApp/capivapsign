@@ -18,7 +18,14 @@ import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-rou
 import { Spinner } from '@documenso/ui/primitives/spinner';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
+import {
+  DocumentStatus,
+  EnvelopeType,
+  ReadStatus,
+  RecipientDeliveryChannel,
+  SendStatus,
+  SigningStatus,
+} from '@prisma/client';
 import { CheckCircle2Icon } from 'lucide-react';
 import { useLayoutEffect, useMemo, useState } from 'react';
 
@@ -323,6 +330,10 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       rejectionReason: null,
       expiresAt: null,
       expirationNotifiedAt: null,
+      // Embedded authoring seeds email recipients only; WhatsApp delivery is set
+      // up in the full editor, so there is no phone number at this point.
+      deliveryChannel: RecipientDeliveryChannel.EMAIL,
+      phone: null,
     }));
 
     const type = embedAuthoringOptions.type;

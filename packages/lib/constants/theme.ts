@@ -29,8 +29,8 @@ export const DEFAULT_BRAND_COLORS = {
   card: '#ffffff', //                    0 0% 100%
   cardBorder: '#e2e8f0', //              214.3 31.8% 91.4%
   cardForeground: '#0f172a', //          222.2 47.4% 11.2%
-  fieldCard: '#e2f8d3', //               95 74% 90%
-  fieldCardBorder: '#a2e771', //         95.08 71.08% 67.45%
+  fieldCard: '#e0e7ff', //               226 100% 94%
+  fieldCardBorder: '#a5b4fc', //         230 94% 82%
   fieldCardForeground: '#0f172a', //     222.2 47.4% 11.2%
   widget: '#f7f7f7', //                  0 0% 97%
   widgetForeground: '#f2f2f2', //        0 0% 95%
@@ -38,8 +38,8 @@ export const DEFAULT_BRAND_COLORS = {
   input: '#e2e8f0', //                   214.3 31.8% 91.4%
   primary: '#5048e5', //                 243 75% 59%
   primaryForeground: '#f8fafc', //       210 40% 98%
-  secondary: '#f1f5f9', //               210 40% 96.1%
-  secondaryForeground: '#0f172a', //     222.2 47.4% 11.2%
+  secondary: '#ec4699', //               330 81% 60%
+  secondaryForeground: '#f8fafc', //     210 40% 98%
   accent: '#f1f5f9', //                  210 40% 96.1%
   accentForeground: '#0f172a', //        222.2 47.4% 11.2%
   destructive: '#ff0000', //             0 100% 50%

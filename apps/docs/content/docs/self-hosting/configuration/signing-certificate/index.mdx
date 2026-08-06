@@ -1,17 +1,17 @@
 ---
 title: Signing Certificate
-description: Configure the X.509 signing certificate used for digital signatures in self-hosted Documenso.
+description: Configure the X.509 signing certificate used for digital signatures in self-hosted CapivaSign.
 ---
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-When a document is completed in Documenso, it is digitally signed using an X.509 certificate. This cryptographic signature provides:
+When a document is completed in CapivaSign, it is digitally signed using an X.509 certificate. This cryptographic signature provides:
 
 - Proof of document authenticity
 - Verification that the document has not been modified since signing
 - Identity information about the signing entity
 
-Self-hosted Documenso instances require a signing certificate. You can generate a self-signed certificate or purchase one from a Certificate Authority (CA).
+Self-hosted CapivaSign instances require a signing certificate. You can generate a self-signed certificate or purchase one from a Certificate Authority (CA).
 
 <Cards>
   <Card
@@ -76,7 +76,7 @@ For Adobe recognition, choose a vendor from the [Adobe Approved Trust List](http
 </Tab>
 <Tab value="Google Cloud HSM">
 
-For organisations requiring hardware-based key protection, Documenso supports Google Cloud HSM. This provides:
+For organisations requiring hardware-based key protection, CapivaSign supports Google Cloud HSM. This provides:
 
 - FIPS 140-2 Level 3 certified key storage
 - Keys never leave the HSM
@@ -87,12 +87,12 @@ See [Google Cloud HSM](/docs/self-hosting/configuration/signing-certificate/goog
 </Tab>
 <Tab value="CSC (AES / QES)">
 
-For Advanced and Qualified Electronic Signatures under eIDAS, Documenso integrates with third-party Trust Service Providers via the Cloud Signature Consortium API. Each recipient authenticates directly with the TSP, which holds the private key and issues the signature.
+For Advanced and Qualified Electronic Signatures under eIDAS, CapivaSign integrates with third-party Trust Service Providers via the Cloud Signature Consortium API. Each recipient authenticates directly with the TSP, which holds the private key and issues the signature.
 
 - Per-recipient identity verification by an accredited TSP
 - Legally equivalent to a handwritten signature within the EU (QES)
 - Requires an [Enterprise Edition](/docs/policies/enterprise-edition) license
-- Instance-wide setting; one CSC provider per Documenso install
+- Instance-wide setting; one CSC provider per CapivaSign install
 
 See [CSC (AES / QES)](/docs/self-hosting/configuration/signing-certificate/csc-qes) for setup instructions.
 

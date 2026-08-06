@@ -1,6 +1,6 @@
 ---
 title: Document Conversion
-description: Enable DOCX uploads on a self-hosted Documenso instance by running a Gotenberg sidecar that converts Word documents to PDF.
+description: Enable DOCX uploads on a self-hosted CapivaSign instance by running a Gotenberg sidecar that converts Word documents to PDF.
 ---
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
@@ -10,7 +10,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Overview
 
-Documenso can accept `.docx` uploads in addition to PDFs. When a user uploads a Word document, the Documenso server sends it to a [Gotenberg](https://gotenberg.dev) service which uses LibreOffice to convert it to PDF. The converted PDF is what gets stored, signed, and downloaded. The original DOCX is discarded.
+CapivaSign can accept `.docx` uploads in addition to PDFs. When a user uploads a Word document, the CapivaSign server sends it to a [Gotenberg](https://gotenberg.dev) service which uses LibreOffice to convert it to PDF. The converted PDF is what gets stored, signed, and downloaded. The original DOCX is discarded.
 
 This feature is **opt-in for self-hosted instances**. When the conversion service is not configured, DOCX uploads are rejected in the UI and only PDFs are accepted.
 
@@ -19,7 +19,7 @@ This feature is **opt-in for self-hosted instances**. When the conversion servic
 | Conversion engine       | [Gotenberg](https://gotenberg.dev) + LibreOffice                     |
 | Input format            | `.docx` (Office Open XML Word documents)                             |
 | Output format           | PDF                                                                  |
-| Network requirement     | Documenso must reach the Gotenberg HTTP API                          |
+| Network requirement     | CapivaSign must reach the Gotenberg HTTP API                          |
 | Default request timeout | 30 seconds per file                                                  |
 | Failure handling        | An internal circuit breaker opens for 30 seconds after a failure |
 
@@ -33,14 +33,14 @@ This feature is **opt-in for self-hosted instances**. When the conversion servic
 ## Requirements
 
 - A running Gotenberg 8 instance with the LibreOffice module (`gotenberg/gotenberg:8-libreoffice` or newer).
-- Network reachability from the Documenso container to the Gotenberg HTTP API.
-- A version of Documenso that includes the document conversion feature.
+- Network reachability from the CapivaSign container to the Gotenberg HTTP API.
+- A version of CapivaSign that includes the document conversion feature.
 
 ## Build the Gotenberg Image
 
 The upstream `gotenberg/gotenberg:8-libreoffice` image works out of the box, but it ships only **metric-compatible font substitutes** (Carlito for Calibri, Liberation for Arial/Times/Courier). Layout widths are preserved but documents will look noticeably different from Word.
 
-For better fidelity, especially for non-Latin scripts, build a derived image that adds Microsoft Core Fonts and additional language fonts. The Documenso repository ships a reference Dockerfile at [`docker/development/Dockerfile.gotenberg`](https://github.com/documenso/documenso/blob/main/docker/development/Dockerfile.gotenberg) that you can use as a starting point:
+For better fidelity, especially for non-Latin scripts, build a derived image that adds Microsoft Core Fonts and additional language fonts. The CapivaSign repository ships a reference Dockerfile at [`docker/development/Dockerfile.gotenberg`](https://github.com/capivapp/capiva-sign/blob/main/docker/development/Dockerfile.gotenberg) that you can use as a starting point:
 
 ```dockerfile
 FROM gotenberg/gotenberg:8-libreoffice
@@ -80,26 +80,26 @@ USER gotenberg
 Build and publish the image to a registry you control:
 
 ```bash
-docker build -t registry.example.com/documenso/gotenberg:8 \
+docker build -t registry.example.com/capivasign/gotenberg:8 \
   -f Dockerfile.gotenberg .
-docker push registry.example.com/documenso/gotenberg:8
+docker push registry.example.com/capivasign/gotenberg:8
 ```
 
 If you do not need extra fonts, skip the build step entirely and reference `gotenberg/gotenberg:8-libreoffice` directly in the next section.
 
 ## Deploy the Service
 
-The Gotenberg service should run **alongside** your Documenso container, not exposed to the public internet. The conversion service has no built-in authorisation beyond HTTP Basic auth, so it should sit on a private network or behind your existing reverse proxy.
+The Gotenberg service should run **alongside** your CapivaSign container, not exposed to the public internet. The conversion service has no built-in authorisation beyond HTTP Basic auth, so it should sit on a private network or behind your existing reverse proxy.
 
 <Tabs items={['Docker Compose', 'Kubernetes', 'External Instance']}>
 <Tab value="Docker Compose">
 
-Add a `gotenberg` service to the `compose.yml` you use for Documenso:
+Add a `gotenberg` service to the `compose.yml` you use for CapivaSign:
 
 ```yaml
 services:
   gotenberg:
-    image: registry.example.com/documenso/gotenberg:8
+    image: registry.example.com/capivasign/gotenberg:8
     # Or use upstream directly:
     # image: gotenberg/gotenberg:8-libreoffice
     restart: unless-stopped
@@ -122,7 +122,7 @@ services:
       retries: 5
       start_period: 20s
 
-  documenso:
+  capivasign:
     # existing config
     environment:
       NEXT_PRIVATE_DOCUMENT_CONVERSION_URL: http://gotenberg:3000
@@ -133,7 +133,7 @@ services:
         condition: service_healthy
 ```
 
-Do **not** publish Gotenberg's port (`3000`) to the host. Documenso reaches it over the internal Docker network using the service name (`http://gotenberg:3000`).
+Do **not** publish Gotenberg's port (`3000`) to the host. CapivaSign reaches it over the internal Docker network using the service name (`http://gotenberg:3000`).
 
 </Tab>
 <Tab value="Kubernetes">
@@ -145,16 +145,16 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: gotenberg-auth
-  namespace: documenso
+  namespace: capivasign
 stringData:
-  username: documenso
+  username: capivasign
   password: replace-me-with-a-strong-password
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gotenberg
-  namespace: documenso
+  namespace: capivasign
 spec:
   replicas: 1
   selector:
@@ -165,7 +165,7 @@ spec:
     spec:
       containers:
         - name: gotenberg
-          image: registry.example.com/documenso/gotenberg:8
+          image: registry.example.com/capivasign/gotenberg:8
           args:
             - gotenberg
             - --api-enable-basic-auth
@@ -192,7 +192,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gotenberg
-  namespace: documenso
+  namespace: capivasign
 spec:
   selector: { app: gotenberg }
   ports:
@@ -200,29 +200,29 @@ spec:
       targetPort: 3000
 ```
 
-Then reference the in-cluster URL from Documenso's environment:
+Then reference the in-cluster URL from CapivaSign's environment:
 
 ```
-NEXT_PRIVATE_DOCUMENT_CONVERSION_URL=http://gotenberg.documenso.svc.cluster.local:3000
-NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME=documenso
+NEXT_PRIVATE_DOCUMENT_CONVERSION_URL=http://gotenberg.capivasign.svc.cluster.local:3000
+NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME=capivasign
 NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD=replace-me-with-a-strong-password
 ```
 
 </Tab>
 <Tab value="External Instance">
 
-Documenso does not have to colocate with Gotenberg. You can point it at any reachable Gotenberg deployment: a managed instance, a shared internal service, or a Gotenberg-compatible API.
+CapivaSign does not have to colocate with Gotenberg. You can point it at any reachable Gotenberg deployment: a managed instance, a shared internal service, or a Gotenberg-compatible API.
 
 ```bash
 NEXT_PRIVATE_DOCUMENT_CONVERSION_URL=https://gotenberg.internal.example.com
-NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME=documenso
+NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME=capivasign
 NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD=replace-me-with-a-strong-password
 ```
 
 The remote instance must:
 
 - Expose the LibreOffice route `/forms/libreoffice/convert`.
-- Be reachable from the Documenso container with low enough latency that the 30 second per-request timeout is comfortable.
+- Be reachable from the CapivaSign container with low enough latency that the 30 second per-request timeout is comfortable.
 - Be on a private network or require authentication. Uploaded documents are sent to it as multipart form data and may contain sensitive content.
 
 </Tab>
@@ -236,15 +236,15 @@ The flags in the examples above are not arbitrary. Each one matters for a produc
 | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--api-enable-basic-auth`         | Requires HTTP Basic credentials on every API route. Without this, anyone with network access to the container can convert arbitrary documents.                                                                                                                       |
 | `--libreoffice-deny-private-ips`  | Rejects any outbound fetch LibreOffice tries to make to private, loopback, link-local, or cloud-metadata addresses while processing a document. Mitigates SSRF via malicious `.docx` files that embed `TargetMode="External"` references. Requires Gotenberg 8.32.0. |
-| `--api-timeout=500s`              | Server-side request ceiling. Documenso aborts at 30 s by default, so this is a safety net for very large documents.                                                                                                                                                  |
+| `--api-timeout=500s`              | Server-side request ceiling. CapivaSign aborts at 30 s by default, so this is a safety net for very large documents.                                                                                                                                                  |
 | `--libreoffice-auto-start`        | Starts LibreOffice at container boot so the first request is not slow.                                                                                                                                                                                               |
 | `--libreoffice-start-timeout=300s`| Allows LibreOffice up to 5 minutes to come up under load.                                                                                                                                                                                                            |
-| `--pdfengines-disable-routes`     | Disables the PDF engines routes Documenso does not use. Shrinks the attack surface.                                                                                                                                                                                  |
-| `--webhook-disable`               | Disables webhook callbacks. Documenso uses synchronous requests only.                                                                                                                                                                                                |
+| `--pdfengines-disable-routes`     | Disables the PDF engines routes CapivaSign does not use. Shrinks the attack surface.                                                                                                                                                                                  |
+| `--webhook-disable`               | Disables webhook callbacks. CapivaSign uses synchronous requests only.                                                                                                                                                                                                |
 
-## Configure Documenso
+## Configure CapivaSign
 
-Set the following environment variables on the Documenso container and restart it.
+Set the following environment variables on the CapivaSign container and restart it.
 
 ### Required
 
@@ -271,7 +271,7 @@ Set the following environment variables on the Documenso container and restart i
 ```bash
 # Document conversion (DOCX -> PDF)
 NEXT_PRIVATE_DOCUMENT_CONVERSION_URL=http://gotenberg:3000
-NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME=documenso
+NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME=capivasign
 NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD=replace-me-with-a-strong-password
 # NEXT_PRIVATE_DOCUMENT_CONVERSION_TIMEOUT_MS=60000
 ```
@@ -281,7 +281,7 @@ NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD=replace-me-with-a-strong-password
 {/* prettier-ignore */}
 <Steps>
 <Step>
-### Restart the Documenso container
+### Restart the CapivaSign container
 
 Restart so the new environment variables are picked up.
 
@@ -289,7 +289,7 @@ Restart so the new environment variables are picked up.
 <Step>
 ### Confirm Gotenberg is healthy
 
-From a shell inside the Documenso container or another container on the same network:
+From a shell inside the CapivaSign container or another container on the same network:
 
 ```bash
 curl -fsS http://gotenberg:3000/health
@@ -301,7 +301,7 @@ The endpoint is exempt from basic auth and should return `200 OK`.
 <Step>
 ### Upload a test DOCX
 
-In the Documenso web UI, open **Documents** and try uploading a small `.docx` file. The upload dropzone should accept it, and after a few seconds the editor should open with the converted PDF.
+In the CapivaSign web UI, open **Documents** and try uploading a small `.docx` file. The upload dropzone should accept it, and after a few seconds the editor should open with the converted PDF.
 
 </Step>
 <Step>
@@ -316,9 +316,9 @@ Successful conversions log a `document_conversion_attempt` event with `result: "
 
 - **Treat the conversion service as untrusted internal infrastructure.** Documents pass through Gotenberg in plain form. Run it on a private network and require HTTP Basic auth.
 - **Run with `--libreoffice-deny-private-ips`.** Without this flag, a malicious `.docx` can trigger LibreOffice to fetch URLs from your internal network (SSRF).
-- **Disable unused routes.** `--pdfengines-disable-routes` and `--webhook-disable` reduce attack surface. Documenso only uses the LibreOffice convert route.
+- **Disable unused routes.** `--pdfengines-disable-routes` and `--webhook-disable` reduce attack surface. CapivaSign only uses the LibreOffice convert route.
 - **Do not expose Gotenberg to the public internet.** Even with basic auth, this is a document-processing service with a non-trivial CPU and memory footprint; exposing it invites abuse.
-- **Rotate credentials.** Rotating the basic auth secret is a config change in both Gotenberg and Documenso, followed by a restart of each.
+- **Rotate credentials.** Rotating the basic auth secret is a config change in both Gotenberg and CapivaSign, followed by a restart of each.
 
 ## Resource Sizing
 
@@ -336,15 +336,15 @@ Gotenberg is stateless. Each container handles one or more concurrent requests i
 
 <Accordions type="multiple">
   <Accordion title="DOCX uploads are rejected with 'Only PDF and DOCX files are allowed'">
-    The Documenso server does not see `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL`. Check the value is set
-    on the running container (`docker exec documenso printenv | grep DOCUMENT_CONVERSION`) and
+    The CapivaSign server does not see `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL`. Check the value is set
+    on the running container (`docker exec capivasign printenv | grep DOCUMENT_CONVERSION`) and
     restart after changing it.
   </Accordion>
 
   <Accordion title="Uploads fail with 'Document conversion service is currently unavailable'">
-    Documenso could not reach Gotenberg. Verify:
+    CapivaSign could not reach Gotenberg. Verify:
 
-    - The URL in `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL` is resolvable from the Documenso container
+    - The URL in `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL` is resolvable from the CapivaSign container
       (use the Docker service name or in-cluster DNS, not `localhost`).
     - Gotenberg's `/health` endpoint returns `200`.
     - Basic auth credentials match between the two services.
@@ -379,9 +379,9 @@ Gotenberg is stateless. Each container handles one or more concurrent requests i
   </Accordion>
 
   <Accordion title="Form controls in the DOCX appear blank or missing">
-    Documenso disables Gotenberg's `exportFormFields` flag during conversion. Word content controls
-    (`<w:sdt>`) become static graphics in the output PDF, which prevents Documenso's later
-    flattening step from making them invisible. This is intentional. Use Documenso fields
+    CapivaSign disables Gotenberg's `exportFormFields` flag during conversion. Word content controls
+    (`<w:sdt>`) become static graphics in the output PDF, which prevents CapivaSign's later
+    flattening step from making them invisible. This is intentional. Use CapivaSign fields
     (signature, text, date, etc.) for anything that needs to be filled in by signers.
   </Accordion>
 

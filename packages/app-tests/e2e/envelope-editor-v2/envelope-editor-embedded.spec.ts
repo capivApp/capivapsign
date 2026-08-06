@@ -221,7 +221,7 @@ const setExternalIdViaSettings = async (surface: TEnvelopeEditorSurface, externa
  */
 const setupMinimalEnvelope = async (surface: TEnvelopeEditorSurface, externalId: string) => {
   await addEnvelopeItemPdf(surface.root);
-  await setRecipientEmail(surface.root, 0, `${nanoid()}@test.documenso.com`);
+  await setRecipientEmail(surface.root, 0, `${nanoid()}@test.capivapp.com.br`);
   await setExternalIdViaSettings(surface, externalId);
 };
 

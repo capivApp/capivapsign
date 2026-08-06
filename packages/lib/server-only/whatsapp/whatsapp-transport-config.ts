@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { DOCUMENSO_ENCRYPTION_SECONDARY_KEY } from '../../constants/crypto';
+import { CAPIVASIGN_ENCRYPTION_SECONDARY_KEY } from '../../constants/crypto';
 import { symmetricDecrypt, symmetricEncrypt } from '../../universal/crypto';
 
 /**
@@ -43,9 +43,7 @@ export const ZWhatsappTransportPublicConfigSchema = z.discriminatedUnion('type',
 
 export type TWhatsappTransportPublicConfig = z.infer<typeof ZWhatsappTransportPublicConfigSchema>;
 
-export const toPublicWhatsappTransportConfig = (
-  config: TWhatsappTransportConfig,
-): TWhatsappTransportPublicConfig => {
+export const toPublicWhatsappTransportConfig = (config: TWhatsappTransportConfig): TWhatsappTransportPublicConfig => {
   const publicConfig: Record<string, unknown> = { ...config };
 
   for (const key of WHATSAPP_TRANSPORT_SECRET_KEYS) {
@@ -57,23 +55,23 @@ export const toPublicWhatsappTransportConfig = (
 };
 
 export const encryptWhatsappTransportConfig = (config: TWhatsappTransportConfig): string => {
-  if (!DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
+  if (!CAPIVASIGN_ENCRYPTION_SECONDARY_KEY) {
     throw new Error('Missing encryption key');
   }
 
   return symmetricEncrypt({
-    key: DOCUMENSO_ENCRYPTION_SECONDARY_KEY,
+    key: CAPIVASIGN_ENCRYPTION_SECONDARY_KEY,
     data: JSON.stringify(config),
   });
 };
 
 export const decryptWhatsappTransportConfig = (encrypted: string): TWhatsappTransportConfig => {
-  if (!DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
+  if (!CAPIVASIGN_ENCRYPTION_SECONDARY_KEY) {
     throw new Error('Missing encryption key');
   }
 
   const decrypted = Buffer.from(
-    symmetricDecrypt({ key: DOCUMENSO_ENCRYPTION_SECONDARY_KEY, data: encrypted }),
+    symmetricDecrypt({ key: CAPIVASIGN_ENCRYPTION_SECONDARY_KEY, data: encrypted }),
   ).toString('utf-8');
 
   return ZWhatsappTransportConfigSchema.parse(JSON.parse(decrypted));

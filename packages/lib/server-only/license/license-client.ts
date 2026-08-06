@@ -13,14 +13,11 @@ import {
   ZLicenseResponseSchema,
 } from '../../types/license';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '../../types/subscription';
-import { env } from '../../utils/env';
-
-const LICENSE_KEY = env('NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY');
-const LICENSE_SERVER_URL = env('INTERNAL_OVERRIDE_LICENSE_SERVER_URL') || 'https://license.documenso.com';
+import { createLicenseSource, LICENSE_KEY } from './license-source';
 
 declare global {
   // eslint-disable-next-line no-var
-  var __documenso_license_client__: LicenseClient | undefined;
+  var __capivasign_license_client__: LicenseClient | undefined;
 }
 
 export class LicenseClient {
@@ -42,13 +39,13 @@ export class LicenseClient {
    * different bundles (e.g. Hono and Remix) at runtime.
    */
   public static async start(): Promise<void> {
-    if (globalThis.__documenso_license_client__) {
+    if (globalThis.__capivasign_license_client__) {
       return;
     }
 
     const instance = new LicenseClient();
 
-    globalThis.__documenso_license_client__ = instance;
+    globalThis.__capivasign_license_client__ = instance;
 
     try {
       await instance.initialize();
@@ -65,7 +62,7 @@ export class LicenseClient {
    * bundles access the same instance.
    */
   public static getInstance(): LicenseClient | null {
-    return globalThis.__documenso_license_client__ ?? null;
+    return globalThis.__capivasign_license_client__ ?? null;
   }
 
   public async getCachedLicense(): Promise<TCachedLicense | null> {
@@ -88,7 +85,9 @@ export class LicenseClient {
   }
 
   private async initialize(): Promise<void> {
-    console.log('[License] Checking license with server...');
+    const source = createLicenseSource();
+
+    console.log(`[License] Resolving license (mode: ${source.mode})...`);
 
     const cachedLicense = await this.loadFromFile();
 
@@ -99,10 +98,13 @@ export class LicenseClient {
     let response: TLicenseResponse | null = null;
 
     try {
-      response = await this.pingLicenseServer();
+      const raw = await source.fetch();
+
+      response = raw === null ? null : ZLicenseResponseSchema.parse(raw);
     } catch (err) {
-      // If server is not responding, or erroring, use the cached license.
-      console.warn('[License] License server not responding, using cached license.');
+      // Source unreachable or malformed — keep running on the cached claim
+      // rather than degrading a working instance.
+      console.warn('[License] Could not resolve license, using cached license.');
       console.error(err);
       return;
     }
@@ -129,7 +131,7 @@ export class LicenseClient {
     const data: TCachedLicense = {
       lastChecked: new Date().toISOString(),
       license: response?.data || null,
-      requestedLicenseKey: LICENSE_KEY,
+      requestedLicenseKey: LICENSE_KEY(),
       unauthorizedFlagUsage,
       derivedStatus: status,
     };
@@ -142,35 +144,6 @@ export class LicenseClient {
     console.log(`[License] Derived Status: ${status}`);
     console.log(`[License] Status: ${response?.data?.status}`);
     console.log(`[License] Flags: ${JSON.stringify(allowedFlags)}`);
-  }
-
-  /**
-   * Ping the license server to get the license response.
-   *
-   * If license not found returns null.
-   */
-  private async pingLicenseServer(): Promise<TLicenseResponse | null> {
-    if (!LICENSE_KEY) {
-      return null;
-    }
-
-    const endpoint = new URL('api/license', LICENSE_SERVER_URL).toString();
-
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ license: LICENSE_KEY }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`License server returned ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-
-    return ZLicenseResponseSchema.parse(data);
   }
 
   private async saveToFile(data: TCachedLicense): Promise<void> {

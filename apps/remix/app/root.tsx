@@ -111,7 +111,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
 
   const [theme] = useTheme();
 
-  // Recipient routes (signing pages) put `documenso-branded` on <body> so the
+  // Recipient routes (signing pages) put `capivasign-branded` on <body> so the
   // <style> block from `RecipientBranding` applies to BOTH the main tree and
   // any portaled content (Radix dialogs/popovers/dropdowns mount outside the
   // route tree, attached directly to document.body).
@@ -145,7 +145,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
         <script nonce={nonce(cspNonce)}>0</script>
       </head>
-      <body className={isRecipientRoute ? 'documenso-branded' : undefined}>
+      <body className={isRecipientRoute ? 'capivasign-branded' : undefined}>
         {/* Global license banner currently disabled. Need to wait until after a few releases. */}
         {/* {licenseStatus === '?' && (
           <div className="bg-destructive text-destructive-foreground">

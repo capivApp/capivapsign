@@ -29,7 +29,7 @@ test.describe('Redistribute updates recipient send status', () => {
   });
 
   test('marks a NOT_SENT signer as SENT after a successful resend', async ({ request }) => {
-    const document = await seedPendingDocument(user, team.id, ['recipient@test.documenso.com']);
+    const document = await seedPendingDocument(user, team.id, ['recipient@test.capivapp.com.br']);
 
     const [recipient] = document.recipients;
 

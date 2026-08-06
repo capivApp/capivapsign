@@ -57,21 +57,21 @@ jobs:
             --progress=plain \
             --build-arg NEXT_PRIVATE_TELEMETRY_KEY="${NEXT_PRIVATE_TELEMETRY_KEY:-}" \
             --build-arg NEXT_PRIVATE_TELEMETRY_HOST="${NEXT_PRIVATE_TELEMETRY_HOST:-}" \
-            -t "documenso/documenso-$BUILD_PLATFORM:latest" \
-            -t "documenso/documenso-$BUILD_PLATFORM:$GIT_SHA" \
-            -t "documenso/documenso-$BUILD_PLATFORM:$APP_VERSION" \
-            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:latest" \
-            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:$GIT_SHA" \
-            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:$APP_VERSION" \
+            -t "capivapp/capiva-sign-$BUILD_PLATFORM:latest" \
+            -t "capivapp/capiva-sign-$BUILD_PLATFORM:$GIT_SHA" \
+            -t "capivapp/capiva-sign-$BUILD_PLATFORM:$APP_VERSION" \
+            -t "ghcr.io/capivapp/capiva-sign-$BUILD_PLATFORM:latest" \
+            -t "ghcr.io/capivapp/capiva-sign-$BUILD_PLATFORM:$GIT_SHA" \
+            -t "ghcr.io/capivapp/capiva-sign-$BUILD_PLATFORM:$APP_VERSION" \
             .
 
       - name: Push the docker image to DockerHub
-        run: docker push --all-tags "documenso/documenso-$BUILD_PLATFORM"
+        run: docker push --all-tags "capivapp/capiva-sign-$BUILD_PLATFORM"
         env:
           BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
 
       - name: Push the docker image to GitHub Container Registry
-        run: docker push --all-tags "ghcr.io/documenso/documenso-$BUILD_PLATFORM"
+        run: docker push --all-tags "ghcr.io/capivapp/capiva-sign-$BUILD_PLATFORM"
         env:
           BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
 
@@ -111,34 +111,34 @@ jobs:
           # Check if the version is stable (no rc or beta in the version)
           if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             docker manifest create \
-              documenso/documenso:latest \
-              --amend documenso/documenso-amd64:latest \
-              --amend documenso/documenso-arm64:latest
+              capivapp/capiva-sign:latest \
+              --amend capivapp/capiva-sign-amd64:latest \
+              --amend capivapp/capiva-sign-arm64:latest
 
-            docker manifest push documenso/documenso:latest
+            docker manifest push capivapp/capiva-sign:latest
           fi
 
           if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
             docker manifest create \
-              documenso/documenso:rc \
-              --amend documenso/documenso-amd64:rc \
-              --amend documenso/documenso-arm64:rc
+              capivapp/capiva-sign:rc \
+              --amend capivapp/capiva-sign-amd64:rc \
+              --amend capivapp/capiva-sign-arm64:rc
 
-            docker manifest push documenso/documenso:rc
+            docker manifest push capivapp/capiva-sign:rc
           fi
 
           docker manifest create \
-            documenso/documenso:$GIT_SHA \
-            --amend documenso/documenso-amd64:$GIT_SHA \
-            --amend documenso/documenso-arm64:$GIT_SHA
+            capivapp/capiva-sign:$GIT_SHA \
+            --amend capivapp/capiva-sign-amd64:$GIT_SHA \
+            --amend capivapp/capiva-sign-arm64:$GIT_SHA
 
           docker manifest create \
-            documenso/documenso:$APP_VERSION \
-            --amend documenso/documenso-amd64:$APP_VERSION \
-            --amend documenso/documenso-arm64:$APP_VERSION
+            capivapp/capiva-sign:$APP_VERSION \
+            --amend capivapp/capiva-sign-amd64:$APP_VERSION \
+            --amend capivapp/capiva-sign-arm64:$APP_VERSION
 
-          docker manifest push documenso/documenso:$GIT_SHA
-          docker manifest push documenso/documenso:$APP_VERSION
+          docker manifest push capivapp/capiva-sign:$GIT_SHA
+          docker manifest push capivapp/capiva-sign:$APP_VERSION
 
       - name: Create and push Github Container Registry manifest
         env:
@@ -152,31 +152,31 @@ jobs:
           # Check if the version is stable (no rc or beta in the version)
           if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             docker manifest create \
-              ghcr.io/documenso/documenso:latest \
-              --amend ghcr.io/documenso/documenso-amd64:latest \
-              --amend ghcr.io/documenso/documenso-arm64:latest
+              ghcr.io/capivapp/capiva-sign:latest \
+              --amend ghcr.io/capivapp/capiva-sign-amd64:latest \
+              --amend ghcr.io/capivapp/capiva-sign-arm64:latest
 
-            docker manifest push ghcr.io/documenso/documenso:latest
+            docker manifest push ghcr.io/capivapp/capiva-sign:latest
           fi
 
           if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
             docker manifest create \
-              ghcr.io/documenso/documenso:rc \
-              --amend ghcr.io/documenso/documenso-amd64:rc \
-              --amend ghcr.io/documenso/documenso-arm64:rc
+              ghcr.io/capivapp/capiva-sign:rc \
+              --amend ghcr.io/capivapp/capiva-sign-amd64:rc \
+              --amend ghcr.io/capivapp/capiva-sign-arm64:rc
 
-            docker manifest push ghcr.io/documenso/documenso:rc
+            docker manifest push ghcr.io/capivapp/capiva-sign:rc
           fi
 
           docker manifest create \
-            ghcr.io/documenso/documenso:$GIT_SHA \
-            --amend ghcr.io/documenso/documenso-amd64:$GIT_SHA \
-            --amend ghcr.io/documenso/documenso-arm64:$GIT_SHA
+            ghcr.io/capivapp/capiva-sign:$GIT_SHA \
+            --amend ghcr.io/capivapp/capiva-sign-amd64:$GIT_SHA \
+            --amend ghcr.io/capivapp/capiva-sign-arm64:$GIT_SHA
 
           docker manifest create \
-            ghcr.io/documenso/documenso:$APP_VERSION \
-            --amend ghcr.io/documenso/documenso-amd64:$APP_VERSION \
-            --amend ghcr.io/documenso/documenso-arm64:$APP_VERSION
+            ghcr.io/capivapp/capiva-sign:$APP_VERSION \
+            --amend ghcr.io/capivapp/capiva-sign-amd64:$APP_VERSION \
+            --amend ghcr.io/capivapp/capiva-sign-arm64:$APP_VERSION
 
-          docker manifest push ghcr.io/documenso/documenso:$GIT_SHA
-          docker manifest push ghcr.io/documenso/documenso:$APP_VERSION
+          docker manifest push ghcr.io/capivapp/capiva-sign:$GIT_SHA
+          docker manifest push ghcr.io/capivapp/capiva-sign:$APP_VERSION

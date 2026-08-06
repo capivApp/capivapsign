@@ -1,6 +1,6 @@
-# Documenso Code Style Guide
+# CapivaSign Code Style Guide
 
-This document captures the code style, patterns, and conventions used in the Documenso codebase. It covers both enforceable rules and subjective "taste" elements that make our code consistent and maintainable.
+This document captures the code style, patterns, and conventions used in the CapivaSign codebase. It covers both enforceable rules and subjective "taste" elements that make our code consistent and maintainable.
 
 ## Table of Contents
 
@@ -90,7 +90,7 @@ import type { Document, Recipient } from '@prisma/client';
 import { DocumentStatus, RecipientRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-// 3. Internal package imports (from @documenso/*)
+// 3. Internal package imports (from @capivasign/*)
 import { AppError } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { Button } from '@documenso/ui/primitives/button';

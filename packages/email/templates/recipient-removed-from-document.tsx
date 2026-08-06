@@ -11,7 +11,7 @@ import { TemplateFooter } from '../template-components/template-footer';
 export type DocumentCancelEmailTemplateProps = Partial<TemplateDocumentCancelProps>;
 
 export const RecipientRemovedFromDocumentTemplate = ({
-  inviterName = 'Lucas Smith',
+  inviterName = 'Ana Souza',
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentCancelEmailTemplateProps) => {

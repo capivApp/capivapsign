@@ -44,6 +44,10 @@ export const DOCUMENT_DISTRIBUTION_METHODS: Record<string, DocumentDistributionM
     value: DocumentDistributionMethod.EMAIL,
     description: msg`Email`,
   },
+  [DocumentDistributionMethod.WHATSAPP]: {
+    value: DocumentDistributionMethod.WHATSAPP,
+    description: msg`WhatsApp`,
+  },
   [DocumentDistributionMethod.NONE]: {
     value: DocumentDistributionMethod.NONE,
     description: msg`None`,

@@ -9,7 +9,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Overview
 
-Signing reminders automatically email recipients who have not completed their signing. You configure when the first reminder goes out and how often it repeats — Documenso handles the rest until the recipient signs or the document leaves a pending state.
+Signing reminders automatically email recipients who have not completed their signing. You configure when the first reminder goes out and how often it repeats — CapivaSign handles the rest until the recipient signs or the document leaves a pending state.
 
 This is useful when:
 
@@ -82,7 +82,7 @@ In the document editor, open the **Settings** dialog and go to the **Reminders**
 
 ### Choose a mode
 
-- **Enabled** — Documenso sends reminders on the schedule you configure below
+- **Enabled** — CapivaSign sends reminders on the schedule you configure below
 - **No reminders** — no automatic reminders for this document
 - **Inherit from organisation** — use the team or organisation default
 
@@ -146,7 +146,7 @@ Click **Save** to apply. New documents created after this change use the updated
 
 When a recipient's next reminder time arrives:
 
-1. Documenso sends the reminder email — same template as the original signing request, but the subject and preview are prefixed with **"Reminder:"**.
+1. CapivaSign sends the reminder email — same template as the original signing request, but the subject and preview are prefixed with **"Reminder:"**.
 2. An audit log entry is created for the recipient (an `EMAIL_SENT` entry of type `REMINDER`).
 3. The `document.reminder.sent` webhook fires. See [webhook events](/docs/developers/webhooks/events).
 4. The next reminder is scheduled based on **Then repeat every**, or no further reminder is scheduled if you chose **Don't repeat**.
@@ -159,7 +159,7 @@ A configured reminder will not be sent in the following cases:
 
 - The recipient is a **CC** — CCs are notified once and never reminded
 - The recipient's **signing deadline has passed** — see [Recipient Expiration](/docs/users/documents/advanced/recipient-expiration). Resending the document refreshes the deadline and resumes reminders.
-- The document uses **manual link distribution** — Documenso never emails recipients for these documents
+- The document uses **manual link distribution** — CapivaSign never emails recipients for these documents
 - The envelope's email settings have **signing request emails disabled**
 - The recipient has not yet been emailed (for example, an unreached step in a sequential workflow)
 

@@ -1,18 +1,18 @@
 ---
 title: Environment Variables
-description: Complete reference for all environment variables used to configure a self-hosted Documenso instance.
+description: Complete reference for all environment variables used to configure a self-hosted CapivaSign instance.
 ---
 
 ## Required Variables
 
-These variables must be set for Documenso to function:
+These variables must be set for CapivaSign to function:
 
 | Variable                                | Description                                                                                |
 | --------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `NEXTAUTH_SECRET`                       | Secret key for NextAuth.js encryption and signing. Generate with `openssl rand -base64 32` |
 | `NEXT_PRIVATE_ENCRYPTION_KEY`           | Primary encryption key for symmetric encryption (minimum 32 characters)                    |
 | `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Secondary encryption key for symmetric encryption (minimum 32 characters)                  |
-| `NEXT_PUBLIC_WEBAPP_URL`                | Public URL of your Documenso instance (e.g., `https://sign.example.com`)                   |
+| `NEXT_PUBLIC_WEBAPP_URL`                | Public URL of your CapivaSign instance (e.g., `https://sign.example.com`)                   |
 | `NEXT_PRIVATE_DATABASE_URL`             | PostgreSQL connection URL with connection pooling                                          |
 | `NEXT_PRIVATE_SMTP_FROM_ADDRESS`        | Email address used as the sender for all outgoing emails                                   |
 | `NEXT_PRIVATE_SMTP_FROM_NAME`           | Display name for the sender of outgoing emails                                             |
@@ -30,7 +30,7 @@ These variables must be set for Documenso to function:
 
 ## Database Configuration
 
-Documenso requires PostgreSQL 14 or higher.
+CapivaSign requires PostgreSQL 14 or higher.
 
 | Variable                           | Required     | Description                                                                                |
 | ---------------------------------- | ------------ | ------------------------------------------------------------------------------------------ |
@@ -90,7 +90,7 @@ Callback URL: `https://<your-domain>/api/auth/callback/microsoft`
 
 ## Email Configuration
 
-Documenso supports multiple email transports for sending notifications.
+CapivaSign supports multiple email transports for sending notifications.
 
 ### Transport Selection
 
@@ -148,7 +148,7 @@ For detailed email setup, see [Email Configuration](/docs/self-hosting/configura
 
 ## Storage Configuration
 
-Documenso can store documents in the database or S3-compatible storage.
+CapivaSign can store documents in the database or S3-compatible storage.
 
 | Variable                                 | Description                                 | Default    |
 | ---------------------------------------- | ------------------------------------------- | ---------- |
@@ -182,7 +182,7 @@ For detailed storage setup, see [Storage Configuration](/docs/self-hosting/confi
 
 ## Signing Certificate Configuration
 
-Documenso requires a certificate to digitally sign documents.
+CapivaSign requires a certificate to digitally sign documents.
 
 ### Transport Selection
 
@@ -292,7 +292,7 @@ NEXT_PUBLIC_DISABLE_SIGNUP="true"
 
 ## AI Features
 
-Documenso can use Google Vertex AI for recipient and field detection.
+CapivaSign can use Google Vertex AI for recipient and field detection.
 
 | Variable                   | Description                                    | Default  |
 | -------------------------- | ---------------------------------------------- | -------- |
@@ -306,7 +306,7 @@ AI features must also be enabled in organisation/team settings after configurati
 
 ## Document Conversion
 
-Documenso can accept `.docx` uploads by sending them to a [Gotenberg](https://gotenberg.dev) service that converts them to PDF. When `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL` is unset, DOCX uploads are rejected and only PDFs are accepted.
+CapivaSign can accept `.docx` uploads by sending them to a [Gotenberg](https://gotenberg.dev) service that converts them to PDF. When `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL` is unset, DOCX uploads are rejected and only PDFs are accepted.
 
 | Variable                                      | Description                                                                                       | Default |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------- |
@@ -323,7 +323,7 @@ For setup, image-build instructions, and security recommendations, see [Document
 
 ## Background Jobs
 
-Documenso supports multiple background job providers for processing emails, documents, webhooks, and scheduled tasks.
+CapivaSign supports multiple background job providers for processing emails, documents, webhooks, and scheduled tasks.
 
 ### Provider Selection
 
@@ -344,7 +344,7 @@ No additional configuration required. Jobs are stored in PostgreSQL and processe
 | Variable                           | Required | Description                                                   | Default     |
 | ---------------------------------- | -------- | ------------------------------------------------------------- | ----------- |
 | `NEXT_PRIVATE_REDIS_URL`           | Yes      | Redis connection URL (e.g., `redis://localhost:6379`)         |             |
-| `NEXT_PRIVATE_REDIS_PREFIX`        | No       | Key prefix for Redis queues (useful when sharing an instance) | `documenso` |
+| `NEXT_PRIVATE_REDIS_PREFIX`        | No       | Key prefix for Redis queues (useful when sharing an instance) | `capivasign` |
 | `NEXT_PRIVATE_BULLMQ_CONCURRENCY` | No       | Number of concurrent jobs to process                          | `10`        |
 
 ### Inngest (inngest)
@@ -364,9 +364,9 @@ For setup guides and provider recommendations, see [Background Jobs](/docs/self-
 
 | Variable                      | Description                                  | Default |
 | ----------------------------- | -------------------------------------------- | ------- |
-| `DOCUMENSO_DISABLE_TELEMETRY` | Set to `true` to disable anonymous telemetry | `false` |
+| `CAPIVASIGN_DISABLE_TELEMETRY` | Set to `true` to disable anonymous telemetry | `false` |
 
-Telemetry also auto-disables when `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` is configured.
+Telemetry also auto-disables when `NEXT_PRIVATE_LICENSE_KEY` is configured.
 
 Telemetry collects only: app version, installation ID, and node ID. No personal data is collected.
 
@@ -384,11 +384,11 @@ Telemetry collects only: app version, installation ID, and node ID. No personal 
 
 ## Enterprise Features
 
-These variables require an active [Enterprise Edition](/docs/policies/enterprise-edition) license. Obtain a license key from [license.documenso.com](https://license.documenso.com) and set it below to unlock enterprise features such as SSO, embed editor, and 21 CFR Part 11 compliance.
+These variables require an active [Enterprise Edition](/docs/policies/enterprise-edition) license. Obtain a license key from [license.capivapp.com.br](https://license.capivapp.com.br) and set it below to unlock enterprise features such as SSO, embed editor, and 21 CFR Part 11 compliance.
 
 | Variable                             | Description                                      |
 | ------------------------------------ | ------------------------------------------------ |
-| `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` | License key for enterprise features              |
+| `NEXT_PRIVATE_LICENSE_KEY` | License key for enterprise features              |
 | `NEXT_PRIVATE_STRIPE_API_KEY`        | Stripe API key for billing                       |
 | `NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET` | Stripe webhook secret                            |
 | `NEXT_PRIVATE_SES_ACCESS_KEY_ID`     | AWS SES access key for email domain verification |
@@ -409,8 +409,8 @@ NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="your-secondary-key-at-least-32-chars"
 NEXT_PUBLIC_WEBAPP_URL="https://sign.example.com"
 
 # Database
-NEXT_PRIVATE_DATABASE_URL="postgres://user:password@localhost:5432/documenso"
-NEXT_PRIVATE_DIRECT_DATABASE_URL="postgres://user:password@localhost:5432/documenso"
+NEXT_PRIVATE_DATABASE_URL="postgres://user:password@localhost:5432/capivasign"
+NEXT_PRIVATE_DIRECT_DATABASE_URL="postgres://user:password@localhost:5432/capivasign"
 
 # Email
 NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
@@ -418,7 +418,7 @@ NEXT_PRIVATE_SMTP_HOST="smtp.example.com"
 NEXT_PRIVATE_SMTP_PORT=587
 NEXT_PRIVATE_SMTP_USERNAME="your-smtp-user"
 NEXT_PRIVATE_SMTP_PASSWORD="your-smtp-password"
-NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+NEXT_PRIVATE_SMTP_FROM_NAME="CapivaSign"
 NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@example.com"
 
 # Signing (certificate must be configured)

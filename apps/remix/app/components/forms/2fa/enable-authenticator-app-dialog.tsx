@@ -111,7 +111,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
       });
 
       downloadFile({
-        filename: 'documenso-2FA-recovery-codes.txt',
+        filename: 'capivasign-2FA-recovery-codes.txt',
         data: blob,
       });
     }

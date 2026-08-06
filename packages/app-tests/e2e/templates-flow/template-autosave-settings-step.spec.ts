@@ -206,7 +206,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
   test('should autosave the redirect URL change', async ({ page }) => {
     const { user, template, team } = await setupTemplate(page);
 
-    const newRedirectUrl = 'https://documenso.com/test/';
+    const newRedirectUrl = 'https://capivasign.com/test/';
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 

@@ -1,8 +1,8 @@
 import { prisma } from '@documenso/prisma';
 
-import { DOCUMENSO_ENCRYPTION_SECONDARY_KEY } from '../../constants/crypto';
-import { generateDatabaseId } from '../../universal/id';
+import { CAPIVASIGN_ENCRYPTION_SECONDARY_KEY } from '../../constants/crypto';
 import { symmetricDecrypt, symmetricEncrypt } from '../../universal/crypto';
+import { generateDatabaseId } from '../../universal/id';
 
 /**
  * System-wide default signing certificate (PAdES local / non-ICP), stored with
@@ -11,11 +11,11 @@ import { symmetricDecrypt, symmetricEncrypt } from '../../universal/crypto';
  */
 
 const requireKey = () => {
-  if (!DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
-    throw new Error('Missing encryption key (DOCUMENSO_ENCRYPTION_SECONDARY_KEY)');
+  if (!CAPIVASIGN_ENCRYPTION_SECONDARY_KEY) {
+    throw new Error('Missing encryption key (CAPIVASIGN_ENCRYPTION_SECONDARY_KEY)');
   }
 
-  return DOCUMENSO_ENCRYPTION_SECONDARY_KEY;
+  return CAPIVASIGN_ENCRYPTION_SECONDARY_KEY;
 };
 
 export type SigningCertificateMeta = {
@@ -91,8 +91,7 @@ export const deleteSigningCertificate = async (): Promise<void> => {
 
 // ---- crypto helpers --------------------------------------------------------
 
-const encryptString = (value: string): string =>
-  symmetricEncrypt({ key: requireKey(), data: value });
+const encryptString = (value: string): string => symmetricEncrypt({ key: requireKey(), data: value });
 
 const decryptToString = (encrypted: string): string =>
   Buffer.from(symmetricDecrypt({ key: requireKey(), data: encrypted })).toString('utf-8');

@@ -58,7 +58,7 @@ const createPendingEnvelopeViaApi = async () => {
     expiresIn: null,
   });
 
-  const recipientEmail = `resend-${Date.now()}@test.documenso.com`;
+  const recipientEmail = `resend-${Date.now()}@test.capivapp.com.br`;
 
   // 1. Create envelope with a PDF.
   const payload = {
@@ -307,7 +307,7 @@ test.describe('document editor', () => {
     const { user, team } = await seedUser();
 
     // Seed a draft document that has a recipient with a field.
-    const document = await seedDraftDocument(user, team.id, ['signer@test.documenso.com'], {
+    const document = await seedDraftDocument(user, team.id, ['signer@test.capivapp.com.br'], {
       key: `dup-exclude-recipients-${Date.now()}`,
       internalVersion: 2,
     });
@@ -352,7 +352,7 @@ test.describe('document editor', () => {
     const { user, team } = await seedUser();
 
     // Seed a draft document that has a recipient with a field.
-    const document = await seedDraftDocument(user, team.id, ['signer@test.documenso.com'], {
+    const document = await seedDraftDocument(user, team.id, ['signer@test.capivapp.com.br'], {
       key: `dup-exclude-fields-${Date.now()}`,
       internalVersion: 2,
     });

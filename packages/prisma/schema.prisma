@@ -473,7 +473,7 @@ model UsageInvoice {
 
 /// System-wide default signing certificate for NON-ICP (PAdES local) signatures,
 /// uploaded by an admin. Both the .p12 bytes and the passphrase are stored
-/// ENCRYPTED at rest (symmetric, DOCUMENSO_ENCRYPTION_SECONDARY_KEY). Effectively
+/// ENCRYPTED at rest (symmetric, CAPIVASIGN_ENCRYPTION_SECONDARY_KEY). Effectively
 /// a singleton: upload replaces any existing row; the loader takes the latest.
 model SigningCertificate {
   id        String   @id

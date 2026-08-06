@@ -110,14 +110,14 @@ test.describe('PDF Viewer Rendering', () => {
       const { recipients: recipientsV1 } = await seedPendingDocumentWithFullFields({
         owner: user,
         teamId: team.id,
-        recipients: ['signer-v1@test.documenso.com'],
+        recipients: ['signer-v1@test.capivapp.com.br'],
         fields: [FieldType.SIGNATURE],
       });
 
       const { document: documentV2, recipients: recipientsV2 } = await seedPendingDocumentWithFullFields({
         owner: user,
         teamId: team.id,
-        recipients: ['signer-v2@test.documenso.com'],
+        recipients: ['signer-v2@test.capivapp.com.br'],
         fields: [FieldType.SIGNATURE],
         updateDocumentOptions: { internalVersion: 2 },
       });
@@ -168,11 +168,11 @@ test.describe('PDF Viewer Rendering', () => {
       const qrTokenV1 = prefixedId('qr');
       const qrTokenV2 = prefixedId('qr');
 
-      const documentV1 = await seedCompletedDocument(user, team.id, ['share-v1@test.documenso.com'], {
+      const documentV1 = await seedCompletedDocument(user, team.id, ['share-v1@test.capivapp.com.br'], {
         createDocumentOptions: { qrToken: qrTokenV1 },
       });
 
-      const documentV2 = await seedCompletedDocument(user, team.id, ['share-v2@test.documenso.com'], {
+      const documentV2 = await seedCompletedDocument(user, team.id, ['share-v2@test.capivapp.com.br'], {
         createDocumentOptions: { qrToken: qrTokenV2 },
         internalVersion: 2,
       });
@@ -205,14 +205,14 @@ test.describe('PDF Viewer Rendering', () => {
       const { recipients: recipientsV1 } = await seedPendingDocumentWithFullFields({
         owner: user,
         teamId: team.id,
-        recipients: ['embed-signer-v1@test.documenso.com'],
+        recipients: ['embed-signer-v1@test.capivapp.com.br'],
         fields: [FieldType.SIGNATURE],
       });
 
       const { document: documentV2, recipients: recipientsV2 } = await seedPendingDocumentWithFullFields({
         owner: user,
         teamId: team.id,
-        recipients: ['embed-signer-v2@test.documenso.com'],
+        recipients: ['embed-signer-v2@test.capivapp.com.br'],
         fields: [FieldType.SIGNATURE],
         updateDocumentOptions: { internalVersion: 2 },
       });
@@ -261,14 +261,14 @@ test.describe('PDF Viewer Rendering', () => {
       const { recipients: recipientsV1 } = await seedPendingDocumentWithFullFields({
         owner: user,
         teamId: team.id,
-        recipients: ['multisign-v1@test.documenso.com'],
+        recipients: ['multisign-v1@test.capivapp.com.br'],
         fields: [FieldType.SIGNATURE],
       });
 
       const { document: documentV2, recipients: recipientsV2 } = await seedPendingDocumentWithFullFields({
         owner: user,
         teamId: team.id,
-        recipients: ['multisign-v2@test.documenso.com'],
+        recipients: ['multisign-v2@test.capivapp.com.br'],
         fields: [FieldType.SIGNATURE],
         updateDocumentOptions: { internalVersion: 2 },
       });
@@ -318,7 +318,7 @@ test.describe('PDF Viewer Rendering', () => {
 
       const emailInput = page.getByPlaceholder('Email').first();
       await emailInput.click();
-      await emailInput.fill('test-signer@documenso.com');
+      await emailInput.fill('test-signer@capivapp.com.br');
 
       const [fileChooser] = await Promise.all([
         page.waitForEvent('filechooser'),

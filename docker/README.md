@@ -1,8 +1,8 @@
-# Docker Setup for Documenso
+# Docker Setup for CapivaSign
 
-For full instructions on running Documenso with Docker, see the official documentation:
+For full instructions on running CapivaSign with Docker, see the official documentation:
 
-- [Docker Deployment](https://docs.documenso.com/docs/self-hosting/deployment/docker) — Standalone container with an external database
-- [Docker Compose Deployment](https://docs.documenso.com/docs/self-hosting/deployment/docker-compose) — Production setup with PostgreSQL included
-- [Environment Variables](https://docs.documenso.com/docs/self-hosting/configuration/environment) — Full configuration reference
-- [Signing Certificate](https://docs.documenso.com/docs/self-hosting/configuration/signing-certificate) — Set up document signing
+- [Docker Deployment](https://docs.capivapp.com.br/docs/self-hosting/deployment/docker) — Standalone container with an external database
+- [Docker Compose Deployment](https://docs.capivapp.com.br/docs/self-hosting/deployment/docker-compose) — Production setup with PostgreSQL included
+- [Environment Variables](https://docs.capivapp.com.br/docs/self-hosting/configuration/environment) — Full configuration reference
+- [Signing Certificate](https://docs.capivapp.com.br/docs/self-hosting/configuration/signing-certificate) — Set up document signing

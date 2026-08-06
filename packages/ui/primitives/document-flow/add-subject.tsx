@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -104,6 +105,15 @@ export const AddSubjectFormPartial = ({
       [DocumentStatus.REJECTED]: msg`Update`,
       [DocumentStatus.CANCELLED]: msg`Update`,
     },
+    [DocumentDistributionMethod.WHATSAPP]: {
+      [DocumentStatus.DRAFT]: msg`Send`,
+      [DocumentStatus.PENDING]: recipients.some((recipient) => recipient.sendStatus === 'SENT')
+        ? msg`Resend`
+        : msg`Send`,
+      [DocumentStatus.COMPLETED]: msg`Update`,
+      [DocumentStatus.REJECTED]: msg`Update`,
+      [DocumentStatus.CANCELLED]: msg`Update`,
+    },
     [DocumentDistributionMethod.NONE]: {
       [DocumentStatus.DRAFT]: msg`Generate Links`,
       [DocumentStatus.PENDING]: msg`View Document`,
@@ -111,7 +121,7 @@ export const AddSubjectFormPartial = ({
       [DocumentStatus.REJECTED]: msg`View Document`,
       [DocumentStatus.CANCELLED]: msg`View Document`,
     },
-  };
+  } satisfies Record<DocumentDistributionMethod, Record<DocumentStatus, MessageDescriptor>>;
 
   const distributionMethod = watch('meta.distributionMethod');
   const emailSettings = watch('meta.emailSettings');

@@ -21,6 +21,11 @@ type CreateOrganisationOptions = {
 };
 
 export const createOrganisation = async ({ name, url, type, userId, customerId, claim }: CreateOrganisationOptions) => {
+  // Minted up front rather than inside the transaction: the Stripe customer is
+  // created first and needs this id as its idempotency scope, so a retry of a
+  // half-failed create reuses the same customer instead of orphaning one.
+  const orgIdAndUrl = prefixedId('org');
+
   let customerIdToUse = customerId;
 
   if (!customerId && IS_BILLING_ENABLED()) {
@@ -39,6 +44,7 @@ export const createOrganisation = async ({ name, url, type, userId, customerId, 
     customerIdToUse = await createCustomer({
       name: user.name || user.email,
       email: user.email,
+      organisationId: orgIdAndUrl,
     })
       .then((customer) => customer.id)
       .catch((err) => {
@@ -74,8 +80,6 @@ export const createOrganisation = async ({ name, url, type, userId, customerId, 
         wellKnownUrl: '',
       },
     });
-
-    const orgIdAndUrl = prefixedId('org');
 
     const organisation = await tx.organisation
       .create({

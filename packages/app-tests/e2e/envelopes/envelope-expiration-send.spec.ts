@@ -38,7 +38,7 @@ test('[ENVELOPE_EXPIRATION]: sending document sets expiresAt on recipients', asy
     title: '[TEST] Expiration Send Test',
     recipients: [
       {
-        email: 'signer-expiry@test.documenso.com',
+        email: 'signer-expiry@test.capivapp.com.br',
         name: 'Signer Expiry',
         role: RecipientRole.SIGNER,
         fields: [
@@ -116,7 +116,7 @@ test('[ENVELOPE_EXPIRATION]: sending document with custom org expiration period'
     title: '[TEST] Custom Expiration Send Test',
     recipients: [
       {
-        email: 'signer-custom@test.documenso.com',
+        email: 'signer-custom@test.capivapp.com.br',
         name: 'Signer Custom',
         role: RecipientRole.SIGNER,
         fields: [
@@ -192,7 +192,7 @@ test('[ENVELOPE_EXPIRATION]: sending document with expiration disabled', async (
     title: '[TEST] Disabled Expiration Send Test',
     recipients: [
       {
-        email: 'signer-disabled@test.documenso.com',
+        email: 'signer-disabled@test.capivapp.com.br',
         name: 'Signer Disabled',
         role: RecipientRole.SIGNER,
         fields: [
@@ -241,7 +241,7 @@ test('[ENVELOPE_EXPIRATION]: sending document with expiration disabled', async (
 test('[ENVELOPE_EXPIRATION]: resending refreshes expiresAt', async ({ page }) => {
   const { user, team } = await seedUser();
 
-  const document = await seedPendingDocument(user, team.id, ['resend-target@test.documenso.com']);
+  const document = await seedPendingDocument(user, team.id, ['resend-target@test.capivapp.com.br']);
 
   const recipient = document.recipients[0];
 
@@ -267,7 +267,7 @@ test('[ENVELOPE_EXPIRATION]: resending refreshes expiresAt', async ({ page }) =>
   await page.getByRole('menuitem', { name: 'Resend' }).click();
 
   // Select the recipient and send.
-  await page.getByLabel('test.documenso.com').first().click();
+  await page.getByLabel('test.capivapp.com.br').first().click();
   await page.getByRole('button', { name: 'Send reminder' }).click();
 
   await expect(page.getByText('Document resent', { exact: true })).toBeVisible({

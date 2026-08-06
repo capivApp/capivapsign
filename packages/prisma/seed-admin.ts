@@ -15,7 +15,7 @@ import { prisma } from '.';
  *
  * Configure via env (all optional):
  *   SEED_ADMIN_NAME      (default: "Admin")
- *   SEED_ADMIN_EMAIL     (default: "admin@documenso.com")
+ *   SEED_ADMIN_EMAIL     (default: "admin@capivapp.com.br")
  *   SEED_ADMIN_PASSWORD  (default: "password")
  *
  * Re-running is safe: an existing user with the same email is only promoted to

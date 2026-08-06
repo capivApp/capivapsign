@@ -1,7 +1,7 @@
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { LicenseFlag, TCachedLicense } from '../../types/license';
-import { env } from '../../utils/env';
 import { LicenseClient } from './license-client';
+import { LICENSE_KEY, resolveLicenseMode } from './license-source';
 
 type AssertLicensedForOptions = {
   /**
@@ -20,16 +20,20 @@ type AssertLicensedForOptions = {
 };
 
 /**
- * Assert the configured Documenso licence grants `flag`. Reads the
- * {@link LicenseClient} cache; never re-pings the licence server.
+ * Assert the configured licence grants `flag`. Reads the {@link LicenseClient}
+ * cache; never re-resolves the licence itself.
  *
- * - No `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` → throws. No licensing intent.
- * - Key set, claim unverifiable (no client, null cache, read throws,
+ * Behaviour depends on the licence mode (see {@link resolveLicenseMode}):
+ *
+ * - `none` → throws. Licensing explicitly switched off.
+ * - `server` with no `NEXT_PRIVATE_LICENSE_KEY` → throws. A remote licence was
+ *   asked for but nothing identifies this instance, so there is no claim to
+ *   honour.
+ * - Otherwise, claim unverifiable (no client, null cache, read throws,
  *   `license: null`) → passes. Mirrors how org-claim gates keep running on
- *   last known state when the licence server is unreachable; paying
- *   operators shouldn't be locked out by transient infra.
- * - Key set, claim loaded and denies the flag (bad standing or flag falsy)
- *   → throws.
+ *   last known state when the licence source is unreachable; operators
+ *   shouldn't be locked out by transient infra.
+ * - Claim loaded and denies the flag (bad standing or flag falsy) → throws.
  */
 export const assertLicensedFor = async (flag: LicenseFlag, options?: AssertLicensedForOptions): Promise<void> => {
   const denied = (): AppError =>
@@ -37,10 +41,18 @@ export const assertLicensedFor = async (flag: LicenseFlag, options?: AssertLicen
       message: options?.message ?? `License does not include the "${flag}" feature.`,
     });
 
-  // No licence key configured = no licensing intent. Fail closed unconditionally
-  // so unlicensed instances cannot reach gated features simply because the
-  // licence cache is empty.
-  if (!env('NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY')) {
+  const mode = resolveLicenseMode();
+
+  // Licensing deliberately disabled — nothing is granted.
+  if (mode === 'none') {
+    throw denied();
+  }
+
+  // Remote licensing without a key = no licensing intent. Fail closed so an
+  // unidentified instance cannot reach gated features just because the licence
+  // cache happens to be empty. `self` mode needs no key: the operator's own
+  // declaration is the grant.
+  if (mode === 'server' && !LICENSE_KEY()) {
     throw denied();
   }
 

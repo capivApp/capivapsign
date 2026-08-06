@@ -1,4 +1,4 @@
-import { DOCUMENSO_ENCRYPTION_SECONDARY_KEY } from '@documenso/lib/constants/crypto';
+import { CAPIVASIGN_ENCRYPTION_SECONDARY_KEY } from '@documenso/lib/constants/crypto';
 import { symmetricDecrypt, symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { z } from 'zod';
 
@@ -84,23 +84,23 @@ export const toPublicEmailTransportConfig = (config: TEmailTransportConfig): TEm
 };
 
 export const encryptEmailTransportConfig = (config: TEmailTransportConfig): string => {
-  if (!DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
+  if (!CAPIVASIGN_ENCRYPTION_SECONDARY_KEY) {
     throw new Error('Missing encryption key');
   }
 
   return symmetricEncrypt({
-    key: DOCUMENSO_ENCRYPTION_SECONDARY_KEY,
+    key: CAPIVASIGN_ENCRYPTION_SECONDARY_KEY,
     data: JSON.stringify(config),
   });
 };
 
 export const decryptEmailTransportConfig = (encrypted: string): TEmailTransportConfig => {
-  if (!DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
+  if (!CAPIVASIGN_ENCRYPTION_SECONDARY_KEY) {
     throw new Error('Missing encryption key');
   }
 
   const decrypted = Buffer.from(
-    symmetricDecrypt({ key: DOCUMENSO_ENCRYPTION_SECONDARY_KEY, data: encrypted }),
+    symmetricDecrypt({ key: CAPIVASIGN_ENCRYPTION_SECONDARY_KEY, data: encrypted }),
   ).toString('utf-8');
 
   return ZEmailTransportConfigSchema.parse(JSON.parse(decrypted));

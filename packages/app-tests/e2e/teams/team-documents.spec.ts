@@ -142,7 +142,7 @@ test('[TEAMS]: check team documents count with external team email', async ({ pa
 
   const { team: team2, teamMember2: team2Member2 } = await seedTeamDocuments();
 
-  const teamEmail = `external-team-email-${team.id}@test.documenso.com`;
+  const teamEmail = `external-team-email-${team.id}@test.capivapp.com.br`;
 
   await seedTeamEmail({
     email: teamEmail,
@@ -235,7 +235,7 @@ test('[TEAMS]: resend pending team document', async ({ page }) => {
   await openDropdownMenu(page, actionBtn);
   await expect(page.getByRole('menuitem', { name: 'Resend' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Resend' }).click();
-  await page.getByLabel('test.documenso.com').first().click();
+  await page.getByLabel('test.capivapp.com.br').first().click();
   await page.getByRole('button', { name: 'Send reminder' }).click();
 
   await expectToastTextToBeVisible(page, 'Document resent');

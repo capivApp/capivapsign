@@ -61,7 +61,7 @@ No configuration required. Database storage is enabled when `NEXT_PUBLIC_UPLOAD_
 
 ## S3 Configuration
 
-S3 storage is recommended for production deployments. Documenso supports AWS S3 and any S3-compatible storage service.
+S3 storage is recommended for production deployments. CapivaSign supports AWS S3 and any S3-compatible storage service.
 
 ### Required Variables
 
@@ -93,7 +93,7 @@ S3 storage is recommended for production deployments. Documenso supports AWS S3 
 Create a bucket in the AWS Console or using the CLI:
 
 ```bash
-aws s3 mb s3://your-documenso-bucket --region us-east-1
+aws s3 mb s3://your-capivasign-bucket --region us-east-1
 ```
 
 </Step>
@@ -109,7 +109,7 @@ Block public access and configure CORS for presigned URL uploads:
   {
     "AllowedHeaders": ["*"],
     "AllowedMethods": ["GET", "PUT", "POST"],
-    "AllowedOrigins": ["https://your-documenso-domain.com"],
+    "AllowedOrigins": ["https://your-capivasign-domain.com"],
     "ExposeHeaders": ["ETag"]
   }
 ]
@@ -118,7 +118,7 @@ Block public access and configure CORS for presigned URL uploads:
 Apply via AWS Console (Bucket > Permissions > CORS configuration) or CLI:
 
 ```bash
-aws s3api put-bucket-cors --bucket your-documenso-bucket --cors-configuration file://cors.json
+aws s3api put-bucket-cors --bucket your-capivasign-bucket --cors-configuration file://cors.json
 ```
 
 </Step>
@@ -134,7 +134,7 @@ Create an IAM user with programmatic access and attach this policy:
     {
       "Effect": "Allow",
       "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
-      "Resource": "arn:aws:s3:::your-documenso-bucket/*"
+      "Resource": "arn:aws:s3:::your-capivasign-bucket/*"
     }
   ]
 }
@@ -146,7 +146,7 @@ Create an IAM user with programmatic access and attach this policy:
 
 ```bash
 NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
-NEXT_PRIVATE_UPLOAD_BUCKET=your-documenso-bucket
+NEXT_PRIVATE_UPLOAD_BUCKET=your-capivasign-bucket
 NEXT_PRIVATE_UPLOAD_REGION=us-east-1
 NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
 NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -179,7 +179,7 @@ docker run -d \
   minio/minio server /data --console-address ":9001"
 ```
 
-Using Docker Compose with Documenso:
+Using Docker Compose with CapivaSign:
 
 ```yaml
 services:
@@ -210,7 +210,7 @@ Access the MinIO Console at `http://localhost:9001` and create a bucket, or use 
 mc alias set myminio http://localhost:9000 minioadmin minioadmin
 
 # Create bucket
-mc mb myminio/documenso
+mc mb myminio/capivasign
 ```
 
 </Step>
@@ -219,7 +219,7 @@ mc mb myminio/documenso
 
 ```bash
 NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
-NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_BUCKET=capivasign
 NEXT_PRIVATE_UPLOAD_ENDPOINT=http://minio:9000
 NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
 NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=minioadmin
@@ -239,13 +239,13 @@ NEXT_PRIVATE_UPLOAD_REGION=us-east-1
 
 ## Other S3-Compatible Services
 
-Documenso works with any S3-compatible storage service. Configure the endpoint and enable path-style URLs if required.
+CapivaSign works with any S3-compatible storage service. Configure the endpoint and enable path-style URLs if required.
 
 ### Cloudflare R2
 
 ```bash
 NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
-NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_BUCKET=capivasign
 NEXT_PRIVATE_UPLOAD_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
 NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-r2-access-key
 NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-r2-secret-key
@@ -256,7 +256,7 @@ NEXT_PRIVATE_UPLOAD_REGION=auto
 
 ```bash
 NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
-NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_BUCKET=capivasign
 NEXT_PRIVATE_UPLOAD_ENDPOINT=https://nyc3.digitaloceanspaces.com
 NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-spaces-key
 NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-spaces-secret
@@ -267,7 +267,7 @@ NEXT_PRIVATE_UPLOAD_REGION=nyc3
 
 ```bash
 NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
-NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_BUCKET=capivasign
 NEXT_PRIVATE_UPLOAD_ENDPOINT=https://s3.us-west-004.backblazeb2.com
 NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-b2-key-id
 NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-b2-application-key
@@ -278,7 +278,7 @@ NEXT_PRIVATE_UPLOAD_REGION=us-west-004
 
 ```bash
 NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
-NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_BUCKET=capivasign
 NEXT_PRIVATE_UPLOAD_ENDPOINT=https://s3.us-east-1.wasabisys.com
 NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-wasabi-key
 NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-wasabi-secret
@@ -289,7 +289,7 @@ NEXT_PRIVATE_UPLOAD_REGION=us-east-1
 
 ## Azure Blob Storage
 
-Azure Blob Storage is supported as a native transport (not S3-compatible). Documenso uses the official `@azure/storage-blob` SDK and signs SAS URLs with the Storage Account key for browser uploads and downloads.
+Azure Blob Storage is supported as a native transport (not S3-compatible). CapivaSign uses the official `@azure/storage-blob` SDK and signs SAS URLs with the Storage Account key for browser uploads and downloads.
 
 ### Required Variables
 
@@ -323,7 +323,7 @@ az storage account create \
   --sku Standard_LRS
 
 az storage container create \
-  --name documenso-documents \
+  --name capivasign-documents \
   --account-name yourstorageaccount
 ```
 
@@ -337,7 +337,7 @@ The browser uploads documents directly to Azure Blob using a SAS URL, and downlo
 az storage cors add \
   --services b \
   --methods GET PUT \
-  --origins https://your-documenso-domain.com \
+  --origins https://your-capivasign-domain.com \
   --allowed-headers "Content-Type" "x-ms-blob-type" "Authorization" \
   --exposed-headers "*" \
   --max-age 3600 \
@@ -352,7 +352,7 @@ az storage cors add \
 NEXT_PUBLIC_UPLOAD_TRANSPORT=azure-blob
 NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_NAME=yourstorageaccount
 NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_KEY=your-account-key
-NEXT_PRIVATE_UPLOAD_AZURE_CONTAINER=documenso-documents
+NEXT_PRIVATE_UPLOAD_AZURE_CONTAINER=capivasign-documents
 ```
 
 </Step>
@@ -372,7 +372,7 @@ Create the container against the well-known development account:
 
 ```bash
 az storage container create \
-  --name documenso-documents \
+  --name capivasign-documents \
   --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
 ```
 
@@ -382,7 +382,7 @@ Configure environment variables to point at the emulator:
 NEXT_PUBLIC_UPLOAD_TRANSPORT=azure-blob
 NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_NAME=devstoreaccount1
 NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
-NEXT_PRIVATE_UPLOAD_AZURE_CONTAINER=documenso-documents
+NEXT_PRIVATE_UPLOAD_AZURE_CONTAINER=capivasign-documents
 NEXT_PRIVATE_UPLOAD_AZURE_ENDPOINT=http://127.0.0.1:10000
 ```
 
@@ -398,7 +398,7 @@ Use Amazon CloudFront to serve documents with lower latency and reduced S3 costs
 
 ### Prerequisites
 
-- An S3 bucket configured for Documenso
+- An S3 bucket configured for CapivaSign
 - A CloudFront distribution with the S3 bucket as origin
 - A CloudFront key pair for signing URLs
 
@@ -486,7 +486,7 @@ Signed URLs expire after 1 hour.
 
 ## Migration Between Storage Backends
 
-Documenso does not provide automatic migration between storage backends. Each document's storage location is recorded in the database.
+CapivaSign does not provide automatic migration between storage backends. Each document's storage location is recorded in the database.
 
 <Callout type="warn">
   Documents uploaded to one storage backend cannot be automatically migrated to another. Plan your
@@ -527,7 +527,7 @@ This requires custom scripts and database modifications.
 
 ### Hybrid Operation
 
-During migration, Documenso can read from both backends. The `DocumentData.type` field indicates where each document is stored.
+During migration, CapivaSign can read from both backends. The `DocumentData.type` field indicates where each document is stored.
 
 - `BYTES_64`: Stored in database
 - `S3_PATH`: Stored in S3

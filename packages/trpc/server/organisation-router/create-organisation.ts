@@ -85,6 +85,7 @@ export const createOrganisationRoute = authenticatedProcedure
         const customer = await createCustomer({
           email: user.email,
           name: user.name || user.email,
+          organisationId: organisation.id,
         });
 
         customerId = customer.id;

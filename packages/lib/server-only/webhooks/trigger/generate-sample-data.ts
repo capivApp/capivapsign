@@ -23,7 +23,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
     authOptions: null,
     formValues: null,
     visibility: DocumentVisibility.EVERYONE,
-    title: 'documenso.pdf',
+    title: 'contrato-exemplo.pdf',
     status: DocumentStatus.DRAFT,
     documentDataId: 'hs8qz1ktr9204jn7mg6c5dxy0',
     createdAt: now,

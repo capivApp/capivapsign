@@ -16,11 +16,12 @@
 
     --card: 0 0% 100%;
     --card-border: 214.3 31.8% 91.4%;
-    --card-border-tint: 112 205 159;
+    /* CapivApp indigo #6366f1 as an RGB triplet (tint overlays expect rgb). */
+    --card-border-tint: 99 102 241;
     --card-foreground: 222.2 47.4% 11.2%;
 
-    --field-card: 95 74% 90%;
-    --field-card-border: 95.08 71.08% 67.45%;
+    --field-card: 226 100% 94%;
+    --field-card-border: 230 94% 82%;
     --field-card-foreground: 222.2 47.4% 11.2%;
 
     --widget: 0 0% 97%;
@@ -83,18 +84,18 @@
     --new-white-800: 0, 0%, 90%;
     --new-white-900: 0, 0%, 100%;
 
-    /* Primary - Green */
-    --new-primary-50: 98, 73%, 97%;
-    --new-primary-100: 95, 73%, 94%;
-    --new-primary-200: 94, 70%, 87%;
-    --new-primary-300: 95, 71%, 81%;
-    --new-primary-400: 95, 71%, 74%;
-    --new-primary-500: 95, 71%, 67%;
-    --new-primary-600: 95, 71%, 54%;
-    --new-primary-700: 95, 71%, 41%;
-    --new-primary-800: 95, 71%, 27%;
-    --new-primary-900: 95, 72%, 14%;
-    --new-primary-950: 95, 72%, 7%;
+    /* Primary - CapivApp indigo (mirrors the `brand-*` Tailwind scale) */
+    --new-primary-50: 226, 100%, 97%;
+    --new-primary-100: 226, 100%, 94%;
+    --new-primary-200: 228, 96%, 89%;
+    --new-primary-300: 230, 94%, 82%;
+    --new-primary-400: 234, 89%, 74%;
+    --new-primary-500: 239, 84%, 67%;
+    --new-primary-600: 243, 75%, 59%;
+    --new-primary-700: 245, 58%, 51%;
+    --new-primary-800: 244, 55%, 41%;
+    --new-primary-900: 243, 47%, 34%;
+    --new-primary-950: 244, 47%, 20%;
 
     /* Secondary - Info */
     --new-info-50: 210, 54%, 95%;
@@ -154,7 +155,7 @@
 
     --card: 0 0% 14.9%;
     --card-border: 0 0% 27.9%;
-    --card-border-tint: 112 205 159;
+    --card-border-tint: 99 102 241;
     --card-foreground: 0 0% 95%;
 
     --widget: 0 0% 14.9%;

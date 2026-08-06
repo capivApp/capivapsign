@@ -50,6 +50,9 @@ const main = async () => {
     params: {
       id: documentId.toString(),
     },
+    body: {
+      sendEmail: true,
+    },
   });
 };
 

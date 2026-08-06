@@ -1,11 +1,11 @@
-# Contributing to Documenso
+# Contributing to CapivaSign
 
-If you plan to contribute to Documenso, please take a moment to feel awesome ✨ People like you are what open source is about ♥. Any contributions, no matter how big or small, are highly appreciated.
+If you plan to contribute to CapivaSign, please take a moment to feel awesome ✨ People like you are what open source is about ♥. Any contributions, no matter how big or small, are highly appreciated.
 
 ## Before getting started
 
-- Before jumping into a PR be sure to search [existing PRs](https://github.com/documenso/documenso/pulls) or [issues](https://github.com/documenso/documenso/issues) for an open or closed item that relates to your submission.
-- Select an issue from [here](https://github.com/documenso/documenso/issues) or create a new one
+- Before jumping into a PR be sure to search [existing PRs](https://github.com/capivapp/capiva-sign/pulls) or [issues](https://github.com/capivapp/capiva-sign/issues) for an open or closed item that relates to your submission.
+- Select an issue from [here](https://github.com/capivapp/capiva-sign/issues) or create a new one
 - Consider the results from the discussion on the issue
 - Accept the [Contributor License Agreement](https://documen.so/cla) to ensure we can accept your contributions.
 
@@ -44,7 +44,7 @@ The development branch is <code>main</code>. All pull requests should be made ag
   git checkout -b feat/doc-999-somefeature-that-rocks
   ```
 
-3. See the [Developer Setup](https://github.com/documenso/documenso/blob/main/README.md#developer-setup) for more setup details.
+3. See the [Developer Setup](https://github.com/capivapp/capiva-sign/blob/main/README.md#developer-setup) for more setup details.
 
 ## Building
 

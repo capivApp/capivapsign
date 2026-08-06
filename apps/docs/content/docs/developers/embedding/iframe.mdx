@@ -15,7 +15,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ```html
 <iframe
-  src="https://app.documenso.com/embed/sign/abc123xyz"
+  src="https://app.capivapp.com.br/embed/sign/abc123xyz"
   width="100%"
   height="800"
   frameborder="0"
@@ -25,7 +25,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 <Callout title="Use the correct embed URL">
   The URL you embed depends on the embed mode you’re using (for example direct links vs sign-token embeds). Use the
-  embed URL provided by Documenso for your flow.
+  embed URL provided by CapivaSign for your flow.
 </Callout>
 
 ### iframe Customization
@@ -33,7 +33,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 You can customize the embedded signing experience by passing **encoded options in the iframe URL fragment** (everything
 after `#`).
 
-Documenso expects the fragment to be **base64** of:
+CapivaSign expects the fragment to be **base64** of:
 
 - `encodeURIComponent(JSON.stringify(options))`
 
@@ -73,7 +73,7 @@ const buildEmbedSrc = (host: string, token: string) => {
 };
 ```
 
-A complete example can be found in the [Embeds repository](https://github.com/documenso/embeds/blob/main/packages/mitosis/src/sign-document.lite.tsx).
+A complete example can be found in the [Embeds repository](https://github.com/capivasign/embeds/blob/main/packages/mitosis/src/sign-document.lite.tsx).
 
 <Callout type="info" title="Why use the URL fragment?">
   The fragment is **not sent to the server** as part of the HTTP request, but it is available to the embedded app in

@@ -617,7 +617,7 @@ export const apiSeedPendingDocument = async (
 
   const recipients = options.recipients ?? [
     {
-      email: `signer-${Date.now()}@test.documenso.com`,
+      email: `signer-${Date.now()}@test.capivapp.com.br`,
       name: 'Test Signer',
       role: 'SIGNER' as const,
     },
@@ -804,7 +804,7 @@ export const apiSeedDirectTemplate = async (
 > => {
   const recipients = options.recipients ?? [
     options.directRecipient ?? {
-      email: 'direct-template-recipient@documenso.com',
+      email: 'direct-template-recipient@capivapp.com.br',
       name: 'Direct Template Recipient',
       role: 'SIGNER' as const,
     },

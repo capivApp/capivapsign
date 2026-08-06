@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Documenso\n"
+"Project-Id-Version: CapivaSign\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-24 13:01+1000\n"
 "PO-Revision-Date: 2025-12-08 12:00+0000\n"
@@ -28,6 +28,10 @@ msgstr "\"{0}\" não é um endereço de e-mail válido."
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx
 msgid "\"{0}\" will appear on the document as it has a timezone of \"{1}\"."
 msgstr "\"{0}\" aparecerá no documento pois tem um fuso horário de \"{1}\"."
+
+#: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
+msgid "\"{claimName}\" is a locked default plan. Deleting it won't affect organisations already using it, but it will no longer be available to assign."
+msgstr "\"{claimName}\" é um plano padrão bloqueado. Excluí-lo não afeta as organizações que já o utilizam, mas ele deixará de ficar disponível para atribuição."
 
 #: packages/email/template-components/template-document-super-delete.tsx
 msgid "\"{documentName}\" has been deleted by an admin."
@@ -366,6 +370,10 @@ msgstr "{charactersRemaining, plural, one {1 caractere restante} other {{charact
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "{expiresInMinutes, plural, one {This code will expire in # minute.} other {This code will expire in # minutes.}}"
 msgstr "{expiresInMinutes, plural, one {Este código expirará em # minuto.} other {Este código expirará em # minutos.}}"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "{freeQuota} grátis/mês"
+msgstr ""
 
 #: packages/email/templates/document-invite.tsx
 msgid "{inviterName} <0>({inviterEmail})</0>"
@@ -1125,6 +1133,10 @@ msgstr "É necessário um e-mail válido"
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "A verification email will be sent to the provided email."
 msgstr "Um e-mail de verificação será enviado para o e-mail fornecido."
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "A1 e A3 nativos"
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
 msgid "Abrindo o agente CapivaSign…"
@@ -2070,8 +2082,8 @@ msgid "API"
 msgstr "API"
 
 #: apps/remix/app/components/general/landing-page.tsx
-msgid "API e webhooks para conectar a CapivaSign aos seus sistemas, com cobrança por uso transparente."
-msgstr "API e webhooks para conectar a CapivaSign aos seus sistemas, com cobrança por uso transparente."
+msgid "API e webhooks prontos"
+msgstr ""
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/components/forms/email-transport-form.tsx
@@ -2237,6 +2249,10 @@ msgstr "Tem certeza de que deseja excluir esta equipe?"
 msgid "Are you sure?"
 msgstr "Você tem certeza?"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Arraste para explorar os recursos que tornam a CapivaSign pronta para o seu negócio."
+msgstr ""
+
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 msgid "Assigned Teams"
 msgstr "Equipes Atribuídas"
@@ -2251,21 +2267,35 @@ msgstr "Assinador ICP-Brasil"
 
 #: apps/remix/app/components/general/landing-page.tsx
 #: apps/remix/app/components/general/landing-page.tsx
+#: apps/remix/app/components/general/landing-page.tsx
+#: apps/remix/app/components/general/landing-page.tsx
 msgid "Assinar plano"
 msgstr ""
 
 #: apps/remix/app/components/general/landing-page.tsx
-msgid "Assinatura com validade jurídica"
-msgstr "Assinatura com validade jurídica"
+msgid "Assinatura coletada"
+msgstr ""
 
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Assinatura digital ICP-Brasil"
 msgstr "Assinatura digital ICP-Brasil"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Assinatura incorporada (embed)"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Assinatura Qualificada (ICP-Brasil)"
 msgstr "Assinatura Qualificada (ICP-Brasil)"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Assinatura qualificada (QES)"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Assinaturas por WhatsApp"
+msgstr ""
 
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Assine de qualquer lugar"
@@ -2274,6 +2304,10 @@ msgstr "Assine de qualquer lugar"
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Assine documentos com segurança e validade jurídica"
 msgstr "Assine documentos com segurança e validade jurídica"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Assine por mensagem"
+msgstr ""
 
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role action verb"
@@ -2654,8 +2688,8 @@ msgid "By enabling 2FA, you will be required to enter a code from your authentic
 msgstr "Ao ativar a 2FA, você precisará inserir um código do seu aplicativo autenticador toda vez que fizer login usando senha de e-mail."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
-msgid "By proceeding to use the electronic signature service provided by Documenso, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
-msgstr "Ao prosseguir com o uso do serviço de assinatura eletrônica fornecido pela Documenso, você afirma que leu e compreendeu esta divulgação. Você concorda com todos os termos e condições relacionados ao uso de assinaturas eletrônicas e transações eletrônicas conforme descrito aqui."
+msgid "By proceeding to use the electronic signature service provided by CapivaSign, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
+msgstr "Ao prosseguir com o uso do serviço de assinatura eletrônica fornecido pela CapivaSign, você afirma que leu e compreendeu esta divulgação. Você concorda com todos os termos e condições relacionados ao uso de assinaturas eletrônicas e transações eletrônicas conforme descrito aqui."
 
 #: apps/remix/app/components/general/document-signing/document-signing-disclosure.tsx
 msgid "By proceeding with your electronic signature, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
@@ -2672,6 +2706,10 @@ msgstr "Ao usar o recurso de assinatura eletrônica, você consente em realizar 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 msgid "Cada destinatário é notificado pelo canal escolhido ao adicioná-lo (e-mail ou WhatsApp). Os campos abaixo se aplicam aos destinatários por e-mail; os de WhatsApp usam o modelo configurado."
 msgstr "Cada destinatário é notificado pelo canal escolhido ao adicioná-lo (e-mail ou WhatsApp). Os campos abaixo se aplicam aos destinatários por e-mail; os de WhatsApp usam o modelo configurado."
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Cada documento é selado e auditável, com trilha de evidências detalhada de ponta a ponta."
+msgstr ""
 
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Can prepare"
@@ -2833,6 +2871,10 @@ msgstr "Não é possível remover o signatário"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 msgid "Cannot upload items after the document has been sent"
 msgstr "Não é possível fazer upload de itens após o envio do documento"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "CapivaSign License"
+msgstr "Licença CapivaSign"
 
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "CapivaSign will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
@@ -3196,6 +3238,10 @@ msgstr "Concluído em {formattedDate}"
 msgid "Conectando ao agente local…"
 msgstr "Conectando ao agente local…"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Conecte a CapivaSign aos seus sistemas com API completa e webhooks, com cobrança por uso transparente."
+msgstr ""
+
 #: apps/remix/app/routes/signer.tsx
 msgid "Conecte o seu token A3 ou tenha o seu certificado A1 (.p12) em mãos."
 msgstr "Conecte o seu token A3 ou tenha o seu certificado A1 (.p12) em mãos."
@@ -3318,6 +3364,18 @@ msgstr "Confirmar e-mail"
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Confirmation email sent"
 msgstr "E-mail de confirmação enviado"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Conformidade 21 CFR Part 11"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Conformidade empresarial"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Conformidade HIPAA"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Consent to Electronic Transactions"
@@ -3953,7 +4011,7 @@ msgstr "Recusar"
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
 #: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
 msgid "Default"
-msgstr ""
+msgstr "Padrão"
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
@@ -4461,10 +4519,6 @@ msgstr "Registros DKIM gerados. Adicione os registros DNS para verificar seu dom
 msgid "DNS Records"
 msgstr "Registros DNS"
 
-#: apps/remix/app/components/general/admin-license-card.tsx
-msgid "Documenso License"
-msgstr "Licença CapivaSign"
-
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
@@ -4865,6 +4919,10 @@ msgstr ""
 msgid "Documento assinado eletronicamente · verificar:"
 msgstr ""
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Documentos ilimitados"
+msgstr ""
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
@@ -4872,7 +4930,7 @@ msgstr ""
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-skeleton.tsx
-#: apps/remix/app/components/general/user-profile-timur.tsx
+#: apps/remix/app/components/general/user-profile-teaser.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -6587,10 +6645,6 @@ msgstr "Aqui você pode definir suas preferências gerais de documento."
 msgid "Here's how it works:"
 msgstr "Veja como funciona:"
 
-#: apps/remix/app/components/general/user-profile-timur.tsx
-msgid "Hey I’m Timur"
-msgstr "Ei, eu sou o Timur"
-
 #: packages/email/template-components/template-document-reminder.tsx
 msgid "Hi {recipientName},"
 msgstr "Olá {recipientName},"
@@ -6686,6 +6740,10 @@ msgstr "Entendo que estou fornecendo minhas credenciais a um serviço de terceir
 msgid "I'm sure! Delete it"
 msgstr "Tenho certeza! Excluir"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "ICP-Brasil"
+msgstr ""
+
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
@@ -6711,8 +6769,8 @@ msgid "If there is any issue with your subscription, please contact us at <0>{SU
 msgstr "Se houver algum problema com sua assinatura, entre em contato conosco em <0>{SUPPORT_EMAIL}</0>."
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
-msgid "If you are using staging, ensure that you have set the host prop on the embedding component to the staging domain (https://stg-app.documenso.com)"
-msgstr "Se estiver usando o ambiente de homologação, verifique se definiu a prop host no componente de incorporação para o domínio de homologação (https://stg-app.documenso.com)"
+msgid "If you are using staging, ensure that you have set the host prop on the embedding component to the staging domain (https://stg-app.capivapp.com.br)"
+msgstr ""
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "If you did not expect this email or believe it is spam, you can report the sender to our team for review."
@@ -6881,6 +6939,10 @@ msgstr "ID da instância"
 msgid "Instance Stats"
 msgstr "Estatísticas da Instância"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Integre em minutos"
+msgstr ""
+
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "Invalid code. Please try again."
 msgstr "Código inválido. Por favor, tente novamente."
@@ -6908,7 +6970,7 @@ msgid "Invalid License Key"
 msgstr "Chave de licença inválida"
 
 #: apps/remix/app/components/general/admin-license-status-banner.tsx
-msgid "Invalid License Type - Your Documenso instance is using features that are not part of your license."
+msgid "Invalid License Type - Your CapivaSign instance is using features that are not part of your license."
 msgstr "Tipo de licença inválido — sua instância CapivaSign está usando recursos que não fazem parte da sua licença."
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
@@ -7205,6 +7267,10 @@ msgstr "Esquerda"
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Legality of Electronic Signatures"
 msgstr "Legalidade das Assinaturas Eletrônicas"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Lembretes de assinatura"
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Letter spacing"
@@ -7550,6 +7616,10 @@ msgstr "Mapeando campos para destinatários"
 msgid "Marca de verificação nas páginas"
 msgstr "Marca de verificação nas páginas"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Marca personalizada"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Mark as viewed"
 msgstr "Marcar como visualizado"
@@ -7683,7 +7753,7 @@ msgid "Min"
 msgstr "Mín"
 
 #: apps/remix/app/components/general/admin-license-status-banner.tsx
-msgid "Missing License - Your Documenso instance is using features that require a license."
+msgid "Missing License - Your CapivaSign instance is using features that require a license."
 msgstr "Licença ausente — sua instância CapivaSign está usando recursos que exigem uma licença."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
@@ -7944,7 +8014,7 @@ msgstr "Nenhuma chave de API ainda."
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "No contact info"
-msgstr ""
+msgstr "Sem informações de contato"
 
 #: apps/remix/app/components/general/pdf-viewer/envelope-pdf-viewer.tsx
 #: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
@@ -8229,8 +8299,8 @@ msgid "Number Settings"
 msgstr "Configurações de Número"
 
 #: apps/remix/app/components/general/document-signing/icp-sign-panel.tsx
-msgid "O agente CapivaSign precisa estar em execução (porta 3231) ou com o protocolo documenso-icp:// registrado. Sua chave privada nunca sai da sua máquina."
-msgstr "O agente CapivaSign precisa estar em execução (porta 3231) ou com o protocolo documenso-icp:// registrado. Sua chave privada nunca sai da sua máquina."
+msgid "O agente CapivaSign precisa estar em execução (porta 3231) ou com o protocolo capivasign-icp:// registrado. Sua chave privada nunca sai da sua máquina."
+msgstr ""
 
 #: apps/remix/app/routes/signer.tsx
 msgid "O assinador roda na sua máquina e usa o seu certificado digital ICP-Brasil (A1 ou A3) para assinar com validade jurídica. Sua chave privada nunca sai do seu computador."
@@ -8526,7 +8596,7 @@ msgstr "Organizações sem transporte usam o servidor de e-mail padrão do siste
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/components/forms/whatsapp-transport-form.tsx
 msgid "Organisations without their own transport will send through this one. Only one transport can be the default."
-msgstr ""
+msgstr "Organizações sem transporte próprio enviarão por este. Apenas um transporte pode ser o padrão."
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Organise your documents"
@@ -8628,6 +8698,10 @@ msgid "Para empresas com alta demanda"
 msgstr ""
 
 #: apps/remix/app/components/general/landing-page.tsx
+msgid "Para plataformas que assinam em escala"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
 msgid "Para startups e produtos em crescimento"
 msgstr ""
 
@@ -8703,6 +8777,10 @@ msgstr "Reautenticação por Senha"
 #: packages/email/templates/forgot-password.tsx
 msgid "Password Reset Requested"
 msgstr "Redefinição de Senha Solicitada"
+
+#: packages/lib/server-only/auth/send-reset-password.ts
+msgid "Password Reset Success!"
+msgstr "Senha redefinida com sucesso!"
 
 #: packages/email/templates/reset-password.tsx
 msgid "Password Reset Successful"
@@ -8836,6 +8914,10 @@ msgstr "Caixa de Entrada Pessoal"
 msgid "Personalizada (X/Y)"
 msgstr "Personalizada (X/Y)"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Personalize páginas de assinatura, e-mails e certificados com o seu logotipo e as suas cores — sem a marca CapivaSign."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
 msgid "Phone"
 msgstr "Telefone"
@@ -8849,7 +8931,7 @@ msgstr "Escolha um número"
 msgid "Pick a password"
 msgstr "Escolha uma senha"
 
-#: apps/remix/app/components/general/user-profile-timur.tsx
+#: apps/remix/app/components/general/user-profile-teaser.tsx
 msgid "Pick any of the following agreements below and start signing to get started"
 msgstr "Escolha qualquer um dos acordos abaixo e comece a assinar para iniciar"
 
@@ -9273,10 +9355,6 @@ msgstr "Progresso"
 msgid "Pronto para assinar com a CapivaSign?"
 msgstr "Pronto para assinar com a CapivaSign?"
 
-#: apps/remix/app/components/general/landing-page.tsx
-msgid "Pronto para integrar"
-msgstr "Pronto para integrar"
-
 #: apps/remix/app/components/forms/whatsapp-transport-form.tsx
 #: apps/remix/app/components/tables/admin-whatsapp-transports-table.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
@@ -9637,11 +9715,20 @@ msgid "Recuperação de arquivo"
 msgstr "Recuperação de arquivo"
 
 #: apps/remix/app/components/general/landing-page.tsx
+#: apps/remix/app/components/general/landing-page.tsx
 msgid "Recursos"
 msgstr ""
 
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "Recursos incluídos em cada plano"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Recursos inclusos"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Recursos para 21 CFR Part 11, HIPAA e assinatura qualificada (QES) para times com alta exigência."
 msgstr ""
 
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
@@ -9920,6 +10007,7 @@ msgstr "Selar novamente o documento"
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Resend"
 msgstr "Reenviar"
@@ -10271,6 +10359,10 @@ msgstr "Ver documentação"
 msgid "See the background jobs tab for the status"
 msgstr "Veja a aba de trabalhos em segundo plano para o status"
 
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Selado com validade jurídica"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgid "Selecione os arquivos para baixar. A cópia <0>Assinada</0> é o PDF certificado (PAdES) com o certificado digital embutido — os certificados ICP-Brasil dos signatários, ou o certificado padrão do sistema quando nenhuma assinatura usou certificado próprio."
 msgstr "Selecione os arquivos para baixar. A cópia <0>Assinada</0> é o PDF certificado (PAdES) com o certificado digital embutido — os certificados ICP-Brasil dos signatários, ou o certificado padrão do sistema quando nenhuma assinatura usou certificado próprio."
@@ -10497,6 +10589,8 @@ msgstr ""
 #: apps/remix/app/components/dialogs/whatsapp-transport-send-test-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 msgid "Send"
@@ -10669,6 +10763,10 @@ msgstr ""
 msgid "Share"
 msgstr "Compartilhar"
 
+#: apps/remix/app/components/general/user-profile-teaser.tsx
+msgid "Share one link and let anyone start signing with you."
+msgstr "Compartilhe um único link e deixe qualquer pessoa começar a assinar com você."
+
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 msgid "Share Signing Card"
@@ -10722,7 +10820,7 @@ msgstr "Mostrar uso com cotas"
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/general/user-profile-skeleton.tsx
-#: apps/remix/app/components/general/user-profile-timur.tsx
+#: apps/remix/app/components/general/user-profile-teaser.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
@@ -11038,10 +11136,6 @@ msgstr "Pular"
 #: apps/remix/app/components/general/landing-page.tsx
 msgid "SLA"
 msgstr ""
-
-#: apps/remix/app/components/general/landing-page.tsx
-msgid "Solicite assinaturas por WhatsApp"
-msgstr "Solicite assinaturas por WhatsApp"
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
@@ -11861,8 +11955,8 @@ msgid "Thank you for letting us know, we have flagged this sender for review. If
 msgstr "Obrigado por nos avisar, sinalizamos este remetente para revisão. Se tiver qualquer preocupação, fale com nossa <0>equipe de suporte</0>."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
-msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
-msgstr "Obrigado por usar o Documenso para realizar sua assinatura eletrônica de documentos. O objetivo desta divulgação é informá-lo sobre o processo, legalidade e seus direitos em relação ao uso de assinaturas eletrônicas em nossa plataforma. Ao optar por usar uma assinatura eletrônica, você concorda com os termos e condições descritos abaixo."
+msgid "Thank you for using CapivaSign to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
+msgstr "Obrigado por usar o CapivaSign para realizar sua assinatura eletrônica de documentos. O objetivo desta divulgação é informá-lo sobre o processo, legalidade e seus direitos em relação ao uso de assinaturas eletrônicas em nossa plataforma. Ao optar por usar uma assinatura eletrônica, você concorda com os termos e condições descritos abaixo."
 
 #: packages/email/template-components/template-forgot-password.tsx
 msgid "That's okay, it happens! Click the button below to reset your password."
@@ -12375,10 +12469,6 @@ msgstr "Esta ação é reversível, mas tenha cuidado, pois a conta pode ser afe
 msgid "This can take a minute or two depending on the size of your document."
 msgstr "Isso pode levar um ou dois minutos, dependendo do tamanho do seu documento."
 
-#: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
-msgid "This claim is locked and cannot be deleted."
-msgstr "Esta reivindicação está bloqueada e não pode ser excluída."
-
 #: packages/email/template-components/template-document-super-delete.tsx
 msgid "This document can not be recovered, if you would like to dispute the reason for future documents please contact support."
 msgstr "Este documento não pode ser recuperado, se você quiser contestar o motivo para documentos futuros, entre em contato com o suporte."
@@ -12458,8 +12548,8 @@ msgid "This document was created using a direct link."
 msgstr "Este documento foi criado usando um link direto."
 
 #: packages/email/template-components/template-footer.tsx
-msgid "This document was sent using <0>CapivApp</0>."
-msgstr ""
+msgid "This document was sent using <0>CapivaSign</0>."
+msgstr "Este documento foi enviado usando o <0>CapivaSign</0>."
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "This document will be duplicated."
@@ -12959,6 +13049,10 @@ msgid "Triggers"
 msgstr "Gatilhos"
 
 #: apps/remix/app/components/general/landing-page.tsx
+msgid "Trilha de auditoria completa"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
 msgid "Troque de plano quando precisar, sem burocracia."
 msgstr ""
 
@@ -12969,6 +13063,10 @@ msgstr ""
 #: apps/remix/app/components/general/document-signing/csc-recipient-blocked-page.tsx
 msgid "Try again"
 msgstr "Tente novamente"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Tudo que você precisa para assinar com confiança"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-signing-timestamp-section.tsx
 msgid "Turn off if no timestamp authority is configured."
@@ -13221,6 +13319,9 @@ msgstr "Grupo sem título"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
@@ -13512,7 +13613,7 @@ msgstr "Usar"
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/components/forms/whatsapp-transport-form.tsx
 msgid "Use as default for all organisations"
-msgstr ""
+msgstr "Usar como padrão para todas as organizações"
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
@@ -13598,6 +13699,10 @@ msgstr "Usuário"
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Users"
 msgstr "Usuários"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "Validade jurídica ICP-Brasil"
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
@@ -13685,6 +13790,10 @@ msgstr "Vertical"
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Vertical Align"
 msgstr "Alinhamento Vertical"
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "via WhatsApp · agora mesmo"
+msgstr ""
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
@@ -14405,6 +14514,10 @@ msgstr "Você estava tentando editar este documento?"
 msgid "What you can do with teams:"
 msgstr "O que você pode fazer com equipes:"
 
+#: packages/lib/constants/document.ts
+msgid "WhatsApp"
+msgstr ""
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "WhatsApp transport"
 msgstr "Transporte WhatsApp"
@@ -14448,6 +14561,14 @@ msgstr "Se deve ativar o portal SSO para sua organização"
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "While waiting for them to do so you can create your own CapivaSign account and get started with document signing right away."
 msgstr "Enquanto espera que eles façam isso, você pode criar sua própria conta CapivaSign e começar a assinar documentos imediatamente."
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "White label (sua marca)"
+msgstr ""
+
+#: apps/remix/app/components/general/landing-page.tsx
+msgid "White label com a sua marca"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.message-templates.tsx
 msgid "White-label required"
@@ -15593,6 +15714,10 @@ msgstr "Seu perfil foi atualizado com sucesso."
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Your profile has been updated."
 msgstr "Seu perfil foi atualizado."
+
+#: apps/remix/app/components/general/user-profile-teaser.tsx
+msgid "Your public profile"
+msgstr "Seu perfil público"
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Your public profile has been updated."

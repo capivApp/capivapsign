@@ -62,7 +62,7 @@ const documentNameField: FieldConfig = {
 const recipientNameField: FieldConfig = {
   type: 'text',
   label: 'Recipient name',
-  default: 'Lucas Smith',
+  default: 'Ana Souza',
 };
 
 const roleField: FieldConfig = {
@@ -93,7 +93,7 @@ export const templates: Record<string, TemplateDefinition> = {
     group: 'Documents',
     component: DocumentInviteEmailTemplate,
     fields: {
-      inviterName: { type: 'text', label: 'Inviter name', default: 'Lucas Smith' },
+      inviterName: { type: 'text', label: 'Inviter name', default: 'Ana Souza' },
       inviterEmail: { type: 'text', label: 'Inviter email', default: 'lucas@capivapp.com.br' },
       documentName: documentNameField,
       role: roleField,
@@ -146,7 +146,7 @@ export const templates: Record<string, TemplateDefinition> = {
     group: 'Documents',
     component: DocumentCancelTemplate,
     fields: {
-      inviterName: { type: 'text', label: 'Inviter name', default: 'Lucas Smith' },
+      inviterName: { type: 'text', label: 'Inviter name', default: 'Ana Souza' },
       documentName: documentNameField,
       cancellationReason: {
         type: 'textarea',
@@ -179,7 +179,7 @@ export const templates: Record<string, TemplateDefinition> = {
     fields: {
       recipientName: recipientNameField,
       documentName: documentNameField,
-      documentOwnerName: { type: 'text', label: 'Document owner', default: 'Timur Ercan' },
+      documentOwnerName: { type: 'text', label: 'Document owner', default: 'Carlos Lima' },
       reason: {
         type: 'textarea',
         label: 'Rejection reason',
@@ -209,7 +209,7 @@ export const templates: Record<string, TemplateDefinition> = {
     group: 'Documents',
     component: BulkSendCompleteEmail,
     fields: {
-      userName: { type: 'text', label: 'User name', default: 'Lucas Smith' },
+      userName: { type: 'text', label: 'User name', default: 'Ana Souza' },
       templateName: { type: 'text', label: 'Template name', default: 'NDA Template' },
       totalProcessed: { type: 'number', label: 'Total processed', default: 50 },
       successCount: { type: 'number', label: 'Success count', default: 48 },
@@ -257,7 +257,7 @@ export const templates: Record<string, TemplateDefinition> = {
     group: 'Organisations',
     component: OrganisationInviteEmailTemplate,
     fields: {
-      senderName: { type: 'text', label: 'Sender name', default: 'Lucas Smith' },
+      senderName: { type: 'text', label: 'Sender name', default: 'Ana Souza' },
       organisationName: { type: 'text', label: 'Organisation name', default: 'CapivaSign' },
     },
   },
@@ -266,7 +266,7 @@ export const templates: Record<string, TemplateDefinition> = {
     group: 'Organisations',
     component: OrganisationJoinEmailTemplate,
     fields: {
-      memberName: { type: 'text', label: 'Member name', default: 'Lucas Smith' },
+      memberName: { type: 'text', label: 'Member name', default: 'Ana Souza' },
       organisationName: { type: 'text', label: 'Organisation name', default: 'CapivaSign' },
     },
   },
@@ -275,7 +275,7 @@ export const templates: Record<string, TemplateDefinition> = {
     group: 'Organisations',
     component: OrganisationLeaveEmailTemplate,
     fields: {
-      memberName: { type: 'text', label: 'Member name', default: 'Lucas Smith' },
+      memberName: { type: 'text', label: 'Member name', default: 'Ana Souza' },
       organisationName: { type: 'text', label: 'Organisation name', default: 'CapivaSign' },
     },
   },
@@ -359,7 +359,7 @@ export const templates: Record<string, TemplateDefinition> = {
     group: 'Account',
     component: ResetPasswordTemplate,
     fields: {
-      userName: { type: 'text', label: 'User name', default: 'Lucas Smith' },
+      userName: { type: 'text', label: 'User name', default: 'Ana Souza' },
       userEmail: { type: 'text', label: 'User email', default: 'lucas@capivapp.com.br' },
     },
   },
@@ -371,7 +371,7 @@ export const templates: Record<string, TemplateDefinition> = {
       documentTitle: { type: 'text', label: 'Document title', default: 'Open Source Pledge.pdf' },
       code: { type: 'text', label: 'Code', default: '123456' },
       userEmail: { type: 'text', label: 'User email', default: 'lucas@capivapp.com.br' },
-      userName: { type: 'text', label: 'User name', default: 'Lucas Smith' },
+      userName: { type: 'text', label: 'User name', default: 'Ana Souza' },
       expiresInMinutes: { type: 'number', label: 'Expires in (min)', default: 10 },
     },
   },

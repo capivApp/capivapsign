@@ -68,9 +68,8 @@ module.exports = {
           foreground: 'hsl(var(--widget-foreground))',
         },
         // CapivApp brand palette (indigo, hue ~243 — matches `--primary`).
-        // Historically the Documenso lime-green scale; repointed to indigo so
-        // the existing `documenso-*` utility classes render in the brand colour.
-        documenso: {
+        // Exposed as the `brand-*` utility scale (`text-brand`, `bg-brand-200`, …).
+        brand: {
           DEFAULT: '#5048e5',
           50: '#eef2ff',
           100: '#e0e7ff',

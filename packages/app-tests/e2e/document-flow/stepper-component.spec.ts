@@ -332,14 +332,14 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
     teamId: team.id,
-    recipients: ['user@documenso.com', 'approver@documenso.com'],
+    recipients: ['user@capivapp.com.br', 'approver@capivapp.com.br'],
     recipientsCreateOptions: [
       {
-        email: 'user@documenso.com',
+        email: 'user@capivapp.com.br',
         role: RecipientRole.SIGNER,
       },
       {
-        email: 'approver@documenso.com',
+        email: 'approver@capivapp.com.br',
         role: RecipientRole.APPROVER,
       },
     ],
@@ -390,7 +390,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
   await page.getByLabel('Title').fill(documentTitle);
   await page.getByRole('button', { name: 'Advanced Options' }).click();
-  await page.getByLabel('Redirect URL').fill('https://documenso.com');
+  await page.getByLabel('Redirect URL').fill('https://capivasign.com');
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
@@ -444,7 +444,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   ).toBeVisible();
   await page.getByRole('button', { name: 'Approve' }).click();
 
-  await page.waitForURL('https://documenso.com');
+  await page.waitForURL('https://capivasign.com');
 
   await expect(async () => {
     // Check if document has been signed

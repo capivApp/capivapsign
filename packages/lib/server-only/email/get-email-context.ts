@@ -102,14 +102,14 @@ export const getEmailContext = async (options: GetEmailContextOptions): Promise<
   const emailLanguage = meta?.language || emailContext.settings.documentLanguage;
 
   // Resolution order: the organisation's own transport (claim) → the global
-  // default transport (`isDefault`) → the system mailer + Documenso sender.
+  // default transport (`isDefault`) → the system mailer + CapivaSign sender.
   const transportResolution = emailContext.claims.emailTransportId
     ? await resolveEmailTransport(emailContext.claims.emailTransportId)
     : await resolveDefaultEmailTransport();
 
   // A configured transport that fails to resolve is an operational problem, not
   // "no transport". Surface it (alertable) before silently falling back to the
-  // system mailer + Documenso sender, so the degraded organisation is findable.
+  // system mailer + CapivaSign sender, so the degraded organisation is findable.
   if (emailContext.claims.emailTransportId && !transportResolution) {
     logger.error({
       msg: 'Configured email transport could not be resolved; falling back to the system mailer',
@@ -149,7 +149,7 @@ export const getEmailContext = async (options: GetEmailContextOptions): Promise<
   const senderEmailId = match(meta?.emailId)
     .with(P.string, (emailId) => emailId) // Explicit string means to use the provided email ID.
     .with(undefined, () => emailContext.settings.emailId) // Undefined means to use the inherited email ID.
-    .with(null, () => null) // Explicit null means to use the Documenso email.
+    .with(null, () => null) // Explicit null means to use the CapivaSign email.
     .exhaustive();
 
   const foundSenderEmail = emailContext.allowedEmails.find((email) => email.id === senderEmailId);
@@ -226,9 +226,7 @@ const handleOrganisationEmailContext = async (organisationId: string) => {
   );
 
   const allowBrandedEmailColors =
-    !IS_BILLING_ENABLED() ||
-    claims.flags.embedSigningWhiteLabel === true ||
-    claims.flags.whiteLabelBranding === true;
+    !IS_BILLING_ENABLED() || claims.flags.embedSigningWhiteLabel === true || claims.flags.whiteLabelBranding === true;
 
   if (!allowBrandedEmailColors) {
     branding.brandingColors = undefined;
@@ -289,9 +287,7 @@ const handleTeamEmailContext = async (teamId: number) => {
   const branding = teamGlobalSettingsToBranding(teamSettings, teamId, claims.flags.hidePoweredBy ?? false);
 
   const allowBrandedEmailColors =
-    !IS_BILLING_ENABLED() ||
-    claims.flags.embedSigningWhiteLabel === true ||
-    claims.flags.whiteLabelBranding === true;
+    !IS_BILLING_ENABLED() || claims.flags.embedSigningWhiteLabel === true || claims.flags.whiteLabelBranding === true;
 
   if (!allowBrandedEmailColors) {
     branding.brandingColors = undefined;

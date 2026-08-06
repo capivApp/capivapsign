@@ -18,7 +18,7 @@ import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_intern
 import type { Json } from './_internal/json';
 import { BaseJobProvider } from './base';
 
-const QUEUE_NAME = 'documenso-jobs';
+const QUEUE_NAME = 'capivasign-jobs';
 
 const DEFAULT_CONCURRENCY = 10;
 const DEFAULT_MAX_RETRIES = 3;
@@ -26,7 +26,7 @@ const DEFAULT_BACKOFF_DELAY = 1000;
 
 declare global {
   // eslint-disable-next-line no-var
-  var __documenso_bullmq_provider__: BullMQJobProvider | undefined;
+  var __capivasign_bullmq_provider__: BullMQJobProvider | undefined;
 }
 
 export class BullMQJobProvider extends BaseJobProvider {
@@ -44,7 +44,7 @@ export class BullMQJobProvider extends BaseJobProvider {
       throw new Error('[JOBS]: NEXT_PRIVATE_REDIS_URL is required when using the BullMQ jobs provider');
     }
 
-    const prefix = env('NEXT_PRIVATE_REDIS_PREFIX') || 'documenso';
+    const prefix = env('NEXT_PRIVATE_REDIS_PREFIX') || 'capivasign';
 
     this._connection = new IORedis(redisUrl, {
       maxRetriesPerRequest: null,
@@ -85,13 +85,13 @@ export class BullMQJobProvider extends BaseJobProvider {
    * different bundles (e.g. Hono and Vite/React Router) at runtime.
    */
   static getInstance() {
-    if (globalThis.__documenso_bullmq_provider__) {
-      return globalThis.__documenso_bullmq_provider__;
+    if (globalThis.__capivasign_bullmq_provider__) {
+      return globalThis.__capivasign_bullmq_provider__;
     }
 
     const instance = new BullMQJobProvider();
 
-    globalThis.__documenso_bullmq_provider__ = instance;
+    globalThis.__capivasign_bullmq_provider__ = instance;
 
     return instance;
   }

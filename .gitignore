@@ -66,8 +66,8 @@ scripts/output*
 scripts/bench-*
 
 # license
-.documenso-license.json
-.documenso-license-backup.json
+.capivasign-license.json
+.capivasign-license-backup.json
 
 # tmp
 tmp/

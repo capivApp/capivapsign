@@ -9,7 +9,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Page, test } from '@playwright/test';
 import { DocumentDataType, FieldType } from '@prisma/client';
 
-const BRANDING_URL = 'https://brand.example/signing?source=documenso';
+const BRANDING_URL = 'https://brand.example/signing?source=capivasign';
 const PDF_PAGE_SELECTOR = 'img[data-page-number]';
 
 const readBrandingLogo = async () => {
@@ -65,7 +65,7 @@ test('[SIGNING_BRANDING]: V1 normal signing renders custom logo as a plain image
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
     teamId: team.id,
-    recipients: ['v1-branding-signer@test.documenso.com'],
+    recipients: ['v1-branding-signer@test.capivapp.com.br'],
     fields: [FieldType.SIGNATURE],
   });
 
@@ -84,7 +84,7 @@ test('[SIGNING_BRANDING]: V2 signing renders custom logo as a plain image', asyn
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
     teamId: team.id,
-    recipients: ['v2-branding-signer@test.documenso.com'],
+    recipients: ['v2-branding-signer@test.capivapp.com.br'],
     fields: [FieldType.SIGNATURE],
     updateDocumentOptions: { internalVersion: 2 },
   });
@@ -103,13 +103,13 @@ test('[SIGNING_BRANDING]: V2 signing renders custom logo as a plain image', asyn
   await expectPlainBrandingLogo(page, `${team.name}'s Logo`);
 });
 
-test('[SIGNING_BRANDING]: V2 signing keeps internal link for the Documenso fallback logo', async ({ page }) => {
+test('[SIGNING_BRANDING]: V2 signing keeps internal link for the CapivaSign fallback logo', async ({ page }) => {
   const { user, team } = await seedUser();
 
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
     teamId: team.id,
-    recipients: ['v2-fallback-signer@test.documenso.com'],
+    recipients: ['v2-fallback-signer@test.capivapp.com.br'],
     fields: [FieldType.SIGNATURE],
     updateDocumentOptions: { internalVersion: 2 },
   });
@@ -131,7 +131,7 @@ test('[SIGNING_BRANDING]: embedded signing does not render custom logo Brand Web
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
     teamId: team.id,
-    recipients: ['embed-branding-signer@test.documenso.com'],
+    recipients: ['embed-branding-signer@test.capivapp.com.br'],
     fields: [FieldType.SIGNATURE],
     updateDocumentOptions: { internalVersion: 2 },
   });

@@ -43,6 +43,7 @@ export const createStripeCustomerRoute = adminProcedure
     const stripeCustomer = await createCustomer({
       name: organisation.name,
       email: organisation.owner.email,
+      organisationId,
     });
 
     await prisma.organisation.update({

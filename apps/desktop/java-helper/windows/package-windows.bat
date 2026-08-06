@@ -4,7 +4,9 @@ REM signer's machine needs no separate Java install. RUN THIS ON WINDOWS with a
 REM JDK 17+ on PATH (jpackage/jlink are platform-specific — a Windows binary
 REM must be produced on Windows).
 REM
-REM Output: dist\IcpAgent\IcpAgent.exe  (app-image; launches the jar)
+REM Output:
+REM   dist\CapivaSign\CapivaSign.exe       WINDOWED  — the agent users run
+REM   dist\CapivaSign\CapivaSignCli.exe    CONSOLE   — list/sign for support
 REM
 REM Prereqs: JDK 17+ (includes jpackage + jlink). WiX Toolset only needed for
 REM the optional --type msi installer.
@@ -24,29 +26,40 @@ jlink --add-modules %MODULES% --strip-debug --no-header-files --no-man-pages --c
 if errorlevel 1 (echo jlink failed & exit /b 1)
 
 REM 3) Package an app-image .exe around the jar + runtime.
-if exist "%ROOT%\dist" rmdir /s /q "%ROOT%\dist"
-REM --win-console is REQUIRED on the MAIN launcher: without it jpackage builds a
-REM windowed (GUI) launcher that is NOT attached to the console, so stdout/stderr
-REM vanish and the CLI (list/sign) appears to print nothing.
 REM
-REM --add-launcher IcpAgentTray adds a SECOND, WINDOWED launcher (no console)
-REM that runs `serve --no-gui`. The installer auto-starts THIS one at logon, so
-REM the tray agent leaves no lingering console window (and AWT stops logging
-REM "GetMessage() failed. System error 1400" into a console with no message pump).
+REM THE MAIN LAUNCHER IS DELIBERATELY WINDOWED (no --win-console).
+REM
+REM jpackage's --win-console flag builds a CONSOLE-subsystem binary, which makes
+REM Windows allocate and show a cmd window for EVERY launch of that exe — at
+REM logon, from the Start menu, and on every `capivasign-icp://` deep link the
+REM browser fires. That stray console next to the agent was the bug: the fix is
+REM for the exe users actually run to be a GUI-subsystem binary.
+REM
+REM --arguments supplies DEFAULT arguments, used only when the launcher is
+REM started with none. So:
+REM   double-click / logon / Start menu  -> `serve --no-gui` -> straight to tray
+REM   protocol handler                   -> the URI overrides them -> signs
+REM
+REM Diagnostics are not lost: the agent tees stderr to
+REM %LOCALAPPDATA%\CapivaSign\agent.log (see Log.java), reachable from the tray
+REM menu. CapivaSignCli.exe keeps a console for interactive support work.
 jpackage ^
   --type app-image ^
-  --name IcpAgent ^
+  --name CapivaSign ^
+  --description "CapivaSign - Assinador ICP-Brasil" ^
+  --vendor "CapivApp" ^
   --input "%ROOT%\build" ^
   --main-jar icp-helper.jar ^
-  --main-class com.documenso.icp.Main ^
+  --main-class br.com.capivapp.icp.Main ^
   --runtime-image "%ROOT%\build\runtime" ^
-  --win-console ^
-  --add-launcher IcpAgentTray="%HERE%tray-launcher.properties" ^
+  --icon "%HERE%capivasign.ico" ^
+  --arguments "serve --no-gui" ^
+  --add-launcher CapivaSignCli="%HERE%cli-launcher.properties" ^
   --dest "%ROOT%\dist"
 if errorlevel 1 (echo jpackage failed & exit /b 1)
 
 echo.
-echo Built: %ROOT%\dist\IcpAgent\IcpAgent.exe        (console — CLI: list/sign)
-echo        %ROOT%\dist\IcpAgent\IcpAgentTray.exe    (windowed — tray serve)
-echo Test:  "%ROOT%\dist\IcpAgent\IcpAgent.exe" list --source windows-my
+echo Built: %ROOT%\dist\CapivaSign\CapivaSign.exe       (windowed - tray agent, no console)
+echo        %ROOT%\dist\CapivaSign\CapivaSignCli.exe    (console  - CLI: list/sign)
+echo Test:  "%ROOT%\dist\CapivaSign\CapivaSignCli.exe" list --source windows-my
 endlocal

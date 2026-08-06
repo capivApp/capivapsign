@@ -19,7 +19,7 @@ export type AuthEmailTransport = {
  * These are sent before any organisation context exists, so `getEmailContext`
  * does not apply. Instead we honour the global default transport configured in
  * the admin panel (`EmailTransport.isDefault`) and only fall back to the system
- * `mailer` + Documenso sender when no default is configured or it fails to
+ * `mailer` + CapivaSign sender when no default is configured or it fails to
  * resolve — otherwise the admin's configured provider would be ignored and the
  * mail silently never delivered.
  */

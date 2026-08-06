@@ -1,251 +1,184 @@
 # CapivaSign
 
-**CapivaSign** is a fork of [**Documenso**](https://github.com/documenso/documenso),
-the open-source DocuSign alternative, extended with **ICP-Brasil digital
-signatures** (A1/A3 certificates, PAdES-LTA, RFC 3161 timestamping) via a local
-signing agent.
+**CapivaSign** é a plataforma de assinatura eletrônica e digital da
+[CapivApp](https://capivapp.com.br), com suporte a **certificados ICP-Brasil**
+(A1/A3, PAdES-LTA, carimbo de tempo RFC 3161) através de um assinador local.
 
-> ### Credits & license
->
-> CapivaSign would not exist without **Documenso** and its contributors — the
-> entire document workflow, signing pipeline, and the PAdES/CSC foundation that
-> our ICP-Brasil support builds on are their work. Huge thanks to the Documenso
-> team. ❤️
->
-> This project is distributed under the **GNU Affero General Public License
-> v3.0 (AGPL-3.0)**, the same license as upstream Documenso (see
-> [`LICENSE`](./LICENSE)). In keeping with the AGPL we keep this notice and the
-> upstream attribution, publish our source, and license our modifications under
-> the same terms. "Documenso" is a trademark of its respective owners;
-> "CapivaSign" and its branding are used by this fork and are not endorsed by
-> Documenso.
+<div align="center">
+  <img src="./packages/assets/logo.png" alt="CapivaSign" width="480" />
+</div>
 
 ---
 
-<img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
+> ## Créditos e licença
+>
+> CapivaSign é um fork do [**Documenso**](https://github.com/documenso/documenso),
+> a alternativa open source ao DocuSign. Todo o fluxo de documentos, o pipeline
+> de assinatura e a fundação PAdES/CSC sobre a qual o suporte ICP-Brasil foi
+> construído são trabalho do Documenso e de seus contribuidores. Nosso muito
+> obrigado ao time do Documenso. ❤️
+>
+> Este projeto é distribuído sob a **GNU Affero General Public License v3.0
+> (AGPL-3.0)**, a mesma licença do Documenso (veja [`LICENSE`](./LICENSE)). Em
+> conformidade com a AGPL, mantemos este aviso e a atribuição ao projeto
+> original, publicamos nosso código-fonte e licenciamos nossas modificações sob
+> os mesmos termos. "Documenso" é marca de seus respectivos titulares; este fork
+> não é endossado por eles.
 
-<p align="center" style="margin-top: 20px">
-  <p align="center">
-  The Open Source DocuSign Alternative.
-  <br>
-    <a href="https://documenso.com"><strong>Learn more »</strong></a>
-    <br />
-    <br />
-    <a href="https://documen.so/discord">Discord</a>
-    ·
-    <a href="https://documenso.com">Website</a>
-    ·
-    <a href="https://docs.documenso.com">Documentation</a>
-    ·
-    <a href="https://github.com/documenso/documenso/issues">Issues</a>
-    ·
-    <a href="https://documen.so/live">Upcoming Releases</a>
-    ·
-    <a href="https://documen.so/roadmap">Roadmap</a>
-  </p>
-</p>
+---
 
-<p align="center">
-   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a>
-   <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
-   <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
-   <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
-   <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso">
-   <img alt="open in devcontainer" src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Enabled&color=blue&logo=visualstudiocode" />
-   </a>
-   <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
-</p>
+## O que o CapivaSign faz
 
-<div align="center">
-  <img src="https://github.com/documenso/documenso/assets/13398220/d96ed533-6f34-4a97-be9b-442bdb189c69" style="width: 80%;" />
-</div>
+- **Assinatura eletrônica** completa: envelopes, campos, ordem de assinatura,
+  lembretes, trilha de auditoria e certificado de assinatura em PDF.
+- **Assinatura digital ICP-Brasil** (A1 e A3) via assinador local — a chave
+  privada nunca sai da máquina do signatário.
+- **PAdES-LTA** com carimbo de tempo RFC 3161 e validação de longo prazo.
+- **Distribuição por e-mail e WhatsApp**, com domínios de e-mail próprios.
+- **API e webhooks** para integração, além de assinatura incorporada (embed).
+- **Cobrança recorrente via Stripe**, com planos, portal do cliente e faturas.
 
-## About Documenso
+## Stack
 
-Signing documents digitally should be fast and easy and should be the best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document-signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood.
+- [TypeScript](https://www.typescriptlang.org/) — linguagem
+- [React Router](https://reactrouter.com/) — framework
+- [Prisma](https://www.prisma.io/) — ORM
+- [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) — UI
+- [react-email](https://react.email/) — templates de e-mail
+- [tRPC](https://trpc.io/) — API
+- [React-PDF](https://github.com/wojtekmaj/react-pdf) / [PDF-Lib](https://github.com/Hopding/pdf-lib) — PDF
+- [Stripe](https://stripe.com/) — pagamentos
+- Java 17+ — assinador ICP-Brasil (`apps/desktop/java-helper`)
 
-Join us in creating the next generation of open trust infrastructure.
+## Desenvolvimento local
 
-## Recognition
+### Requisitos
 
-<p align="center">
-  <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily" alt="Documenso - The&#0032;open&#0032;source&#0032;DocuSign&#0032;alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-  <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Documenso - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-</p>
+- Node.js 22+
+- PostgreSQL
+- Docker (opcional, para o quickstart)
+- JDK 17+ (apenas se for mexer no assinador ICP)
 
-## Community and Next Steps 🎯
-
-- Check out the first source code release in this repository and test it.
-- Tell us what you think in the [Discussions](https://github.com/documenso/documenso/discussions).
-- Join the [Discord server](https://documen.so/discord) for any questions and getting to know to other community members.
-- ⭐ the repository to help us raise awareness.
-- Spread the word on Twitter that Documenso is working towards a more open signing tool.
-- Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release.
-
-## Contributing
-
-- To contribute, please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
-
-## Contact us
-
-Contact us if you are interested in our Enterprise plan for large organizations that need extra flexibility and control.
-
-<a href="https://cal.com/timurercan/enterprise-customers?utm_source=banner&utm_campaign=oss"><img alt="Book us with Cal.com" src="https://cal.com/book-with-cal-dark.svg" /></a>
-
-## Tech Stack
-
-<p align="left">
-  <a href="https://www.typescriptlang.org"><img src="https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square" alt="TypeScript"></a>
-  <a href="https://prisma.io"><img width="122" height="20" src="http://made-with.prisma.io/indigo.svg" alt="Made with Prisma" /></a>
-  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/tailwindcss-0F172A?&logo=tailwindcss" alt="Tailwind CSS"></a>
-  <a href=""><img src="" alt=""></a>
-  <a href=""><img src="" alt=""></a>
-  <a href=""><img src="" alt=""></a>
-  <a href=""><img src="" alt=""></a>
-  <a href=""><img src="" alt=""></a>
-</p>
-
-- [Typescript](https://www.typescriptlang.org/) - Language
-- [ReactRouter](https://reactrouter.com/) - Framework
-- [Prisma](https://www.prisma.io/) - ORM
-- [Tailwind](https://tailwindcss.com/) - CSS
-- [shadcn/ui](https://ui.shadcn.com/) - Component Library
-- [react-email](https://react.email/) - Email Templates
-- [tRPC](https://trpc.io/) - API
-- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - PDF Signatures (launching soon)
-- [React-PDF](https://github.com/wojtekmaj/react-pdf) - Viewing PDFs
-- [PDF-Lib](https://github.com/Hopding/pdf-lib) - PDF manipulation
-- [Stripe](https://stripe.com/) - Payments
-
-<!-- - Support for [opensignpdf (requires Java on server)](https://github.com/open-pdf-sign) is currently planned. -->
-
-## Local Development
-
-### Requirements
-
-To run Documenso locally, you will need
-
-- Node.js (v22 or above)
-- Postgres SQL Database
-- Docker (optional)
-
-### Developer Quickstart
-
-> **Note**: This is a quickstart for developers. It assumes that you have both [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/) installed on your machine.
-
-Want to get up and running quickly? Follow these steps:
-
-1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
-
-After forking the repository, clone it to your local device by using the following command:
+### Quickstart
 
 ```sh
-git clone https://github.com/<your-username>/documenso
+git clone https://github.com/capivapp/capiva-sign
+cd capiva-sign
+cp .env.example .env
+npm run dx     # sobe Postgres + Inbucket + MinIO e roda as migrations
+npm run dev
 ```
 
-2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively, just run `cp .env.example .env` to get started with our handpicked defaults.
+Ou, em um comando só: `npm run d`.
 
-3. Run `npm run dx` in the root directory
+#### Endereços
 
-   - This will spin up a postgres database and inbucket mailserver in a docker container.
+| Serviço              | URL                    |
+| -------------------- | ---------------------- |
+| Aplicação            | http://localhost:3000  |
+| E-mails (Inbucket)   | http://localhost:9000  |
+| Storage S3 (MinIO)   | http://localhost:9001  |
+| Banco de dados       | porta `54320`          |
 
-4. Run `npm run dev` in the root directory
+## Configuração
 
-5. Want it even faster? Just use
+Todas as variáveis estão documentadas em [`.env.example`](./.env.example). Os
+blocos que mais importam:
+
+### Cobrança recorrente (Stripe)
+
+1. `NEXT_PUBLIC_FEATURE_BILLING_ENABLED=true`
+2. `NEXT_PRIVATE_STRIPE_API_KEY` — chave secreta (`sk_live_...` em produção).
+3. Para cada plano, crie um **Product** com um **Price recorrente** no Stripe e
+   marque os metadados:
+   - Product: `claimId` = `free` | `individual` | `team` | `platform` | `enterprise` | `earlyAdopter`
+   - Product: `isSeatBased` = `true` (somente planos por assento)
+   - Price: `visibleInApp` = `true` (para aparecer na página de planos)
+
+   Um price sem `claimId` é ignorado — é a causa mais comum de um plano não
+   aparecer no app.
+4. Crie um webhook apontando para `https://<seu-host>/api/stripe/webhook`
+   inscrito em `customer.subscription.created/updated/deleted`,
+   `checkout.session.completed`, `invoice.payment_succeeded` e
+   `invoice.payment_failed`, e coloque o signing secret em
+   `NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET`.
+
+Localmente: `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
+
+O servidor **recusa subir** se a cobrança estiver habilitada sem a chave da
+Stripe — a falha aparece no deploy, não na frente do primeiro cliente.
+
+### Licenciamento
+
+`NEXT_PRIVATE_LICENSE_MODE` decide como as permissões de recursos são resolvidas:
+
+| Modo     | Comportamento                                                              |
+| -------- | -------------------------------------------------------------------------- |
+| `self`   | Padrão. A própria instância concede seus recursos — sem chamada externa.     |
+| `server` | Valida a chave contra `NEXT_PRIVATE_LICENSE_SERVER_URL`.                    |
+| `none`   | Licenciamento desligado; todo recurso restrito permanece fechado.            |
+
+### Identidade visual
+
+`NEXT_PUBLIC_BRAND_NAME`, `NEXT_PUBLIC_BRAND_URL` e
+`NEXT_PUBLIC_BRAND_SOCIAL_HANDLE` permitem que uma instância self-hosted
+apresente a própria marca sem rebuild.
+
+## Assinador ICP-Brasil
+
+O assinador local vive em [`apps/desktop/java-helper`](./apps/desktop/java-helper)
+e é o que dá acesso ao certificado A1/A3 do signatário.
 
 ```sh
-npm run d
+cd apps/desktop/java-helper
+./build.sh                                    # gera build/icp-helper.jar
+java -jar build/icp-helper.jar serve --no-gui # agente na bandeja, porta 3231
 ```
 
-#### Access Points for Your Application
+No Windows, `windows/build-installer.bat` gera um instalador único que embute
+uma JRE, registra o deep link `capivasign-icp://` e inicia o agente na bandeja
+do sistema a cada logon — **sem janela de console**. Detalhes em
+[`apps/desktop/java-helper/README.md`](./apps/desktop/java-helper/README.md).
 
-1. **App** - http://localhost:3000
-2. **Incoming Mail Access** - http://localhost:9000
-3. **Database Connection Details**
+Diagnóstico: o agente grava log em `%LOCALAPPDATA%\CapivaSign\agent.log`
+(`~/.local/state/capivasign/agent.log` no Linux), acessível pelo menu da bandeja.
 
-   - **Port**: 54320
-   - **Connection**: Use your favorite database client to connect using the provided port.
+## Docker e self-hosting
 
-4. **S3 Storage Dashboard** - http://localhost:9001
+Imagens são publicadas em `ghcr.io/capivapp/capiva-sign`. Os composes de
+desenvolvimento, teste e produção estão em [`docker/`](./docker).
 
-## Developer Setup
-
-### Manual Setup
-
-Follow the [manual setup guide](https://docs.documenso.com/docs/developers/local-development/manual) to configure Documenso on your local machine.
-
-### Run in Gitpod
-
-- Click below to launch a ready-to-use Gitpod workspace in your browser.
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/documenso/documenso)
-
-### Run in DevContainer
-
-We support DevContainers for VSCode. [Click here to get started.](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso)
-
-### Video walkthrough
-
-If you're a visual learner and prefer to watch a video walkthrough of setting up Documenso locally, check out this video:
-
-[![Watch the video](https://img.youtube.com/vi/Y0ppIQrEnZs/hqdefault.jpg)](https://youtu.be/Y0ppIQrEnZs)
-
-## Docker
-
-We provide official Docker images on [DockerHub](https://hub.docker.com/r/documenso/documenso) and [GitHub Container Registry](https://ghcr.io/documenso/documenso).
-
-For setup instructions, see the [Docker Deployment](https://docs.documenso.com/docs/self-hosting/deployment/docker) and [Docker Compose](https://docs.documenso.com/docs/self-hosting/deployment/docker-compose) guides.
-
-## Self Hosting
-
-We support a variety of deployment methods including Docker, Docker Compose, Railway, Kubernetes, and manual deployment.
-
-For full instructions, requirements, and configuration details, see the [Self Hosting documentation](https://docs.documenso.com/docs/self-hosting).
-
-### One-Click Deploys
-
-#### Railway
-
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/DjrRRX?referralCode=EZR3s0&utm_medium=integration&utm_source=template&utm_campaign=generic)
-
-#### Render
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
-
-#### Koyeb
-
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
-
-#### Elestio
-
-[![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/documenso)
-
-## Troubleshooting
-
-For troubleshooting self-hosted deployments, see the [Troubleshooting guide](https://docs.documenso.com/docs/self-hosting/maintenance/troubleshooting) and [Tips & Common Pitfalls](https://docs.documenso.com/docs/self-hosting/getting-started/tips).
-
-### I'm not receiving any emails when using the developer quickstart.
-
-When using the developer quickstart, an [Inbucket](https://inbucket.org/) server will be spun up in a docker container that will store all outgoing emails locally for you to view.
-
-The Web UI can be found at http://localhost:9000, while the SMTP port will be on localhost:2500.
-
-### I can't see environment variables in my package scripts.
-
-Wrap your package script with the `with:env` script like such:
-
-```
-npm run with:env -- npm run myscript
+```sh
+docker compose -f docker/production/compose.yml up -d
 ```
 
-The same can be done when using `npx` for one of the bin scripts:
+## Testes
 
+```sh
+npm run lint                      # Biome
+npm run --workspace @documenso/lib test   # unitários
+npx turbo run test:e2e            # Playwright (requer app rodando)
 ```
-npm run with:env -- npx myscript
+
+## Solução de problemas
+
+**Não recebo e-mails no ambiente local.** O quickstart sobe um
+[Inbucket](https://inbucket.org/) que captura tudo: UI em http://localhost:9000,
+SMTP em `localhost:2500`.
+
+**Variáveis de ambiente não aparecem nos scripts.** Envolva o comando com
+`with:env`:
+
+```sh
+npm run with:env -- npm run meu-script
 ```
 
-This will load environment variables from your `.env` and `.env.local` files.
+## Contribuindo
 
-## Repo Activity
+Veja o [guia de contribuição](./CONTRIBUTING.md) e o
+[código de conduta](./CODE_OF_CONDUCT.md).
 
-![Repository Activity](https://repobeats.axiom.co/api/embed/622a2e9aa709696f7226304b5b7178a5741b3868.svg)
+## Segurança
+
+Para reportar uma vulnerabilidade, escreva para **security@capivapp.com.br**.
+Veja [`.well-known/security.txt`](./.well-known/security.txt).

@@ -94,7 +94,7 @@ describe('isPrivateUrl', () => {
   describe('public URLs', () => {
     it('should allow public hostnames', () => {
       expect(isPrivateUrl('https://example.com')).toBe(false);
-      expect(isPrivateUrl('https://api.documenso.com/webhook')).toBe(false);
+      expect(isPrivateUrl('https://api.capivapp.com.br/webhook')).toBe(false);
     });
 
     it('should allow public IP addresses', () => {

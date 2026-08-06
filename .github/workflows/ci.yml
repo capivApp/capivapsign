@@ -47,4 +47,4 @@ jobs:
           push: false
           context: .
           file: ./docker/Dockerfile
-          tags: documenso-${{ github.sha }}
+          tags: capivasign-${{ github.sha }}
