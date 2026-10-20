@@ -10,6 +10,7 @@ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-re
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
@@ -19,7 +20,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { CheckCircle2, Clock8, DownloadIcon, Loader2 } from 'lucide-react';
+import { CheckCircle2, Clock8, DownloadIcon, EyeIcon, Loader2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -139,6 +140,10 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
   // Use signing status from query if available, otherwise fall back to document status
   const signingStatus = signingStatusData?.status ?? 'PENDING';
 
+  // The document often completes after this page loaded (sealing runs in the
+  // background), so the polled status also unlocks the download.
+  const isCompleted = signingStatus === 'COMPLETED' || (document ? isDocumentCompleted(document) : false);
+
   if (!isDocumentAccessValid) {
     return (
       <>
@@ -255,10 +260,27 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                 className="w-full max-w-none md:flex-1"
               />
 
-              {isDocumentCompleted(document) && (
+              {document.envelopeItems.map((item) => (
+                <Button key={item.id} type="button" variant="outline" className="flex-1 md:flex-initial" asChild>
+                  <a
+                    href={getEnvelopeItemPdfUrl({
+                      type: 'view',
+                      envelopeItem: { id: item.id, envelopeId: document.envelopeId },
+                      token: recipient.token,
+                    })}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <EyeIcon className="mr-2 h-5 w-5" />
+                    {document.envelopeItems.length > 1 ? item.title : <Trans>View document</Trans>}
+                  </a>
+                </Button>
+              ))}
+
+              {isCompleted && (
                 <EnvelopeDownloadDialog
                   envelopeId={document.envelopeId}
-                  envelopeStatus={document.status}
+                  envelopeStatus={DocumentStatus.COMPLETED}
                   envelopeItems={document.envelopeItems}
                   token={recipient?.token}
                   trigger={
