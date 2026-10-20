@@ -7,6 +7,7 @@ import type { Canvas } from 'skia-canvas';
 import { Image as SkiaImage } from 'skia-canvas';
 
 import { ensureFontLibrary } from './helpers';
+import { type IcpStampLine, LINE_HEIGHT, layoutIcpStampLines } from './layout-icp-stamp-lines';
 
 /**
  * Renders the ICP-Brasil signature stamp ("Assinado eletronicamente por …") for
@@ -40,6 +41,14 @@ const GRAY = '#6b7280';
 const DARK = '#111827';
 const BORDER = '#cbd5e1';
 const PRIMARY = '#3b3bd6';
+
+const measureStampLine = (line: IcpStampLine, fontSize: number) =>
+  new Konva.Text({
+    text: line.text,
+    fontFamily: 'Inter',
+    fontStyle: line.fontStyle ?? 'normal',
+    fontSize,
+  }).getTextWidth();
 
 const loadLogoImage = async (logoBytes?: Uint8Array): Promise<SkiaImage> => {
   const raw = logoBytes
@@ -102,53 +111,32 @@ export const buildIcpStampOverlay = async (options: BuildIcpStampOverlayOptions)
       }),
     );
 
-    group.add(
-      new Konva.Text({
-        x: textX,
-        y: pad,
-        width: textW,
-        text: 'Assinado eletronicamente por',
-        fontFamily: 'Inter',
-        fontSize: Math.max(5, h * 0.15),
-        fill: GRAY,
-      }),
-    );
-    group.add(
-      new Konva.Text({
-        x: textX,
-        y: pad + h * 0.2,
-        width: textW,
-        text: signerName,
-        fontFamily: 'Inter',
-        fontStyle: 'bold',
-        fontSize: Math.max(6, h * 0.2),
-        fill: DARK,
-        ellipsis: true,
-        wrap: 'none',
-      }),
-    );
-    group.add(
-      new Konva.Text({
-        x: textX,
-        y: pad + h * 0.47,
-        width: textW,
-        text: roleLabel,
-        fontFamily: 'Inter',
-        fontSize: Math.max(5, h * 0.14),
-        fill: PRIMARY,
-      }),
-    );
-    group.add(
-      new Konva.Text({
-        x: textX,
-        y: pad + h * 0.66,
-        width: textW,
-        text: dateText,
-        fontFamily: 'Inter',
-        fontSize: Math.max(5, h * 0.14),
-        fill: GRAY,
-      }),
-    );
+    const lines: (IcpStampLine & { fill: string })[] = [
+      { text: 'Assinado eletronicamente por', sizeRatio: 0.15, fill: GRAY },
+      { text: signerName, sizeRatio: 0.2, fontStyle: 'bold', fill: DARK },
+      { text: roleLabel, sizeRatio: 0.14, fill: PRIMARY },
+      { text: dateText, sizeRatio: 0.14, fill: GRAY },
+    ];
+
+    const placed = layoutIcpStampLines({ lines, textWidth: textW, height: h, pad, measureWidth: measureStampLine });
+
+    lines.forEach((line, index) => {
+      group.add(
+        new Konva.Text({
+          x: textX,
+          y: placed[index].y,
+          width: textW,
+          text: line.text,
+          fontFamily: 'Inter',
+          fontStyle: line.fontStyle ?? 'normal',
+          fontSize: placed[index].fontSize,
+          lineHeight: LINE_HEIGHT,
+          fill: line.fill,
+          wrap: 'none',
+          ellipsis: true,
+        }),
+      );
+    });
 
     layer.add(group);
   }

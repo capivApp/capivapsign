@@ -7,7 +7,9 @@ import type { Canvas } from 'skia-canvas';
 import { Image as SkiaImage } from 'skia-canvas';
 import { renderSVG } from 'uqr';
 
+import { formatCpfCnpj } from '../../utils/cpf-cnpj';
 import { svgToPng } from '../../utils/images/svg-to-png';
+import { buildIcpInfoBlock } from './build-icp-info-block';
 import { ensureFontLibrary } from './helpers';
 
 /**
@@ -224,72 +226,24 @@ export const buildIcpAuditPagePdf = async (options: BuildIcpAuditPageOptions): P
   );
   y += 58;
 
-  layer.add(
-    new Konva.Text({
-      x: rightX,
-      y,
-      width: rightW,
-      text: 'Assinaturas eletrônicas realizadas em conformidade com a Lei nº 14.063/2020 e Regulamento (UE) nº 910/2014 (eIDAS).',
-      fontFamily: FONT,
-      fontSize: 8.5,
-      fill: MUTED,
-      lineHeight: 1.4,
-    }),
-  );
-  y += 34;
+  const complianceNote = new Konva.Text({
+    x: rightX,
+    y,
+    width: rightW,
+    text: 'Assinaturas eletrônicas realizadas em conformidade com a Lei nº 14.063/2020 e Regulamento (UE) nº 910/2014 (eIDAS).',
+    fontFamily: FONT,
+    fontSize: 8.5,
+    fill: MUTED,
+    lineHeight: 1.4,
+  });
+  layer.add(complianceNote);
+  y += complianceNote.height() + 10;
 
   const infoBlock = (title: string, body: string, accent: string, badge: string) => {
-    const blockH = 78;
-    layer.add(
-      new Konva.Rect({
-        x: rightX,
-        y,
-        width: rightW,
-        height: blockH,
-        fill: PANEL,
-        stroke: BORDER,
-        strokeWidth: 1,
-        cornerRadius: 6,
-      }),
-    );
-    layer.add(new Konva.Rect({ x: rightX, y, width: 4, height: blockH, fill: accent, cornerRadius: 6 }));
-    layer.add(
-      new Konva.Text({
-        x: rightX + 16,
-        y: y + 10,
-        width: rightW - 28,
-        text: badge,
-        fontFamily: FONT,
-        fontStyle: 'bold',
-        fontSize: 8,
-        fill: accent,
-      }),
-    );
-    layer.add(
-      new Konva.Text({
-        x: rightX + 16,
-        y: y + 22,
-        width: rightW - 28,
-        text: title,
-        fontFamily: FONT,
-        fontStyle: 'bold',
-        fontSize: 10.5,
-        fill: INK,
-      }),
-    );
-    layer.add(
-      new Konva.Text({
-        x: rightX + 16,
-        y: y + 38,
-        width: rightW - 28,
-        text: body,
-        fontFamily: FONT,
-        fontSize: 8,
-        fill: MUTED,
-        lineHeight: 1.4,
-      }),
-    );
-    y += blockH + 12;
+    const block = buildIcpInfoBlock({ x: rightX, y, width: rightW, badge, title, body, accent });
+
+    layer.add(block.group);
+    y += block.height + 12;
   };
 
   infoBlock(
@@ -395,7 +349,7 @@ export const buildIcpAuditPagePdf = async (options: BuildIcpAuditPageOptions): P
     // Event log only on signed (single-signer) cards — multi-signer cards stay
     // identity-only so the page never changes between signatures.
     if (isSigned) {
-      line('CPF/CNPJ', signer.cpfCnpj ?? '—', 0, 1);
+      line('CPF/CNPJ', signer.cpfCnpj ? formatCpfCnpj(signer.cpfCnpj) : '—', 0, 1);
       line('Assinado em', signer.signedAt ?? '—', 1, 1);
       line('IP', signer.ipAddress ?? '—', 0, 2);
       line('Dispositivo', signer.device ?? '—', 1, 2);
