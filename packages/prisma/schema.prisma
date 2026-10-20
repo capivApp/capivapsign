@@ -760,7 +760,7 @@ model DocumentMeta {
   /// page; pages without an entry fall back to `pageStampPosition`.
   pageStampOverrides Json? /// [PageStampOverrides] @zod.custom.use(ZPageStampOverridesSchema)
 
-  language           String                     @default("en")
+  language           String                     @default("pt-BR")
   distributionMethod DocumentDistributionMethod @default(EMAIL)
 
   emailSettings Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)

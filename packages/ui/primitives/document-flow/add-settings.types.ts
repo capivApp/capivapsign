@@ -1,6 +1,6 @@
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
-import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
+import { APP_I18N_OPTIONS, SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentMetaDateFormatSchema, ZDocumentMetaTimezoneSchema } from '@documenso/lib/types/document-meta';
@@ -31,7 +31,7 @@ export const ZAddSettingsFormSchema = z.object({
     language: z
       .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
       .optional()
-      .default('en'),
+      .default(APP_I18N_OPTIONS.defaultLang),
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
       message: msg`At least one signature type must be enabled`.id,
     }),

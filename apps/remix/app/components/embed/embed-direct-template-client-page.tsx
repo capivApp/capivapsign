@@ -1,6 +1,5 @@
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { AppError } from '@documenso/lib/errors/app-error';
@@ -299,7 +298,7 @@ export const EmbedDirectTemplateClientPage = ({
         });
       }
 
-      if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
+      if (data.language) {
         void dynamicActivate(data.language).finally(() => {
           setHasFinishedInit(true);
         });

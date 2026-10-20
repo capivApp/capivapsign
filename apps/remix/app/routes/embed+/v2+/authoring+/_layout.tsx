@@ -1,7 +1,6 @@
 import { PAID_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
 import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
-import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
@@ -89,7 +88,7 @@ export default function AuthoringLayout() {
         });
       }
 
-      if (language && language !== APP_I18N_OPTIONS.sourceLang) {
+      if (language) {
         void dynamicActivate(language).finally(() => {
           setHasFinishedInit(true);
         });

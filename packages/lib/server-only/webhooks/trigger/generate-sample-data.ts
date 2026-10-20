@@ -46,7 +46,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
       typedSignatureEnabled: true,
       uploadSignatureEnabled: true,
       drawSignatureEnabled: true,
-      language: 'en',
+      language: 'pt-BR',
       distributionMethod: DocumentDistributionMethod.EMAIL,
       emailSettings: null,
     },

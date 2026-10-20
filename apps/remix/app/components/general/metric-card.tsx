@@ -30,7 +30,7 @@ export const CardMetric = ({ icon: Icon, title, value, className, children }: Ca
 
         {children || (
           <p className="mt-auto font-semibold text-4xl text-foreground leading-8">
-            {typeof value === 'number' ? value.toLocaleString('en-US') : value}
+            {typeof value === 'number' ? value.toLocaleString('pt-BR') : value}
           </p>
         )}
       </div>

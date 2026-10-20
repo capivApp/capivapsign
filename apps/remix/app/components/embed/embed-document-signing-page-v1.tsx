@@ -1,5 +1,4 @@
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
-import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
@@ -222,7 +221,7 @@ export const EmbedSignDocumentV1ClientPage = ({
         });
       }
 
-      if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
+      if (data.language) {
         void dynamicActivate(data.language).finally(() => {
           setHasFinishedInit(true);
         });

@@ -2,7 +2,7 @@ import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_DISTRIBUTION_METHODS, DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
-import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
+import { APP_I18N_OPTIONS, SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import type { TDocumentMetaDateFormat } from '@documenso/lib/types/document-meta';
@@ -108,7 +108,7 @@ export const AddTemplateSettingsFormPartial = ({
         dateFormat: (template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT) as TDocumentMetaDateFormat,
         distributionMethod: template.templateMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
         redirectUrl: template.templateMeta?.redirectUrl ?? '',
-        language: template.templateMeta?.language ?? 'en',
+        language: template.templateMeta?.language ?? APP_I18N_OPTIONS.defaultLang,
         emailId: template.templateMeta?.emailId ?? null,
         emailReplyTo: template.templateMeta?.emailReplyTo ?? undefined,
         emailSettings: ZDocumentEmailSettingsSchema.parse(template?.templateMeta?.emailSettings),

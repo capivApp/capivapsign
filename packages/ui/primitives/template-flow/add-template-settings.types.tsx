@@ -1,6 +1,6 @@
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
-import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
+import { APP_I18N_OPTIONS, SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
@@ -37,7 +37,7 @@ export const ZAddTemplateSettingsFormSchema = z.object({
     language: z
       .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
       .optional()
-      .default('en'),
+      .default(APP_I18N_OPTIONS.defaultLang),
     emailId: z.string().nullable(),
     emailReplyTo: z.preprocess((val) => (val === '' ? undefined : val), zEmail().optional()),
     emailSettings: ZDocumentEmailSettingsSchema,

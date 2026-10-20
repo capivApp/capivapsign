@@ -2,7 +2,7 @@ import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
-import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
+import { APP_I18N_OPTIONS, SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import type { TDocument } from '@documenso/lib/types/document';
 import type { TRecipientLite } from '@documenso/lib/types/recipient';
@@ -97,7 +97,7 @@ export const AddSettingsFormPartial = ({
           DATE_FORMATS.find((format) => format.value === document.documentMeta?.dateFormat)?.value ??
           DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
-        language: document.documentMeta?.language ?? 'en',
+        language: document.documentMeta?.language ?? APP_I18N_OPTIONS.defaultLang,
         signatureTypes: extractTeamSignatureSettings(document.documentMeta),
       },
     },

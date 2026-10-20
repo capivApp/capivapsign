@@ -18,7 +18,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
         <p>{label}</p>
         <p className="text-brand">
           {payload[0].name === 'cume_count' ? 'Cumulative MAU' : 'Monthly Active Users'}:{' '}
-          <span className="text-black">{Number(payload[0].value).toLocaleString('en-US')}</span>
+          <span className="text-black">{Number(payload[0].value).toLocaleString('pt-BR')}</span>
         </p>
       </div>
     );

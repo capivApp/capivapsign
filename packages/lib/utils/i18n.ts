@@ -2,8 +2,8 @@ import type { I18n, MessageDescriptor } from '@lingui/core';
 import { i18n } from '@lingui/core';
 import type { MacroMessageDescriptor } from '@lingui/core/macro';
 
-import type { I18nLocaleData, SupportedLanguageCodes } from '../constants/i18n';
-import { APP_I18N_OPTIONS } from '../constants/i18n';
+import type { SupportedLanguageCodes } from '../constants/locales';
+import { APP_I18N_OPTIONS, isValidLanguageCode } from '../constants/locales';
 import { env } from './env';
 
 export async function getTranslations(locale: string) {
@@ -53,37 +53,13 @@ export const extractLocaleDataFromHeaders = (
   };
 };
 
-type ExtractLocaleDataOptions = {
-  headers: Headers;
-};
-
 /**
- * Extract the supported language from the header.
- *
- * Will return the default fallback language if not found.
+ * The language a page is rendered in: the one the visitor picked in the
+ * language switcher (cookie), otherwise the app default. The browser's
+ * `accept-language` is ignored on purpose so everyone starts in pt-BR.
  */
-export const extractLocaleData = ({ headers }: ExtractLocaleDataOptions): I18nLocaleData => {
-  const headerLocales = (headers.get('accept-language') ?? '').split(',');
-
-  const unknownLanguages = headerLocales
-    .map((locale) => parseLanguageFromLocale(locale))
-    .filter((value): value is SupportedLanguageCodes => value !== null);
-
-  // Filter out locales that are not valid.
-  const languages = (unknownLanguages ?? []).filter((language) => {
-    try {
-      new Intl.Locale(language);
-      return true;
-    } catch {
-      return false;
-    }
-  });
-
-  return {
-    lang: languages[0] || APP_I18N_OPTIONS.sourceLang,
-    locales: headerLocales,
-  };
-};
+export const getRequestLanguage = (cookieLanguage: unknown): SupportedLanguageCodes =>
+  isValidLanguageCode(cookieLanguage) ? cookieLanguage : APP_I18N_OPTIONS.defaultLang;
 
 export const parseMessageDescriptor = (_: I18n['_'], value: string | MessageDescriptor) => {
   return typeof value === 'string' ? value : _(value);

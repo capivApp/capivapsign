@@ -112,7 +112,7 @@ export const run = async ({
   }
 
   // Todo: Logging
-  const i18n = await getI18nInstance('en');
+  const i18n = await getI18nInstance();
 
   const supportSubject =
     payload.kind === 'quotaNearing'

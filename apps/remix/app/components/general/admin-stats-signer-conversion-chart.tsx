@@ -39,7 +39,7 @@ export const AdminStatsSignerConversionChart = ({
               labelStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value, name) => [Number(value).toLocaleString('en-US'), name === 'Recipients']}
+              formatter={(value, name) => [Number(value).toLocaleString('pt-BR'), name === 'Recipients']}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
 

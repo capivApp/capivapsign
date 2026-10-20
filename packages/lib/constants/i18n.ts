@@ -1,7 +1,7 @@
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 
-import { SUPPORTED_LANGUAGE_CODES, type SupportedLanguageCodes } from './locales';
+import type { SupportedLanguageCodes } from './locales';
 
 export * from './locales';
 
@@ -68,6 +68,3 @@ export const SUPPORTED_LANGUAGES: Record<string, SupportedLanguage> = {
     full: msg`Chinese`,
   },
 } satisfies Record<SupportedLanguageCodes, SupportedLanguage>;
-
-export const isValidLanguageCode = (code: unknown): code is SupportedLanguageCodes =>
-  SUPPORTED_LANGUAGE_CODES.includes(code as SupportedLanguageCodes);

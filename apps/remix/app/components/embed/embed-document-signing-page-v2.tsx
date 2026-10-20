@@ -1,4 +1,3 @@
-import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
@@ -161,7 +160,7 @@ export const EmbedSignDocumentV2ClientPage = ({
         });
       }
 
-      if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
+      if (data.language) {
         void dynamicActivate(data.language).finally(() => {
           setHasFinishedInit(true);
         });
