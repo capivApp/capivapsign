@@ -10,7 +10,9 @@
     "universal/"
   ],
   "scripts": {
-    "clean": "rimraf node_modules"
+    "clean": "rimraf node_modules",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.998.0",
@@ -22,5 +24,8 @@
     "react": "^18",
     "ts-pattern": "^5.9.0",
     "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.18"
   }
 }

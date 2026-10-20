@@ -1,11 +1,10 @@
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
-import { isOrganisationPendingPayment } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
 import { DocumentSource, EnvelopeType, SubscriptionStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 
-import { FREE_PLAN_LIMITS, INACTIVE_PLAN_LIMITS, PAID_PLAN_LIMITS, SELFHOSTED_PLAN_LIMITS } from './constants';
+import { FREE_PLAN_LIMITS, PAID_PLAN_LIMITS, SELFHOSTED_PLAN_LIMITS } from './constants';
 import { ERROR_CODES } from './errors';
 import type { TLimitsResponseSchema } from './schema';
 
@@ -52,8 +51,10 @@ export const getServerLimits = async ({ userId, teamId }: GetServerLimitsOptions
     };
   }
 
-  // Bypass all limits even if plan expired for ENTERPRISE.
-  if (organisation.organisationClaimId === INTERNAL_CLAIM_ID.ENTERPRISE) {
+  const { originalSubscriptionClaimId, flags } = organisation.organisationClaim;
+
+  // Enterprise is never limited, not even with an overdue bill.
+  if (originalSubscriptionClaimId === INTERNAL_CLAIM_ID.ENTERPRISE) {
     return {
       quota: PAID_PLAN_LIMITS,
       remaining: PAID_PLAN_LIMITS,
@@ -61,27 +62,12 @@ export const getServerLimits = async ({ userId, teamId }: GetServerLimitsOptions
     };
   }
 
-  // Early return for users with an expired subscription.
-  if (subscription && subscription.status === SubscriptionStatus.INACTIVE) {
-    return {
-      quota: INACTIVE_PLAN_LIMITS,
-      remaining: INACTIVE_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
-    };
-  }
+  // An overdue bill marks the subscription INACTIVE: the organisation keeps
+  // working within the free plan's limits until it pays.
+  const isOverdue = subscription?.status === SubscriptionStatus.INACTIVE;
 
-  // Early return for organisations created ahead of a paid checkout that are still awaiting payment.
-  if (isOrganisationPendingPayment(organisation)) {
-    return {
-      quota: INACTIVE_PLAN_LIMITS,
-      remaining: INACTIVE_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
-    };
-  }
-
-  // Allow unlimited documents for users with an unlimited documents claim.
-  // This also allows "free" claim users without subscriptions if they have this flag.
-  if (organisation.organisationClaim.flags.unlimitedDocuments) {
+  // Unlimited documents claim, which also applies to "free" claims that carry it.
+  if (flags.unlimitedDocuments && !isOverdue) {
     return {
       quota: PAID_PLAN_LIMITS,
       remaining: PAID_PLAN_LIMITS,
