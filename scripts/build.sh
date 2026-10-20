@@ -33,4 +33,9 @@ npm run prisma:generate
 echo "[build] Compilando o app e os pacotes de que ele depende"
 npx turbo run build --filter=@documenso/remix...
 
+# The app build extracts the translation catalogs, rewriting the tracked .po
+# files; restore them so the next `git pull` is not blocked. The compiled
+# catalogs the server uses are untracked and stay.
+git checkout -- packages/lib/translations
+
 echo "[build] Concluído em $(($(date +%s) - start_time))s"
