@@ -1,6 +1,6 @@
 import { PassThrough } from 'node:stream';
-import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
-import { dynamicActivate, extractLocaleData } from '@documenso/lib/utils/i18n';
+import { createDocumentCloseTagDeferrer } from '@documenso/lib/server-only/html/defer-document-close-tag';
+import { dynamicActivate, getRequestLanguage } from '@documenso/lib/utils/i18n';
 import { i18n } from '@lingui/core';
 import { I18nProvider } from '@lingui/react';
 import { createReadableStreamFromReadable } from '@react-router/node';
@@ -21,11 +21,7 @@ export default async function handleRequest(
   routerContext: EntryContext,
   loadContext: AppLoadContext,
 ) {
-  let language = await langCookie.parse(request.headers.get('cookie') ?? '');
-
-  if (!APP_I18N_OPTIONS.supportedLangs.includes(language)) {
-    language = extractLocaleData({ headers: request.headers }).lang;
-  }
+  const language = getRequestLanguage(await langCookie.parse(request.headers.get('cookie') ?? ''));
 
   await dynamicActivate(language);
 
@@ -53,7 +49,7 @@ export default async function handleRequest(
         [readyOption]() {
           shellRendered = true;
           const body = new PassThrough();
-          const stream = createReadableStreamFromReadable(body);
+          const stream = createReadableStreamFromReadable(body.pipe(createDocumentCloseTagDeferrer()));
 
           responseHeaders.set('Content-Type', 'text/html');
 
