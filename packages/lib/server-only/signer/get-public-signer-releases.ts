@@ -1,6 +1,5 @@
-import type { SignerPlatform } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import type { SignerPlatform } from '@prisma/client';
 
 import { getPresignGetUrl } from '../../universal/upload/server-actions';
 
@@ -41,7 +40,11 @@ export const getPublicSignerReleases = async (): Promise<PublicSignerRelease[]> 
           fileName: release.fileName,
           downloadUrl: url,
         };
-      } catch {
+      } catch (err) {
+        // Without this log a storage misconfiguration only shows up as an empty
+        // download page.
+        console.error(`[signer] Could not sign the download URL of release ${release.id} (${release.key})`, err);
+
         return null;
       }
     }),

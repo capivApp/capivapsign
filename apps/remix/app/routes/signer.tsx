@@ -8,7 +8,7 @@ import { BrandingLogo } from '~/components/general/branding-logo';
 import type { Route } from './+types/signer';
 
 export function meta() {
-  return [{ title: 'CapivaSign — Baixar o assinador ICP-Brasil' }];
+  return [{ title: 'CapivaSign: Baixar o assinador ICP-Brasil' }];
 }
 
 const PLATFORM_LABEL: Record<string, string> = {
@@ -27,26 +27,26 @@ export default function SignerDownloadPage({ loaderData }: Route.ComponentProps)
   const releases = loaderData?.releases ?? [];
 
   return (
-    <div className="bg-background text-foreground min-h-screen">
-      <header className="border-b border-border/60">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-border/60 border-b">
         <div className="mx-auto flex max-w-4xl items-center px-6 py-4">
           <BrandingLogo className="h-8 w-auto" />
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-medium text-emerald-700 text-xs dark:text-emerald-300">
           <ShieldCheckIcon className="h-3.5 w-3.5" />
           <Trans>Assinador ICP-Brasil</Trans>
         </span>
 
-        <h1 className="mt-6 text-3xl font-bold tracking-tight">
+        <h1 className="mt-6 font-bold text-3xl tracking-tight">
           <Trans>Baixe o assinador CapivaSign</Trans>
         </h1>
-        <p className="text-muted-foreground mt-4">
+        <p className="mt-4 text-muted-foreground">
           <Trans>
-            O assinador roda na sua máquina e usa o seu certificado digital ICP-Brasil (A1 ou A3) para
-            assinar com validade jurídica. Sua chave privada nunca sai do seu computador.
+            O assinador roda na sua máquina e usa o seu certificado digital ICP-Brasil (A1 ou A3) para assinar com
+            validade jurídica. Sua chave privada nunca sai do seu computador.
           </Trans>
         </p>
 
@@ -57,10 +57,7 @@ export default function SignerDownloadPage({ loaderData }: Route.ComponentProps)
             </p>
           ) : (
             releases.map((release) => (
-              <div
-                key={release.id}
-                className="flex items-center justify-between rounded-lg border border-border p-4"
-              >
+              <div key={release.id} className="flex items-center justify-between rounded-lg border border-border p-4">
                 <div>
                   <p className="font-medium">{PLATFORM_LABEL[release.platform] ?? release.platform}</p>
                   <p className="text-muted-foreground text-xs">
@@ -82,7 +79,7 @@ export default function SignerDownloadPage({ loaderData }: Route.ComponentProps)
           <p className="font-medium">
             <Trans>Como usar</Trans>
           </p>
-          <ol className="text-muted-foreground mt-2 list-decimal space-y-1 pl-5">
+          <ol className="mt-2 list-decimal space-y-1 pl-5 text-muted-foreground">
             <li>
               <Trans>Baixe e instale o assinador para o seu sistema.</Trans>
             </li>
