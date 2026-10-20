@@ -1,6 +1,8 @@
+import { getI18nInstance } from '@documenso/lib/client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRecipientOrSenderByShareLinkSlug } from '@documenso/lib/server-only/document/get-recipient-or-sender-by-share-link-slug';
 import { svgToPng } from '@documenso/lib/utils/images/svg-to-png';
+import { msg } from '@lingui/core/macro';
 import satori from 'satori';
 import { match, P } from 'ts-pattern';
 
@@ -27,6 +29,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
   }
 
   const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
+  const i18n = await getI18nInstance();
 
   const [interSemiBold, interRegular, caveatRegular] = await Promise.all([
     fetch(new URL(`${baseUrl}/fonts/inter-semibold.ttf`, import.meta.url)).then(async (res) => res.arrayBuffer()),
@@ -147,7 +150,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
             fontWeight: 700,
           }}
         >
-          {isRecipient ? 'Document Signed!' : 'Document Sent!'}
+          {isRecipient ? i18n._(msg`Document Signed`) : i18n._(msg`Document sent`)}
         </h2>
       </div>
     </div>,

@@ -4,7 +4,7 @@ import type { DocumentMeta, Envelope, RecipientRole } from '@prisma/client';
 import Konva from 'konva';
 import 'konva/skia-backend';
 import fs from 'node:fs';
-import path from 'node:path';
+import { createRequire } from 'node:module';
 import type { DateTimeFormatOptions } from 'luxon';
 import { DateTime } from 'luxon';
 import type { Canvas } from 'skia-canvas';
@@ -442,9 +442,10 @@ const renderRow = (options: RenderRowOptions) => {
 const renderBranding = () => {
   const branding = new Konva.Group();
 
-  const brandingHeight = 16;
+  // Same logo and size as the signing certificate (see render-certificate.ts).
+  const brandingHeight = 48;
 
-  const logoPath = path.join(process.cwd(), 'public/static/logo.png');
+  const logoPath = createRequire(import.meta.url).resolve('@documenso/assets/logo.png');
   const logo = fs.readFileSync(logoPath);
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
