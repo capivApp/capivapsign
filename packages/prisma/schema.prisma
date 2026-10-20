@@ -448,9 +448,16 @@ model DefaultMessageTemplate {
   @@unique([channel, event])
 }
 
+enum UsageInvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
 /// One generated monthly bill per organisation. The unique (organisationId,
 /// period) guarantees idempotency: the monthly sweep can run repeatedly without
-/// double-charging. `stripeInvoiceId` is set once the Stripe invoice is created.
+/// double-charging. `asaasPaymentId` is set once the Asaas charge is created.
 model UsageInvoice {
   id String @id
 
@@ -465,10 +472,44 @@ model UsageInvoice {
   totalCents        Int     @default(0)
   stripeInvoiceId   String?
 
+  status         UsageInvoiceStatus @default(PENDING)
+  asaasPaymentId String?            @unique
+  /// Asaas page where the payer picks Pix, boleto or card.
+  invoiceUrl     String?
+  dueDate        DateTime?
+  paidAt         DateTime?
+
+  items UsageInvoiceItem[]
+
   createdAt DateTime @default(now())
 
   @@unique([organisationId, period])
   @@index([organisationId])
+}
+
+/// One line of a monthly bill (the plan fee, or one usage category), so the
+/// charge can be itemised on the statement and in the app.
+model UsageInvoiceItem {
+  id String @id
+
+  usageInvoiceId String
+  usageInvoice   UsageInvoice @relation(fields: [usageInvoiceId], references: [id], onDelete: Cascade)
+
+  position       Int
+  description    String
+  quantity       Int
+  unitPriceCents Int
+  amountCents    Int
+
+  @@index([usageInvoiceId])
+}
+
+/// Asaas webhook events already handled. Asaas delivers at least once, so the
+/// event id is recorded to ignore redeliveries.
+model AsaasWebhookEvent {
+  id        String   @id
+  event     String
+  createdAt DateTime @default(now())
 }
 
 /// System-wide default signing certificate for NON-ICP (PAdES local) signatures,
@@ -1097,6 +1138,12 @@ model Organisation {
 
   customerId   String?       @unique
   subscription Subscription?
+
+  /// Payer data sent to Asaas, which requires CPF/CNPJ to issue a charge.
+  billingName     String?
+  /// CPF or CNPJ without the mask (letters uppercased: CNPJs can be alphanumeric).
+  billingDocument String?
+  billingEmail    String?
 
   organisationClaimId String            @unique
   organisationClaim   OrganisationClaim @relation(fields: [organisationClaimId], references: [id])
