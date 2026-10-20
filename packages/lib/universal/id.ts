@@ -29,6 +29,7 @@ type DatabaseIdPrefix =
   | 'message_template'
   | 'signing_certificate'
   | 'usage_invoice'
+  | 'usage_invoice_item'
   | 'signer_release'
   | 'org_claim'
   | 'org_group'

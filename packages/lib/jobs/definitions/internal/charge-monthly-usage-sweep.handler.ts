@@ -1,20 +1,21 @@
 import { prisma } from '@documenso/prisma';
 
+import { IS_BILLING_ENABLED } from '../../../constants/app';
 import { chargeOrganisationMonthlyUsage } from '../../../server-only/billing/charge-monthly-usage';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TChargeMonthlyUsageSweepJobDefinition } from './charge-monthly-usage-sweep';
 
 /**
- * Bills every organisation for the PREVIOUS calendar month: the fixed monthly
- * plan price plus the metered usage. Idempotent per (org, month) via the
- * UsageInvoice unique constraint, so a re-run never double-charges.
+ * Bills every organisation for the PREVIOUS calendar month: one Asaas charge
+ * with the plan fee plus the metered usage. Idempotent per (org, month) via the
+ * UsageInvoice unique constraint, so a re-run never double-charges. Does
+ * nothing while billing is switched off.
  */
-export const run = async ({
-  io,
-}: {
-  payload: TChargeMonthlyUsageSweepJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ io }: { payload: TChargeMonthlyUsageSweepJobDefinition; io: JobRunIO }) => {
+  if (!IS_BILLING_ENABLED()) {
+    return;
+  }
+
   const now = new Date();
   // Previous month (UTC). January wraps to December of the prior year.
   const prev = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));

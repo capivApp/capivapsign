@@ -43,3 +43,14 @@ export const ZCpfCnpjSchema = z
   .string()
   .refine(isValidCpfCnpj, 'Informe um CPF ou CNPJ válido.')
   .transform(normalizeCpfCnpj);
+
+const MASK_BY_LENGTH: Record<number, [RegExp, string]> = {
+  11: [/^(.{3})(.{3})(.{3})(.{2})$/, '$1.$2.$3-$4'],
+  14: [/^(.{2})(.{3})(.{3})(.{4})(.{2})$/, '$1.$2.$3/$4-$5'],
+};
+
+export const formatCpfCnpj = (value: string) => {
+  const mask = MASK_BY_LENGTH[value.length];
+
+  return mask ? value.replace(...mask) : value;
+};

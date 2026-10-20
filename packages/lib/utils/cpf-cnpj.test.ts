@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isValidCpfCnpj, normalizeCpfCnpj, ZCpfCnpjSchema } from './cpf-cnpj';
+import { formatCpfCnpj, isValidCpfCnpj, normalizeCpfCnpj, ZCpfCnpjSchema } from './cpf-cnpj';
 
 describe('normalizeCpfCnpj', () => {
   it('strips the mask and uppercases letters', () => {
@@ -53,5 +53,17 @@ describe('ZCpfCnpjSchema', () => {
 
     expect(result.success).toBe(false);
     expect(result.error?.issues[0].message).toBe('Informe um CPF ou CNPJ válido.');
+  });
+});
+
+describe('formatCpfCnpj', () => {
+  it('applies the CPF and CNPJ masks', () => {
+    expect(formatCpfCnpj('52998224725')).toBe('529.982.247-25');
+    expect(formatCpfCnpj('11222333000181')).toBe('11.222.333/0001-81');
+    expect(formatCpfCnpj('12ABC34501DE35')).toBe('12.ABC.345/01DE-35');
+  });
+
+  it('leaves values of any other length as they are', () => {
+    expect(formatCpfCnpj('123')).toBe('123');
   });
 });

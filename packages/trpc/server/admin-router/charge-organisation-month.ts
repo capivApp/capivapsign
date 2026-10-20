@@ -7,7 +7,7 @@ export const ZChargeOrganisationMonthRequestSchema = z.object({
   organisationId: z.string(),
   year: z.number().int().min(2020).max(2100),
   month: z.number().int().min(1).max(12),
-  /** Preview only — computes the breakdown without touching Stripe. */
+  /** Preview only: computes the itemised bill without saving it or calling Asaas. */
   dryRun: z.boolean().default(false),
 });
 
@@ -17,13 +17,20 @@ export const ZChargeOrganisationMonthResponseSchema = z.object({
   monthlyPriceCents: z.number(),
   meteredCents: z.number(),
   totalCents: z.number(),
-  byCategory: z.array(z.object({ type: z.string(), amountCents: z.number() })),
+  items: z.array(
+    z.object({
+      description: z.string(),
+      quantity: z.number(),
+      unitPriceCents: z.number(),
+      amountCents: z.number(),
+    }),
+  ),
 });
 
 /**
- * Admin action to bill one organisation for a given month (base plan price +
- * metered usage). Idempotent per (org, month). Useful for testing the Stripe
- * flow or re-issuing a missed month.
+ * Admin action to bill one organisation for a given month (plan fee + metered
+ * usage) as one Asaas charge. Idempotent per (org, month); re-running it retries
+ * a saved bill whose charge failed. Useful for re-issuing a missed month.
  */
 export const chargeOrganisationMonthRoute = adminProcedure
   .input(ZChargeOrganisationMonthRequestSchema)
@@ -49,6 +56,6 @@ export const chargeOrganisationMonthRoute = adminProcedure
       monthlyPriceCents: breakdown.monthlyPriceCents,
       meteredCents: breakdown.meteredCents,
       totalCents: breakdown.totalCents,
-      byCategory: breakdown.byCategory,
+      items: breakdown.items,
     };
   });
