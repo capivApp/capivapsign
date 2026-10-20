@@ -1,0 +1,30 @@
+# systemd unit for CapivaSign. Adjust User and the /opt/capiva-sign paths to
+# where the repository lives on the server, then:
+#
+#   sudo cp scripts/capivasign.service /etc/systemd/system/capivasign.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now capivasign
+#
+# Logs: journalctl -u capivasign -f
+
+[Unit]
+Description=CapivaSign
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=capivasign
+WorkingDirectory=/opt/capiva-sign
+ExecStart=/opt/capiva-sign/scripts/start.sh
+Restart=always
+RestartSec=5
+# node must be on PATH. With nvm, point this at the version's bin directory,
+# e.g. /home/capivasign/.nvm/versions/node/v22.18.0/bin:/usr/bin:/bin
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+# Startup includes `prisma migrate deploy`; give it time on large migrations.
+TimeoutStartSec=300
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

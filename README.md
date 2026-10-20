@@ -152,6 +152,27 @@ desenvolvimento, teste e produção estão em [`docker/`](./docker).
 docker compose -f docker/production/compose.yml up -d
 ```
 
+### Servidor sem Docker (systemd)
+
+Com o repositório clonado no servidor e o `.env` preenchido na raiz:
+
+```sh
+./scripts/build.sh   # npm ci, cliente Prisma e build do app
+./scripts/start.sh   # aplica as migrations e sobe o servidor (porta $PORT, padrão 3000)
+```
+
+Para rodar como serviço, ajuste `User` e os caminhos em
+[`scripts/capivasign.service`](./scripts/capivasign.service) e instale:
+
+```sh
+sudo cp scripts/capivasign.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now capivasign
+journalctl -u capivasign -f
+```
+
+A cada atualização: `git pull && ./scripts/build.sh && sudo systemctl restart capivasign`.
+
 ## Testes
 
 ```sh
