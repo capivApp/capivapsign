@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 export const ZSyncOrganisationSubscriptionRequestSchema = z.object({
   organisationId: z.string(),
-  syncClaims: z.boolean(),
 });
 
 export const ZSyncOrganisationSubscriptionResponseSchema = z.void();

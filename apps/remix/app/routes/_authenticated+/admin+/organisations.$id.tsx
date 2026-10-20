@@ -4,6 +4,7 @@ import { AppError } from '@documenso/lib/errors/app-error';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
+import { formatBrl, formatPeriod, formatQuantity } from '@documenso/lib/universal/billing-format';
 import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
@@ -31,7 +32,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { OrganisationMemberRole } from '@prisma/client';
-import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
+import { InfoIcon, Loader } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
@@ -77,25 +78,6 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       retry: false,
     },
   );
-
-  const { mutateAsync: createStripeCustomer, isPending: isCreatingStripeCustomer } =
-    trpc.admin.stripe.createCustomer.useMutation({
-      onSuccess: async () => {
-        await navigate(0);
-
-        toast({
-          title: t`Success`,
-          description: t`Stripe customer created successfully`,
-        });
-      },
-      onError: () => {
-        toast({
-          title: t`Error`,
-          description: t`We couldn't create a Stripe customer. Please try again.`,
-          variant: 'destructive',
-        });
-      },
-    });
 
   const teamsColumns = useMemo(() => {
     return [
@@ -352,55 +334,22 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
           </AlertDescription>
         </div>
 
-        {!organisation.customerId && (
-          <div>
-            <Button
-              variant="outline"
-              loading={isCreatingStripeCustomer}
-              onClick={async () => createStripeCustomer({ organisationId })}
-            >
-              <Trans>Create Stripe customer</Trans>
-            </Button>
-          </div>
-        )}
+        {organisation.customerId && (
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <span className="text-muted-foreground text-xs">
+              <Trans>Asaas customer: {organisation.customerId}</Trans>
+            </span>
 
-        {organisation.customerId && !organisation.subscription && (
-          <div>
-            <Button variant="outline" asChild>
-              <Link
-                target="_blank"
-                to={`https://dashboard.stripe.com/customers/${organisation.customerId}?create=subscription&subscription_default_customer=${organisation.customerId}`}
-              >
-                <Trans>Create subscription</Trans>
-                <ExternalLinkIcon className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        )}
-
-        {organisation.subscription && (
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <AdminOrganisationSyncSubscriptionDialog
-              organisationId={organisationId}
-              trigger={
-                <Button variant="outline">
-                  <Trans>Sync Stripe subscription</Trans>
-                </Button>
-              }
-            />
-
-            <Button variant="outline" asChild>
-              <Link
-                target="_blank"
-                to={`https://dashboard.stripe.com/subscriptions/${organisation.subscription.planId}`}
-              >
-                <Trans>Manage subscription</Trans>
-                <ExternalLinkIcon className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            <AdminOrganisationSyncSubscriptionDialog organisationId={organisationId} />
           </div>
         )}
       </Alert>
+
+      <AdminGrantPlanSection
+        organisationId={organisationId}
+        currentClaimId={organisation.organisationClaim.originalSubscriptionClaimId}
+        currentDiscountPercent={organisation.subscription?.discountPercent ?? 0}
+      />
 
       <AdminChargeMonthSection organisationId={organisationId} />
 
@@ -697,20 +646,11 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
           render={({ field }) => (
             <FormItem>
               <FormLabel required>
-                <Trans>Stripe Customer ID</Trans>
+                <Trans>Asaas customer ID</Trans>
               </FormLabel>
               <FormControl>
-                <Input {...field} placeholder={t`No Stripe customer attached`} />
+                <Input {...field} placeholder={t`No Asaas customer attached`} />
               </FormControl>
-              {!form.formState.errors.customerId && field.value && (
-                <Link
-                  target="_blank"
-                  to={`https://dashboard.stripe.com/customers/${field.value}`}
-                  className="font-normal text-foreground/50 text-xs"
-                >
-                  {`https://dashboard.stripe.com/customers/${field.value}`}
-                </Link>
-              )}
 
               <FormMessage />
             </FormItem>
@@ -917,24 +857,25 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
   );
 };
 
-const brlFromCents = (cents: number) => (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+type ChargeResult = {
+  period: string;
+  monthlyPriceCents: number;
+  meteredCents: number;
+  discountCents: number;
+  totalCents: number;
+  items: { description: string; quantity: number; unitPriceCents: number; amountCents: number }[];
+};
 
 const AdminChargeMonthSection = ({ organisationId }: { organisationId: string }) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
-  // Default to the previous calendar month.
   const now = new Date();
   const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
   const [year, setYear] = useState(prev.getFullYear());
   const [month, setMonth] = useState(prev.getMonth() + 1);
-  const [result, setResult] = useState<{
-    period: string;
-    totalCents: number;
-    monthlyPriceCents: number;
-    meteredCents: number;
-  } | null>(null);
+  const [result, setResult] = useState<ChargeResult | null>(null);
 
   const { mutateAsync: charge, isPending } = trpc.admin.billing.chargeOrganisationMonth.useMutation();
 
@@ -942,7 +883,7 @@ const AdminChargeMonthSection = ({ organisationId }: { organisationId: string })
     try {
       const res = await charge({ organisationId, year, month, dryRun });
       setResult(res);
-      toast({ title: dryRun ? t`Preview ready` : t`Invoice generated` });
+      toast({ title: dryRun ? t`Preview ready` : t`Bill issued` });
     } catch (err) {
       toast({
         title: dryRun ? t`Preview failed` : t`Charge failed`,
@@ -959,7 +900,9 @@ const AdminChargeMonthSection = ({ organisationId }: { organisationId: string })
           <Trans>Monthly billing</Trans>
         </AlertTitle>
         <AlertDescription>
-          <Trans>Charge the fixed plan price + metered usage for a month via Stripe. Idempotent per month.</Trans>
+          <Trans>
+            Issues the month's bill (plan fee, usage and discount) as one Asaas charge. A month is never charged twice.
+          </Trans>
         </AlertDescription>
       </div>
 
@@ -988,17 +931,127 @@ const AdminChargeMonthSection = ({ organisationId }: { organisationId: string })
           <Trans>Preview</Trans>
         </Button>
         <Button loading={isPending} onClick={async () => run(false)}>
-          <Trans>Charge via Stripe</Trans>
+          <Trans>Charge via Asaas</Trans>
         </Button>
       </div>
 
       {result && (
-        <p className="text-sm">
-          <span className="font-medium">{result.period}:</span> {brlFromCents(result.monthlyPriceCents)}{' '}
-          <Trans>plan</Trans> + {brlFromCents(result.meteredCents)} <Trans>usage</Trans> ={' '}
-          <span className="font-semibold">{brlFromCents(result.totalCents)}</span>
-        </p>
+        <div className="space-y-1 text-sm">
+          <p className="font-medium">{formatPeriod(result.period)}</p>
+
+          {result.items.map((item, index) => (
+            <p key={index} className="flex justify-between gap-4">
+              <span>
+                {item.description} ({formatQuantity(item.quantity)} x {formatBrl(item.unitPriceCents)})
+              </span>
+              <span>{formatBrl(item.amountCents)}</span>
+            </p>
+          ))}
+
+          <p className="flex justify-between gap-4 font-semibold">
+            <Trans>Total</Trans>
+            <span>{formatBrl(result.totalCents)}</span>
+          </p>
+        </div>
       )}
+    </Alert>
+  );
+};
+
+type AdminGrantPlanSectionProps = {
+  organisationId: string;
+  currentClaimId: string | null;
+  currentDiscountPercent: number;
+};
+
+/**
+ * Gives an organisation a plan with a standing discount (e.g. 100% for a plan
+ * given away). Its bills keep showing the full amounts plus the discount line.
+ */
+const AdminGrantPlanSection = ({
+  organisationId,
+  currentClaimId,
+  currentDiscountPercent,
+}: AdminGrantPlanSectionProps) => {
+  const { t } = useLingui();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const [claimId, setClaimId] = useState(currentClaimId ?? '');
+  const [discountPercent, setDiscountPercent] = useState(currentDiscountPercent);
+
+  const { data: claims } = trpc.admin.claims.find.useQuery({ perPage: 100 });
+  const { mutateAsync: grantPlan, isPending } = trpc.admin.billing.grantPlan.useMutation();
+
+  const onGrant = async () => {
+    try {
+      await grantPlan({ organisationId, claimId, discountPercent });
+
+      toast({ title: t`Plan granted` });
+
+      await navigate(0);
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      toast({
+        title: t`Could not grant the plan`,
+        description: error.userMessage ?? error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <Alert className="my-6 flex flex-col gap-4 p-6" variant="neutral">
+      <div>
+        <AlertTitle>
+          <Trans>Grant plan</Trans>
+        </AlertTitle>
+        <AlertDescription>
+          <Trans>
+            The plan applies now, without billing details. Bills still list the amounts, and at 100% discount nothing is
+            charged.
+          </Trans>
+        </AlertDescription>
+      </div>
+
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="min-w-56">
+          <label className="text-muted-foreground text-xs">
+            <Trans>Plan</Trans>
+          </label>
+          <Select value={claimId} onValueChange={setClaimId}>
+            <SelectTrigger>
+              <SelectValue placeholder={t`Choose a plan`} />
+            </SelectTrigger>
+            <SelectContent>
+              {(claims?.data ?? []).map((claim) => (
+                <SelectItem key={claim.id} value={claim.id}>
+                  {claim.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <label className="text-muted-foreground text-xs">
+            <Trans>Discount (%)</Trans>
+          </label>
+          <Input
+            type="number"
+            min={0}
+            max={100}
+            value={discountPercent}
+            onChange={(e) => setDiscountPercent(e.target.valueAsNumber)}
+            className="w-28"
+          />
+        </div>
+
+        <Button loading={isPending} disabled={!claimId} onClick={() => void onGrant()}>
+          <Trans>Grant</Trans>
+        </Button>
+      </div>
     </Alert>
   );
 };

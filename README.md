@@ -36,7 +36,8 @@
 - **PAdES-LTA** com carimbo de tempo RFC 3161 e validação de longo prazo.
 - **Distribuição por e-mail e WhatsApp**, com domínios de e-mail próprios.
 - **API e webhooks** para integração, além de assinatura incorporada (embed).
-- **Cobrança recorrente via Stripe**, com planos, portal do cliente e faturas.
+- **Cobrança mensal via Asaas** (Pix, boleto ou cartão): uma fatura por mês com a
+  mensalidade do plano e o uso, detalhada item a item.
 
 ## Stack
 
@@ -47,7 +48,7 @@
 - [react-email](https://react.email/) — templates de e-mail
 - [tRPC](https://trpc.io/) — API
 - [React-PDF](https://github.com/wojtekmaj/react-pdf) / [PDF-Lib](https://github.com/Hopding/pdf-lib) — PDF
-- [Stripe](https://stripe.com/) — pagamentos
+- [Asaas](https://www.asaas.com/) — pagamentos
 - Java 17+ — assinador ICP-Brasil (`apps/desktop/java-helper`)
 
 ## Desenvolvimento local
@@ -85,28 +86,41 @@ Ou, em um comando só: `npm run d`.
 Todas as variáveis estão documentadas em [`.env.example`](./.env.example). Os
 blocos que mais importam:
 
-### Cobrança recorrente (Stripe)
+### Cobrança (Asaas)
 
 1. `NEXT_PUBLIC_FEATURE_BILLING_ENABLED=true`
-2. `NEXT_PRIVATE_STRIPE_API_KEY` — chave secreta (`sk_live_...` em produção).
-3. Para cada plano, crie um **Product** com um **Price recorrente** no Stripe e
-   marque os metadados:
-   - Product: `claimId` = `free` | `individual` | `team` | `platform` | `enterprise` | `earlyAdopter`
-   - Product: `isSeatBased` = `true` (somente planos por assento)
-   - Price: `visibleInApp` = `true` (para aparecer na página de planos)
+2. `NEXT_PRIVATE_ASAAS_API_KEY`: chave de API do Asaas.
+3. `NEXT_PRIVATE_ASAAS_ENVIRONMENT=production` em produção. Qualquer outro valor
+   usa o sandbox.
+4. No Asaas, crie um webhook para `https://<seu-host>/api/asaas/webhook` com os
+   eventos de cobrança (`PAYMENT_*`) e um token de autenticação próprio (nunca a
+   chave de API). Coloque o token em `NEXT_PRIVATE_ASAAS_WEBHOOK_TOKEN`.
 
-   Um price sem `claimId` é ignorado — é a causa mais comum de um plano não
-   aparecer no app.
-4. Crie um webhook apontando para `https://<seu-host>/api/stripe/webhook`
-   inscrito em `customer.subscription.created/updated/deleted`,
-   `checkout.session.completed`, `invoice.payment_succeeded` e
-   `invoice.payment_failed`, e coloque o signing secret em
-   `NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET`.
+Como funciona:
 
-Localmente: `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
+- **Planos** vêm do admin (Admin > Claims). Um plano com mensalidade
+  (`pricing.monthlyPriceCents`) aparece para o cliente escolher; planos sem preço
+  (enterprise, internos) só são atribuídos pelo admin.
+- **Plano pago** exige os dados de cobrança da organização (nome ou razão social,
+  CPF/CNPJ, inclusive o CNPJ alfanumérico, e e-mail financeiro), que viram o
+  cliente no Asaas. Subir de plano vale na hora; descer ou voltar ao gratuito vale
+  no dia 1º.
+- **Dia 1º às 03:00 UTC** o job `internal.charge-monthly-usage-sweep` emite, por
+  organização, **uma** cobrança no Asaas (Pix, boleto ou cartão, vencimento em 5
+  dias) com a mensalidade e o uso do mês anterior. Cada item vai na descrição da
+  cobrança e num PDF "Demonstrativo" anexado, e aparece em Configurações >
+  Cobrança.
+- **Fatura vencida** coloca a organização nos limites do plano gratuito até o
+  pagamento; o webhook libera assim que o Asaas confirma.
+- **Liberar plano** (Admin > Organização): aplica qualquer plano na hora com um
+  desconto fixo. Com 100% a fatura do mês continua sendo emitida, para o cliente
+  acompanhar os valores, mas fica "Sem cobrança" e não vai para o Asaas.
+- Se um webhook se perder, "Sincronizar com o Asaas" na página da organização no
+  admin relê as cobranças em aberto.
 
-O servidor **recusa subir** se a cobrança estiver habilitada sem a chave da
-Stripe — a falha aparece no deploy, não na frente do primeiro cliente.
+O servidor **recusa subir** com a cobrança habilitada e sem a chave do Asaas, e
+avisa no log quando falta o token do webhook ou quando produção aponta para o
+sandbox.
 
 ### Licenciamento
 

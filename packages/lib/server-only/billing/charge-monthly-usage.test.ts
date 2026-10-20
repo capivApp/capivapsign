@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import { BillableEventType } from '@prisma/client';
+import { BillableEventType, UsageInvoiceStatus } from '@prisma/client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AsaasClient } from '../asaas/asaas-client';
@@ -27,6 +27,14 @@ const ORGANISATION = {
   billingDocument: '11222333000181',
   billingEmail: 'financeiro@capivapp.com.br',
   organisationClaim: { originalSubscriptionClaimId: 'team', pricing: { monthlyPriceCents: 14990 } },
+  subscription: null as { discountPercent: number } | null,
+};
+
+const mockDiscount = (discountPercent: number) => {
+  vi.mocked(prisma.organisation.findUniqueOrThrow).mockResolvedValue({
+    ...ORGANISATION,
+    subscription: { discountPercent },
+  } as never);
 };
 
 const USAGE = [
@@ -190,6 +198,45 @@ describe('chargeOrganisationMonthlyUsage', () => {
     const asaas = createFakeAsaas();
 
     await expect(charge(asaas)).resolves.toMatchObject({ totalCents: 0, items: [] });
+    expect(prisma.usageInvoice.create).not.toHaveBeenCalled();
+  });
+
+  it('records a fully discounted bill without charging it', async () => {
+    mockDiscount(100);
+    const asaas = createFakeAsaas();
+
+    const breakdown = await charge(asaas);
+
+    expect(breakdown).toMatchObject({ totalCents: 0, discountCents: 20990 });
+    expect(prisma.usageInvoice.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        totalCents: 0,
+        status: UsageInvoiceStatus.WAIVED,
+        items: {
+          create: expect.arrayContaining([
+            expect.objectContaining({ description: 'Desconto (100%)', amountCents: -20990 }),
+          ]),
+        },
+      }),
+    });
+    expect(asaas.createPayment).not.toHaveBeenCalled();
+  });
+
+  it('charges only the discounted total', async () => {
+    mockDiscount(50);
+    const asaas = createFakeAsaas();
+
+    await charge(asaas);
+
+    expect(asaas.createPayment).toHaveBeenCalledWith(expect.objectContaining({ value: 104.95 }));
+  });
+
+  it('shows the discount in the preview', async () => {
+    mockDiscount(100);
+
+    const breakdown = await charge(createFakeAsaas(), { dryRun: true });
+
+    expect(breakdown.items.at(-1)).toMatchObject({ description: 'Desconto (100%)' });
     expect(prisma.usageInvoice.create).not.toHaveBeenCalled();
   });
 });

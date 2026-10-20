@@ -1,7 +1,6 @@
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { isOrganisationPendingPayment } from '@documenso/lib/utils/billing';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -28,27 +27,14 @@ export const UserBillingOrganisationsTable = () => {
         label: t({ message: `Active`, context: `Subscription status` }),
         variant: 'default' as const,
       }))
-      .with(SubscriptionStatus.PAST_DUE, () => ({
-        label: t({ message: `Past Due`, context: `Subscription status` }),
-        variant: 'warning' as const,
-      }))
       .with(SubscriptionStatus.INACTIVE, () => ({
-        label: t({ message: `Inactive`, context: `Subscription status` }),
-        variant: 'neutral' as const,
+        label: t({ message: `Overdue bill`, context: `Subscription status` }),
+        variant: 'destructive' as const,
       }))
-      .otherwise(() => {
-        if (isOrganisationPendingPayment(organisation)) {
-          return {
-            label: t({ message: `Free (Pending)`, context: `Subscription status` }),
-            variant: 'warning' as const,
-          };
-        }
-
-        return {
-          label: t({ message: `Free`, context: `Subscription status` }),
-          variant: 'neutral' as const,
-        };
-      });
+      .otherwise(() => ({
+        label: t({ message: `Free`, context: `Subscription status` }),
+        variant: 'neutral' as const,
+      }));
   };
 
   const columns = useMemo(() => {

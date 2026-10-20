@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import { UsageInvoiceStatus } from '@prisma/client';
 
 import type { TClaimPricing } from '../../types/subscription';
 import { generateDatabaseId } from '../../universal/id';
@@ -6,6 +7,7 @@ import { logger } from '../../utils/logger';
 import type { AsaasClient } from '../asaas/asaas-client';
 import { getAsaasClient } from '../asaas/get-asaas-client';
 import {
+  applyInvoiceDiscount,
   buildInvoiceDescription,
   buildMonthlyInvoiceItems,
   getInvoiceDueDate,
@@ -31,6 +33,8 @@ export type MonthlyUsageBreakdown = {
   currency: 'brl';
   monthlyPriceCents: number;
   meteredCents: number;
+  /** Admin-granted discount taken off the plan fee plus usage. */
+  discountCents: number;
   totalCents: number;
   items: MonthlyInvoiceItem[];
 };
@@ -56,6 +60,7 @@ const findBillableOrganisation = async (organisationId: string) =>
       billingDocument: true,
       billingEmail: true,
       organisationClaim: { select: { originalSubscriptionClaimId: true, pricing: true } },
+      subscription: { select: { discountPercent: true } },
     },
   });
 
@@ -96,7 +101,10 @@ const buildBreakdown = async (organisation: BillableOrganisation, year: number, 
     findMonthlyUsage(organisation.id, periodStart, periodEnd),
   ]);
 
-  const items = buildMonthlyInvoiceItems({ planName, monthlyPriceCents, usage });
+  const billedItems = buildMonthlyInvoiceItems({ planName, monthlyPriceCents, usage });
+  const subtotalCents = billedItems.reduce((sum, item) => sum + item.amountCents, 0);
+
+  const items = applyInvoiceDiscount(billedItems, organisation.subscription?.discountPercent ?? 0);
   const totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
 
   return {
@@ -104,7 +112,8 @@ const buildBreakdown = async (organisation: BillableOrganisation, year: number, 
     period: `${year}-${String(month).padStart(2, '0')}`,
     currency: 'brl',
     monthlyPriceCents,
-    meteredCents: totalCents - monthlyPriceCents,
+    meteredCents: subtotalCents - monthlyPriceCents,
+    discountCents: subtotalCents - totalCents,
     totalCents,
     items,
   } satisfies MonthlyUsageBreakdown;
@@ -123,6 +132,9 @@ const createUsageInvoice = async (breakdown: MonthlyUsageBreakdown) =>
       monthlyPriceCents: breakdown.monthlyPriceCents,
       meteredCents: breakdown.meteredCents,
       totalCents: breakdown.totalCents,
+      // Fully discounted bills are kept so the organisation sees the amounts,
+      // but there is nothing to collect.
+      status: breakdown.totalCents > 0 ? UsageInvoiceStatus.PENDING : UsageInvoiceStatus.WAIVED,
       items: {
         create: breakdown.items.map((item, position) => ({
           id: generateDatabaseId('usage_invoice_item'),
@@ -222,7 +234,7 @@ export const chargeOrganisationMonthlyUsage = async ({
   const organisation = await findBillableOrganisation(organisationId);
   const breakdown = await buildBreakdown(organisation, year, month);
 
-  if (dryRun || breakdown.totalCents <= 0) {
+  if (dryRun || breakdown.items.length === 0) {
     return breakdown;
   }
 
@@ -236,6 +248,10 @@ export const chargeOrganisationMonthlyUsage = async ({
   }
 
   const usageInvoice = existing ?? (await createUsageInvoice(breakdown));
+
+  if (breakdown.totalCents <= 0) {
+    return breakdown;
+  }
 
   await issueAsaasCharge({
     organisation,

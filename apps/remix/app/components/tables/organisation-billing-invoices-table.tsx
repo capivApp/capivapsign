@@ -1,153 +1,213 @@
+import { formatBrl, formatPeriod, formatQuantity } from '@documenso/lib/universal/billing-format';
 import { trpc } from '@documenso/trpc/react';
+import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@documenso/ui/primitives/dialog';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
-import { TableCell } from '@documenso/ui/primitives/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@documenso/ui/primitives/table';
+import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { File } from 'lucide-react';
-import { DateTime } from 'luxon';
+import { UsageInvoiceStatus } from '@prisma/client';
 import { useMemo } from 'react';
 import { Link } from 'react-router';
 
 export type OrganisationBillingInvoicesTableProps = {
   organisationId: string;
-  subscriptionExists: boolean;
 };
 
-export const OrganisationBillingInvoicesTable = ({
-  organisationId,
-  subscriptionExists,
-}: OrganisationBillingInvoicesTableProps) => {
-  const { _ } = useLingui();
+const INVOICE_STATUS_BADGE: Record<
+  UsageInvoiceStatus,
+  { label: MessageDescriptor; variant: 'default' | 'warning' | 'destructive' | 'neutral' }
+> = {
+  [UsageInvoiceStatus.PENDING]: { label: msg({ message: `Open`, context: `Bill status` }), variant: 'warning' },
+  [UsageInvoiceStatus.PAID]: { label: msg({ message: `Paid`, context: `Bill status` }), variant: 'default' },
+  [UsageInvoiceStatus.OVERDUE]: { label: msg({ message: `Overdue`, context: `Bill status` }), variant: 'destructive' },
+  [UsageInvoiceStatus.CANCELLED]: { label: msg({ message: `Cancelled`, context: `Bill status` }), variant: 'neutral' },
+  [UsageInvoiceStatus.WAIVED]: { label: msg({ message: `Not charged`, context: `Bill status` }), variant: 'neutral' },
+};
+
+const PAYABLE_STATUSES: UsageInvoiceStatus[] = [UsageInvoiceStatus.PENDING, UsageInvoiceStatus.OVERDUE];
+
+export const OrganisationBillingInvoicesTable = ({ organisationId }: OrganisationBillingInvoicesTableProps) => {
+  const { _, i18n } = useLingui();
 
   const { data, isLoading, isLoadingError } = trpc.enterprise.billing.invoices.get.useQuery(
-    {
-      organisationId,
-    },
-    {
-      placeholderData: (previousData) => previousData,
-    },
+    { organisationId },
+    { placeholderData: (previousData) => previousData },
   );
 
-  const formatCurrency = (currency: string, amount: number) => {
-    const formatter = new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency,
-    });
-
-    return formatter.format(amount);
-  };
-
-  const results = {
-    data: data || [],
-    perPage: 100,
-    currentPage: 1,
-    totalPages: 1,
-  };
+  const invoices = data ?? [];
 
   const columns = useMemo(() => {
     return [
       {
-        header: _(msg`Invoice`),
-        accessorKey: 'created',
+        header: _(msg`Month`),
+        accessorKey: 'period',
         cell: ({ row }) => (
-          <div className="flex max-w-xs items-center gap-2">
-            <File className="h-6 w-6" />
-
-            <div className="font-semibold text-foreground/80 text-sm">
-              {DateTime.fromSeconds(row.original.created).toFormat('MMMM yyyy')}
-            </div>
-          </div>
+          <span className="font-semibold text-foreground/80">{formatPeriod(row.original.period)}</span>
         ),
+      },
+      {
+        header: _(msg`Due date`),
+        accessorKey: 'dueDate',
+        cell: ({ row }) => (row.original.dueDate ? i18n.date(row.original.dueDate, { timeZone: 'UTC' }) : '-'),
+      },
+      {
+        header: _(msg`Total`),
+        accessorKey: 'totalCents',
+        cell: ({ row }) => formatBrl(row.original.totalCents),
       },
       {
         header: _(msg`Status`),
         accessorKey: 'status',
         cell: ({ row }) => {
-          const { status } = row.original;
+          const badge = INVOICE_STATUS_BADGE[row.original.status];
 
-          if (!status) {
-            return 'N/A';
-          }
-
-          return status.charAt(0).toUpperCase() + status.slice(1);
+          return <Badge variant={badge.variant}>{_(badge.label)}</Badge>;
         },
-      },
-      {
-        header: _(msg`Amount`),
-        accessorKey: 'total',
-        cell: ({ row }) => formatCurrency(row.original.currency, row.original.total / 100),
       },
       {
         id: 'actions',
         cell: ({ row }) => (
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" asChild disabled={typeof row.original.hosted_invoice_url !== 'string'}>
-              <Link to={row.original.hosted_invoice_url ?? ''} target="_blank">
-                <Trans>View</Trans>
-              </Link>
-            </Button>
+          <div className="flex justify-end gap-2">
+            <InvoiceItemsDialog invoice={row.original} />
 
-            <Button variant="outline" asChild disabled={typeof row.original.invoice_pdf !== 'string'}>
-              <Link to={row.original.invoice_pdf ?? ''} target="_blank">
-                <Trans>Download</Trans>
-              </Link>
-            </Button>
+            {row.original.invoiceUrl && (
+              <Button variant={PAYABLE_STATUSES.includes(row.original.status) ? 'default' : 'outline'} asChild>
+                <Link to={row.original.invoiceUrl} target="_blank">
+                  {PAYABLE_STATUSES.includes(row.original.status) ? <Trans>Pay</Trans> : <Trans>View bill</Trans>}
+                </Link>
+              </Button>
+            )}
           </div>
         ),
       },
-    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+    ] satisfies DataTableColumnDef<(typeof invoices)[number]>[];
   }, []);
 
-  if (results.data.length === 0 && !subscriptionExists) {
-    return null;
+  if (!isLoading && invoices.length === 0) {
+    return (
+      <p className="text-muted-foreground text-sm">
+        <Trans>No bills yet. Bills are issued on the 1st of each month.</Trans>
+      </p>
+    );
   }
 
   return (
     <DataTable
       columns={columns}
-      data={results.data}
-      perPage={results.perPage}
-      currentPage={results.currentPage}
-      totalPages={results.totalPages}
-      error={{
-        enable: isLoadingError,
-      }}
+      data={invoices}
+      perPage={100}
+      currentPage={1}
+      totalPages={1}
+      error={{ enable: isLoadingError }}
       skeleton={{
         enable: isLoading,
         rows: 3,
         component: (
           <>
-            <TableCell className="w-1/3 py-4 pr-4">
-              <div className="flex w-full flex-row items-center">
-                <Skeleton className="h-7 w-7 flex-shrink-0 rounded" />
-
-                <div className="ml-2 flex flex-grow flex-col">
-                  <Skeleton className="h-4 w-1/2 max-w-[8rem]" />
-                  <Skeleton className="mt-1 h-4 w-2/3 max-w-[12rem]" />
-                </div>
-              </div>
-            </TableCell>
             <TableCell>
-              <Skeleton className="h-4 w-12 rounded-full" />
+              <Skeleton className="h-4 w-16 rounded-full" />
             </TableCell>
             <TableCell>
               <Skeleton className="h-4 w-20 rounded-full" />
             </TableCell>
             <TableCell>
-              <div className="flex flex-row justify-end space-x-2">
+              <Skeleton className="h-4 w-20 rounded-full" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-12 rounded-full" />
+            </TableCell>
+            <TableCell>
+              <div className="flex flex-row justify-end gap-2">
                 <Skeleton className="h-10 w-20 rounded" />
-                <Skeleton className="h-10 w-16 rounded" />
               </div>
             </TableCell>
           </>
         ),
       }}
-    >
-      {/* {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />} */}
-    </DataTable>
+    />
+  );
+};
+
+type InvoiceItemsDialogProps = {
+  invoice: {
+    period: string;
+    totalCents: number;
+    items: { id: string; description: string; quantity: number; unitPriceCents: number; amountCents: number }[];
+  };
+};
+
+const InvoiceItemsDialog = ({ invoice }: InvoiceItemsDialogProps) => {
+  const period = formatPeriod(invoice.period);
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          <Trans>Details</Trans>
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            <Trans>Bill for {period}</Trans>
+          </DialogTitle>
+
+          <DialogDescription>
+            <Trans>Plan fee, usage and discount for this month.</Trans>
+          </DialogDescription>
+        </DialogHeader>
+
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                <Trans>Description</Trans>
+              </TableHead>
+              <TableHead className="text-right">
+                <Trans>Qty.</Trans>
+              </TableHead>
+              <TableHead className="text-right">
+                <Trans>Unit price</Trans>
+              </TableHead>
+              <TableHead className="text-right">
+                <Trans>Total</Trans>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {invoice.items.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell>{item.description}</TableCell>
+                <TableCell className="text-right">{formatQuantity(item.quantity)}</TableCell>
+                <TableCell className="text-right">{formatBrl(item.unitPriceCents)}</TableCell>
+                <TableCell className="text-right">{formatBrl(item.amountCents)}</TableCell>
+              </TableRow>
+            ))}
+
+            <TableRow>
+              <TableCell colSpan={3} className="font-semibold">
+                <Trans>Total</Trans>
+              </TableCell>
+              <TableCell className="text-right font-semibold">{formatBrl(invoice.totalCents)}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </DialogContent>
+    </Dialog>
   );
 };

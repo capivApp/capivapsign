@@ -1,12 +1,10 @@
 import { DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT, PAID_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { isOrganisationPendingPayment } from '@documenso/lib/utils/billing';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
-import { SubscriptionStatus } from '@prisma/client';
 import { useMemo } from 'react';
 import { Link, Outlet } from 'react-router';
 
@@ -17,29 +15,11 @@ export default function Layout() {
   const team = useOptionalCurrentTeam();
   const organisation = useOptionalCurrentOrganisation();
 
+  // Optimistic until the provider fetches the real limits from the server,
+  // which also applies the free plan limits of an overdue organisation.
   const limits = useMemo(() => {
     if (!organisation) {
       return undefined;
-    }
-
-    const isRestricted =
-      (organisation.subscription && organisation.subscription.status === SubscriptionStatus.INACTIVE) ||
-      isOrganisationPendingPayment(organisation);
-
-    if (isRestricted) {
-      return {
-        quota: {
-          documents: 0,
-          recipients: 0,
-          directTemplates: 0,
-        },
-        remaining: {
-          documents: 0,
-          recipients: 0,
-          directTemplates: 0,
-        },
-        maximumEnvelopeItemCount: 0,
-      };
     }
 
     return {

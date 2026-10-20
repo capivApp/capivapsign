@@ -246,17 +246,24 @@ enum SubscriptionStatus {
   INACTIVE
 }
 
+/// Billing standing of an organisation. ACTIVE while no bill is overdue,
+/// INACTIVE (free plan limits) while one is. Created on the first paid plan or
+/// the first bill, whichever comes first.
 model Subscription {
-  id                Int                @id @default(autoincrement())
-  status            SubscriptionStatus @default(INACTIVE)
-  planId            String             @unique
-  priceId           String
-  periodEnd         DateTime?
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  cancelAtPeriodEnd Boolean            @default(false)
+  id        Int                @id @default(autoincrement())
+  status    SubscriptionStatus @default(INACTIVE)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
 
-  customerId String
+  /// Plan the organisation moves to on `scheduledAt`. Downgrades wait for the
+  /// month already used to be billed at the current plan's price.
+  scheduledClaimId String?
+  scheduledAt      DateTime?
+
+  /// Discount granted by an admin on every monthly bill (0 to 100). At 100 the
+  /// bill is still issued, so the organisation sees the amounts, but never
+  /// charged.
+  discountPercent Int @default(0)
 
   organisationId String       @unique
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
@@ -453,6 +460,8 @@ enum UsageInvoiceStatus {
   PAID
   OVERDUE
   CANCELLED
+  /// Fully discounted: recorded for the organisation, never sent to Asaas.
+  WAIVED
 }
 
 /// One generated monthly bill per organisation. The unique (organisationId,
@@ -467,10 +476,9 @@ model UsageInvoice {
   /// Billed calendar month, `YYYY-MM`.
   period String
 
-  monthlyPriceCents Int     @default(0)
-  meteredCents      Int     @default(0)
-  totalCents        Int     @default(0)
-  stripeInvoiceId   String?
+  monthlyPriceCents Int @default(0)
+  meteredCents      Int @default(0)
+  totalCents        Int @default(0)
 
   status         UsageInvoiceStatus @default(PENDING)
   asaasPaymentId String?            @unique
@@ -1136,6 +1144,7 @@ model Organisation {
   url           String           @unique
   avatarImageId String?
 
+  /// Asaas customer id.
   customerId   String?       @unique
   subscription Subscription?
 

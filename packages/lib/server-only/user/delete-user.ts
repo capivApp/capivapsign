@@ -20,11 +20,6 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
               id: true,
             },
           },
-          subscription: {
-            select: {
-              planId: true,
-            },
-          },
         },
       },
       organisationMember: {
@@ -59,10 +54,9 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
       })),
     );
 
-  // For organisations the user owns - fully tear them down (orphan envelopes,
-  // delete the organisation, and cancel any Stripe subscription). Without this
-  // the organisations would only cascade away when the user row is deleted,
-  // leaving their subscriptions billing and account rows behind.
+  // For organisations the user owns - fully tear them down (orphan envelopes
+  // and delete the organisation). Without this the organisations would only
+  // cascade away when the user row is deleted, leaving account rows behind.
   for (const organisation of user.ownedOrganisations) {
     await deleteOrganisation({ organisation });
   }

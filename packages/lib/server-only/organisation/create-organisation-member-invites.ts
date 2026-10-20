@@ -1,9 +1,5 @@
-import {
-  assertMemberCountWithinCap,
-  syncMemberCountWithStripeSeatPlan,
-} from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
@@ -17,11 +13,11 @@ import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { generateDatabaseId } from '../../universal/id';
-import { validateIfSubscriptionIsRequired } from '../../utils/billing';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getMemberOrganisationRole } from '../team/get-member-roles';
+import { assertMemberCountWithinCap } from './assert-member-count-within-cap';
 
 export type CreateOrganisationMemberInvitesOptions = {
   userId: number;
@@ -63,7 +59,6 @@ export const createOrganisationMemberInvites = async ({
       },
       organisationGlobalSettings: true,
       organisationClaim: true,
-      subscription: true,
     },
   });
 
@@ -72,8 +67,6 @@ export const createOrganisationMemberInvites = async ({
   }
 
   const { organisationClaim } = organisation;
-
-  const subscription = validateIfSubscriptionIsRequired(organisation.subscription);
 
   const currentOrganisationMemberRole = await getMemberOrganisationRole({
     organisationId: organisation.id,
@@ -126,11 +119,9 @@ export const createOrganisationMemberInvites = async ({
 
   const totalMemberCountWithInvites = numberOfCurrentMembers + numberOfCurrentInvites + numberOfNewInvites;
 
-  // Enforce the seat cap and sync billing for seat based plans.
-  if (subscription) {
-    await assertMemberCountWithinCap(subscription, organisationClaim, totalMemberCountWithInvites);
-
-    await syncMemberCountWithStripeSeatPlan(subscription, organisationClaim, totalMemberCountWithInvites);
+  // Self-hosted instances (billing off) have no member cap.
+  if (IS_BILLING_ENABLED()) {
+    assertMemberCountWithinCap(organisationClaim, totalMemberCountWithInvites);
   }
 
   await prisma.organisationMemberInvite.createMany({

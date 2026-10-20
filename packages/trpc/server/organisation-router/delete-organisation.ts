@@ -39,11 +39,6 @@ export const deleteOrganisationRoute = authenticatedProcedure
             id: true,
           },
         },
-        subscription: {
-          select: {
-            planId: true,
-          },
-        },
       },
     });
 

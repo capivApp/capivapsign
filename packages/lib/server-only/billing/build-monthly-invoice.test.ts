@@ -1,12 +1,11 @@
 import { BillableEventType } from '@prisma/client';
 import { describe, expect, it } from 'vitest';
 
+import { formatBrl, formatPeriod, formatQuantity } from '../../universal/billing-format';
 import {
+  applyInvoiceDiscount,
   buildInvoiceDescription,
   buildMonthlyInvoiceItems,
-  formatBrl,
-  formatPeriod,
-  formatQuantity,
   getInvoiceDueDate,
 } from './build-monthly-invoice';
 
@@ -62,6 +61,39 @@ describe('buildMonthlyInvoiceItems', () => {
     });
 
     expect(items).toEqual([]);
+  });
+});
+
+describe('applyInvoiceDiscount', () => {
+  const ITEMS = [
+    { description: 'Plano Equipe', quantity: 1, unitPriceCents: 14990, amountCents: 14990 },
+    { description: 'Documentos criados', quantity: 120, unitPriceCents: 50, amountCents: 6000 },
+  ];
+
+  it('leaves the bill untouched without a discount', () => {
+    expect(applyInvoiceDiscount(ITEMS, 0)).toEqual(ITEMS);
+  });
+
+  it('adds a negative line that zeroes the bill at 100%', () => {
+    const items = applyInvoiceDiscount(ITEMS, 100);
+
+    expect(items.at(-1)).toEqual({
+      description: 'Desconto (100%)',
+      quantity: 1,
+      unitPriceCents: -20990,
+      amountCents: -20990,
+    });
+    expect(items.reduce((sum, item) => sum + item.amountCents, 0)).toBe(0);
+  });
+
+  it('rounds partial discounts to the cent', () => {
+    const items = applyInvoiceDiscount(ITEMS, 15);
+
+    expect(items.at(-1)?.amountCents).toBe(-3149);
+  });
+
+  it('does not add a line to an empty bill', () => {
+    expect(applyInvoiceDiscount([], 100)).toEqual([]);
   });
 });
 

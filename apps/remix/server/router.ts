@@ -3,6 +3,7 @@ import { auth } from '@documenso/auth/server';
 import { csc } from '@documenso/ee/server-only/signing/csc/hono';
 import { icp } from '@documenso/ee/server-only/signing/icp/hono';
 import { jobsClient } from '@documenso/lib/jobs/client';
+import { assertBillingConfigured } from '@documenso/lib/server-only/billing/assert-billing-configured';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { createRateLimitMiddleware } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
 import {
@@ -12,7 +13,6 @@ import {
   apiV2RateLimit,
   fileUploadRateLimit,
 } from '@documenso/lib/server-only/rate-limit/rate-limits';
-import { assertBillingConfigured } from '@documenso/lib/server-only/stripe/assert-billing-configured';
 import { TelemetryClient } from '@documenso/lib/server-only/telemetry/telemetry-client';
 import { migrateDeletedAccountServiceAccount } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { migrateLegacyServiceAccount } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';

@@ -9,7 +9,6 @@ import { mapAsaasPaymentStatus, syncUsageInvoicePayment } from './sync-usage-inv
 vi.mock('@documenso/prisma', () => ({
   prisma: {
     usageInvoice: { findUnique: vi.fn(), update: vi.fn(), count: vi.fn() },
-    organisation: { findUniqueOrThrow: vi.fn() },
     subscription: { upsert: vi.fn() },
   },
 }));
@@ -32,10 +31,6 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(prisma.usageInvoice.findUnique).mockResolvedValue(INVOICE as never);
   vi.mocked(prisma.usageInvoice.count).mockResolvedValue(0);
-  vi.mocked(prisma.organisation.findUniqueOrThrow).mockResolvedValue({
-    customerId: 'cus_1',
-    organisationClaim: { originalSubscriptionClaimId: 'team' },
-  } as never);
 });
 
 describe('mapAsaasPaymentStatus', () => {
@@ -117,13 +112,7 @@ describe('syncUsageInvoicePayment', () => {
     });
     expect(prisma.subscription.upsert).toHaveBeenCalledWith({
       where: { organisationId: 'org_1' },
-      create: {
-        organisationId: 'org_1',
-        customerId: 'cus_1',
-        planId: 'org_1',
-        priceId: 'team',
-        status: SubscriptionStatus.INACTIVE,
-      },
+      create: { organisationId: 'org_1', status: SubscriptionStatus.INACTIVE },
       update: { status: SubscriptionStatus.INACTIVE },
     });
   });

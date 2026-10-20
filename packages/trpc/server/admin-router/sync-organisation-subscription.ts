@@ -1,5 +1,5 @@
-import { syncStripeCustomerSubscription } from '@documenso/ee/server-only/stripe/sync-stripe-customer-subscription';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { resyncOrganisationBilling } from '@documenso/lib/server-only/billing/resync-organisation-billing';
 import { prisma } from '@documenso/prisma';
 
 import { adminProcedure } from '../trpc';
@@ -8,21 +8,21 @@ import {
   ZSyncOrganisationSubscriptionResponseSchema,
 } from './sync-organisation-subscription.types';
 
+/**
+ * Re-reads the organisation's open Asaas charges and recomputes its billing
+ * standing. For when a webhook was missed.
+ */
 export const syncOrganisationSubscriptionRoute = adminProcedure
   .input(ZSyncOrganisationSubscriptionRequestSchema)
   .output(ZSyncOrganisationSubscriptionResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { organisationId, syncClaims } = input;
+    const { organisationId } = input;
 
-    ctx.logger.info({
-      input: {
-        organisationId,
-        syncClaims,
-      },
-    });
+    ctx.logger.info({ input: { organisationId } });
 
     const organisation = await prisma.organisation.findUnique({
       where: { id: organisationId },
+      select: { id: true },
     });
 
     if (!organisation) {
@@ -31,14 +31,5 @@ export const syncOrganisationSubscriptionRoute = adminProcedure
       });
     }
 
-    if (!organisation.customerId) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Organisation has no Stripe customer to sync from',
-      });
-    }
-
-    await syncStripeCustomerSubscription({
-      customerId: organisation.customerId,
-      bypassClaimUpdate: !syncClaims,
-    });
+    await resyncOrganisationBilling({ organisationId });
   });

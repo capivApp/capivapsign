@@ -22,7 +22,7 @@ type UserData = {
   documentCount: number;
 };
 
-type SubscriptionLite = Pick<Subscription, 'id' | 'status' | 'planId' | 'priceId' | 'createdAt' | 'periodEnd'>;
+type SubscriptionLite = Pick<Subscription, 'id' | 'status' | 'createdAt'>;
 
 type AdminDashboardUsersTableProps = {
   users: UserData[];

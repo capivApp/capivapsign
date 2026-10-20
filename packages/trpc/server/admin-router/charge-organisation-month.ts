@@ -16,6 +16,7 @@ export const ZChargeOrganisationMonthResponseSchema = z.object({
   period: z.string(),
   monthlyPriceCents: z.number(),
   meteredCents: z.number(),
+  discountCents: z.number(),
   totalCents: z.number(),
   items: z.array(
     z.object({
@@ -55,6 +56,7 @@ export const chargeOrganisationMonthRoute = adminProcedure
       period: breakdown.period,
       monthlyPriceCents: breakdown.monthlyPriceCents,
       meteredCents: breakdown.meteredCents,
+      discountCents: breakdown.discountCents,
       totalCents: breakdown.totalCents,
       items: breakdown.items,
     };

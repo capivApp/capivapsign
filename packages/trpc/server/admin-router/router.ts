@@ -1,8 +1,13 @@
 import { router } from '../trpc';
+import { chargeOrganisationMonthRoute } from './charge-organisation-month';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
-import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
 import { createUserRoute } from './create-user';
+import {
+  deleteDefaultMessageTemplateRoute,
+  findDefaultMessageTemplatesRoute,
+  upsertDefaultMessageTemplateRoute,
+} from './default-message-template';
 import { deleteDocumentRoute } from './delete-document';
 import { deleteOrganisationRoute } from './delete-organisation';
 import { deleteAdminOrganisationMemberRoute } from './delete-organisation-member';
@@ -16,28 +21,6 @@ import { deleteEmailTransportRoute } from './email-transport/delete-email-transp
 import { findEmailTransportsRoute } from './email-transport/find-email-transports';
 import { sendTestEmailTransportRoute } from './email-transport/send-test-email-transport';
 import { updateEmailTransportRoute } from './email-transport/update-email-transport';
-import { createWhatsappTransportRoute } from './whatsapp-transport/create-whatsapp-transport';
-import { deleteWhatsappTransportRoute } from './whatsapp-transport/delete-whatsapp-transport';
-import { findWhatsappTransportsRoute } from './whatsapp-transport/find-whatsapp-transports';
-import { sendTestWhatsappTransportRoute } from './whatsapp-transport/send-test-whatsapp-transport';
-import { updateWhatsappTransportRoute } from './whatsapp-transport/update-whatsapp-transport';
-import {
-  deleteSigningCertificateRoute,
-  getSigningCertificateRoute,
-  uploadSigningCertificateRoute,
-} from './signing-certificate';
-import { chargeOrganisationMonthRoute } from './charge-organisation-month';
-import {
-  deleteDefaultMessageTemplateRoute,
-  findDefaultMessageTemplatesRoute,
-  upsertDefaultMessageTemplateRoute,
-} from './default-message-template';
-import {
-  createSignerReleaseRoute,
-  createSignerReleaseUploadUrlRoute,
-  deleteSignerReleaseRoute,
-  findSignerReleasesRoute,
-} from './signer-release';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
@@ -52,13 +35,24 @@ import { getAdminOrganisationRoute } from './get-admin-organisation';
 import { getAdminTeamRoute } from './get-admin-team';
 import { getEmailDomainRoute } from './get-email-domain';
 import { getUserRoute } from './get-user';
+import { grantOrganisationPlanRoute } from './grant-organisation-plan';
 import { promoteMemberToOwnerRoute } from './promote-member-to-owner';
 import { reregisterEmailDomainRoute } from './reregister-email-domain';
 import { resealDocumentRoute } from './reseal-document';
 import { resetOrganisationMonthlyStatRoute } from './reset-organisation-monthly-stat';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
 import { resyncLicenseRoute } from './resync-license';
-import { swapOrganisationSubscriptionRoute } from './swap-organisation-subscription';
+import {
+  createSignerReleaseRoute,
+  createSignerReleaseUploadUrlRoute,
+  deleteSignerReleaseRoute,
+  findSignerReleasesRoute,
+} from './signer-release';
+import {
+  deleteSigningCertificateRoute,
+  getSigningCertificateRoute,
+  uploadSigningCertificateRoute,
+} from './signing-certificate';
 import { syncOrganisationSubscriptionRoute } from './sync-organisation-subscription';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
 import { updateOrganisationMemberRoleRoute } from './update-organisation-member-role';
@@ -66,6 +60,11 @@ import { updateRecipientRoute } from './update-recipient';
 import { updateSiteSettingRoute } from './update-site-setting';
 import { updateSubscriptionClaimRoute } from './update-subscription-claim';
 import { updateUserRoute } from './update-user';
+import { createWhatsappTransportRoute } from './whatsapp-transport/create-whatsapp-transport';
+import { deleteWhatsappTransportRoute } from './whatsapp-transport/delete-whatsapp-transport';
+import { findWhatsappTransportsRoute } from './whatsapp-transport/find-whatsapp-transports';
+import { sendTestWhatsappTransportRoute } from './whatsapp-transport/send-test-whatsapp-transport';
+import { updateWhatsappTransportRoute } from './whatsapp-transport/update-whatsapp-transport';
 
 export const adminRouter = router({
   organisation: {
@@ -75,7 +74,6 @@ export const adminRouter = router({
     update: updateAdminOrganisationRoute,
     delete: deleteOrganisationRoute,
     subscription: {
-      swap: swapOrganisationSubscriptionRoute,
       sync: syncOrganisationSubscriptionRoute,
     },
     stats: {
@@ -93,9 +91,6 @@ export const adminRouter = router({
     create: createSubscriptionClaimRoute,
     update: updateSubscriptionClaimRoute,
     delete: deleteSubscriptionClaimRoute,
-  },
-  stripe: {
-    createCustomer: createStripeCustomerRoute,
   },
   license: {
     resync: resyncLicenseRoute,
@@ -148,6 +143,7 @@ export const adminRouter = router({
   },
   billing: {
     chargeOrganisationMonth: chargeOrganisationMonthRoute,
+    grantPlan: grantOrganisationPlanRoute,
   },
   defaultMessageTemplate: {
     find: findDefaultMessageTemplatesRoute,

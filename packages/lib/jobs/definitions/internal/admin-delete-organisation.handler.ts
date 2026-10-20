@@ -32,11 +32,6 @@ export const run = async ({ payload, io }: { payload: TAdminDeleteOrganisationJo
             id: true,
           },
         },
-        subscription: {
-          select: {
-            planId: true,
-          },
-        },
       },
     });
   });
@@ -61,8 +56,8 @@ export const run = async ({ payload, io }: { payload: TAdminDeleteOrganisationJo
     return serializableContext;
   });
 
-  // 1. Orphan envelopes, delete the organisation, and schedule the Stripe
-  // subscription cancellation. Shared with organisation-router/delete-organisation.ts.
+  // 1. Orphan envelopes and delete the organisation. Shared with
+  // organisation-router/delete-organisation.ts.
   await io.runTask('delete-organisation', async () => {
     await deleteOrganisation({ organisation });
   });

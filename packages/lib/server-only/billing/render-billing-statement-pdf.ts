@@ -3,10 +3,10 @@ import 'konva/skia-backend';
 import { PDF } from '@libpdf/core';
 import { DateTime } from 'luxon';
 import type { Canvas } from 'skia-canvas';
-
+import { formatBrl, formatPeriod, formatQuantity } from '../../universal/billing-format';
 import { formatCpfCnpj } from '../../utils/cpf-cnpj';
 import { ensureFontLibrary } from '../pdf/helpers';
-import { formatBrl, formatPeriod, formatQuantity, type MonthlyInvoiceItem } from './build-monthly-invoice';
+import type { MonthlyInvoiceItem } from './build-monthly-invoice';
 
 export type BillingStatement = {
   period: string;

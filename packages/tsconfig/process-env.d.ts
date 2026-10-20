@@ -26,9 +26,6 @@ declare namespace NodeJS {
 
     NEXT_PRIVATE_LOGGER_FILE_PATH?: string;
 
-    NEXT_PRIVATE_STRIPE_API_KEY: string;
-    NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET: string;
-
     NEXT_PRIVATE_ASAAS_API_KEY?: string;
     NEXT_PRIVATE_ASAAS_WEBHOOK_TOKEN?: string;
     NEXT_PRIVATE_ASAAS_ENVIRONMENT?: 'sandbox' | 'production';

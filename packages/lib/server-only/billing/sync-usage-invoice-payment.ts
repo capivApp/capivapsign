@@ -1,7 +1,6 @@
 import { prisma } from '@documenso/prisma';
 import { SubscriptionStatus, UsageInvoiceStatus } from '@prisma/client';
 
-import { INTERNAL_CLAIM_ID } from '../../types/subscription';
 import { logger } from '../../utils/logger';
 import type { AsaasClient } from '../asaas/asaas-client';
 import { getAsaasClient } from '../asaas/get-asaas-client';
@@ -51,7 +50,7 @@ const resolvePaidAt = (status: UsageInvoiceStatus, previousPaidAt: Date | null, 
   status === UsageInvoiceStatus.PAID ? (previousPaidAt ?? now) : null;
 
 /**
- * An organisation is blocked (inactive limits) while any of its bills is
+ * An organisation is held to the free plan limits while any of its bills is
  * overdue, and unblocked as soon as none is. Derived from all bills rather than
  * the one that changed, so events arriving out of order cannot leave it stale.
  */
@@ -62,21 +61,9 @@ export const syncOrganisationBillingStatus = async (organisationId: string) => {
 
   const status = overdueCount > 0 ? SubscriptionStatus.INACTIVE : SubscriptionStatus.ACTIVE;
 
-  const organisation = await prisma.organisation.findUniqueOrThrow({
-    where: { id: organisationId },
-    select: { customerId: true, organisationClaim: { select: { originalSubscriptionClaimId: true } } },
-  });
-
   await prisma.subscription.upsert({
     where: { organisationId },
-    create: {
-      organisationId,
-      customerId: organisation.customerId ?? '',
-      // Stripe-era columns, dropped once Stripe is removed.
-      planId: organisationId,
-      priceId: organisation.organisationClaim.originalSubscriptionClaimId ?? INTERNAL_CLAIM_ID.FREE,
-      status,
-    },
+    create: { organisationId, status },
     update: { status },
   });
 };

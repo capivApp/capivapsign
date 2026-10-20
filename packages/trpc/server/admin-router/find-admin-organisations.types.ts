@@ -27,12 +27,10 @@ export const ZFindAdminOrganisationsResponseSchema = ZFindResultResponse.extend(
       subscription: SubscriptionSchema.pick({
         status: true,
         id: true,
-        planId: true,
-        priceId: true,
-        periodEnd: true,
+        scheduledClaimId: true,
+        scheduledAt: true,
         createdAt: true,
         updatedAt: true,
-        cancelAtPeriodEnd: true,
       }).nullable(),
     })
     .array(),

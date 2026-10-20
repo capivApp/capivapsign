@@ -1,9 +1,7 @@
-import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
 import { prisma } from '@documenso/prisma';
 import { OrganisationMemberRole, OrganisationType, Prisma, type SubscriptionClaim } from '@prisma/client';
 
-import { IS_BILLING_ENABLED } from '../../constants/app';
 import { ORGANISATION_INTERNAL_GROUPS } from '../../constants/organisations';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { INTERNAL_CLAIM_ID } from '../../types/subscription';
@@ -16,43 +14,11 @@ type CreateOrganisationOptions = {
   name: string;
   type: OrganisationType;
   url?: string;
-  customerId?: string;
   claim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
 };
 
-export const createOrganisation = async ({ name, url, type, userId, customerId, claim }: CreateOrganisationOptions) => {
-  // Minted up front rather than inside the transaction: the Stripe customer is
-  // created first and needs this id as its idempotency scope, so a retry of a
-  // half-failed create reuses the same customer instead of orphaning one.
+export const createOrganisation = async ({ name, url, type, userId, claim }: CreateOrganisationOptions) => {
   const orgIdAndUrl = prefixedId('org');
-
-  let customerIdToUse = customerId;
-
-  if (!customerId && IS_BILLING_ENABLED()) {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
-
-    if (!user) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'User not found',
-      });
-    }
-
-    customerIdToUse = await createCustomer({
-      name: user.name || user.email,
-      email: user.email,
-      organisationId: orgIdAndUrl,
-    })
-      .then((customer) => customer.id)
-      .catch((err) => {
-        console.error(err);
-
-        return undefined;
-      });
-  }
 
   return await prisma.$transaction(async (tx) => {
     const organisationSetting = await tx.organisationGlobalSettings.create({
@@ -98,7 +64,6 @@ export const createOrganisation = async ({ name, url, type, userId, customerId, 
               id: generateDatabaseId('org_group'),
             })),
           },
-          customerId: customerIdToUse,
         },
         include: {
           groups: true,

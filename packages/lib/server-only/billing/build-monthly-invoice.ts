@@ -1,6 +1,8 @@
 import { BillableEventType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
+import { formatBrl, formatPeriod, formatQuantity } from '../../universal/billing-format';
+
 export type MonthlyInvoiceItem = {
   description: string;
   quantity: number;
@@ -30,18 +32,6 @@ const BILLABLE_EVENT_LABEL: Record<BillableEventType, string> = {
 };
 
 const CATEGORY_ORDER = Object.values(BillableEventType);
-
-const brlFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-
-// Intl puts a no-break space after "R$"; a plain one keeps PDFs and the Asaas
-// description predictable.
-export const formatBrl = (cents: number) => brlFormatter.format(cents / 100).replace(/\s/g, ' ');
-
-const quantityFormatter = new Intl.NumberFormat('pt-BR');
-
-export const formatQuantity = (quantity: number) => quantityFormatter.format(quantity);
-
-export const formatPeriod = (period: string) => period.split('-').reverse().join('/');
 
 const isBilled = (line: MonthlyUsageLine) => line.amountCents > 0 && line.unitPriceCents > 0;
 
@@ -79,6 +69,29 @@ export const buildMonthlyInvoiceItems = ({
   ...buildPlanItems(planName, monthlyPriceCents),
   ...usage.filter(isBilled).sort(compareUsageLines).map(toUsageItem),
 ];
+
+/**
+ * Appends the admin-granted discount as a negative line, so the bill keeps
+ * showing what the organisation would pay. 100% zeroes the total.
+ */
+export const applyInvoiceDiscount = (items: MonthlyInvoiceItem[], discountPercent: number): MonthlyInvoiceItem[] => {
+  const subtotalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
+  const discountCents = Math.round((subtotalCents * discountPercent) / 100);
+
+  if (discountCents <= 0) {
+    return items;
+  }
+
+  return [
+    ...items,
+    {
+      description: `Desconto (${discountPercent}%)`,
+      quantity: 1,
+      unitPriceCents: -discountCents,
+      amountCents: -discountCents,
+    },
+  ];
+};
 
 const formatItem = (item: MonthlyInvoiceItem) =>
   item.quantity === 1

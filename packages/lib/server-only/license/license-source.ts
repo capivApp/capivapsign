@@ -7,7 +7,7 @@ import { env } from '../../utils/env';
  * The upstream project had exactly one answer — POST the key to a vendor-run
  * licence server — which is wrong for an instance whose operator *is* the
  * vendor: it makes every start-up depend on a third party, and leaves the
- * `billing` flag ungrantable, so turning Stripe on marks the instance
+ * `billing` flag ungrantable, so turning billing on marks the instance
  * "unauthorized" forever.
  *
  * So the source is a strategy, chosen by `NEXT_PRIVATE_LICENSE_MODE`:
