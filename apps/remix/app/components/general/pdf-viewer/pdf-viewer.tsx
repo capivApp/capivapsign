@@ -342,8 +342,11 @@ const PdfViewerPage = ({
     scale,
   });
 
+  // The frame is a ring, not a border: a border would shrink the content box by
+  // 2px, squeezing the page image while the Konva stage (fields and verification
+  // mark) keeps the full scaled size and spills past the page edge.
   return (
-    <div className="relative w-full rounded border border-border" style={{ width: scaledWidth, height: scaledHeight }}>
+    <div className="relative w-full rounded ring-1 ring-border" style={{ width: scaledWidth, height: scaledHeight }}>
       {CustomPageRenderer && imageLoadingState === 'loaded' && (
         <CustomPageRenderer
           pageData={{
