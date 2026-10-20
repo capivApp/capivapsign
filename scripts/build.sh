@@ -18,6 +18,10 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
+# The app typecheck (tsc) needs more than Node's default ~2GB heap. Override
+# with NODE_OPTIONS if the server has less memory (add swap in that case).
+export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=4096}"
+
 start_time=$(date +%s)
 
 echo "[build] Instalando dependências"
