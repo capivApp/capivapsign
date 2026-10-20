@@ -195,7 +195,9 @@ const run = await new Promise((resolve) => {
       '--password',
       'test',
     ],
-    { encoding: 'utf8' },
+    // The agent only talks to allow-listed origins (default *.capivapp.com.br),
+    // so the mock server's origin has to be allowed explicitly.
+    { encoding: 'utf8', env: { ...process.env, ICP_ALLOWED_ORIGIN: `http://127.0.0.1:${port}` } },
   );
   let stdout = '';
   let stderr = '';

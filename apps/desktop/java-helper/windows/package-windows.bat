@@ -25,7 +25,16 @@ if exist "%ROOT%\build\runtime" rmdir /s /q "%ROOT%\build\runtime"
 jlink --add-modules %MODULES% --strip-debug --no-header-files --no-man-pages --compress=2 --output "%ROOT%\build\runtime"
 if errorlevel 1 (echo jlink failed & exit /b 1)
 
-REM 3) Package an app-image .exe around the jar + runtime.
+REM 3) Stage ONLY the jar as jpackage input. --input copies the whole directory
+REM into app\, so pointing it at build\ would also ship build\runtime (a second
+REM JRE), build\classes and sources.txt inside the installer.
+set INPUT=%ROOT%\build\package-input
+if exist "%INPUT%" rmdir /s /q "%INPUT%"
+mkdir "%INPUT%"
+copy /y "%ROOT%\build\icp-helper.jar" "%INPUT%\" >nul
+if errorlevel 1 (echo staging failed & exit /b 1)
+
+REM 4) Package an app-image .exe around the jar + runtime.
 REM
 REM THE MAIN LAUNCHER IS DELIBERATELY WINDOWED (no --win-console).
 REM
@@ -48,7 +57,7 @@ jpackage ^
   --name CapivaSign ^
   --description "CapivaSign - Assinador ICP-Brasil" ^
   --vendor "CapivApp" ^
-  --input "%ROOT%\build" ^
+  --input "%INPUT%" ^
   --main-jar icp-helper.jar ^
   --main-class br.com.capivapp.icp.Main ^
   --runtime-image "%ROOT%\build\runtime" ^

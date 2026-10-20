@@ -10,16 +10,18 @@ REM   - JDK 17+ on PATH (jpackage + jlink; produces a Windows app-image).
 REM   - Inno Setup 6 (ISCC.exe on PATH): https://jrsoftware.org/isdl.php
 REM
 REM Usage:
-REM   build-installer.bat                         (origin = https://app.capivapp.com.br)
-REM   build-installer.bat https://app.suaempresa.com
+REM   build-installer.bat                         (origins = https://*.capivapp.com.br)
+REM   build-installer.bat "https://*.suaempresa.com"
+REM   build-installer.bat "https://assina.capivapp.com.br,http://localhost:3000"
 
 setlocal
 set HERE=%~dp0
 set ROOT=%HERE%..
 
-REM Allowed origin baked into the installer (SSRF guard). Override via arg 1.
+REM Allowed origins baked into the installer (SSRF guard): comma-separated exact
+REM or wildcard (https://*.dominio) origins. Override via arg 1.
 set ORIGIN=%~1
-if "%ORIGIN%"=="" set ORIGIN=https://app.capivapp.com.br
+if "%ORIGIN%"=="" set ORIGIN=https://*.capivapp.com.br
 
 REM 1) Build the self-contained app-image (dist\CapivaSign\CapivaSign.exe).
 call "%HERE%package-windows.bat"
@@ -36,10 +38,10 @@ if errorlevel 1 (
 )
 
 REM 3) Compile the installer.
-ISCC /DAllowedOrigin=%ORIGIN% "%HERE%installer.iss"
+ISCC "/DAllowedOrigin=%ORIGIN%" "%HERE%installer.iss"
 if errorlevel 1 (echo ISCC failed & exit /b 1)
 
 echo.
 echo Built: %ROOT%\dist\installer\CapivaSign-Setup.exe
-echo Origin baked in: %ORIGIN%
+echo Origins baked in: %ORIGIN%
 endlocal

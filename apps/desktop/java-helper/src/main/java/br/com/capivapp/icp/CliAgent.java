@@ -60,10 +60,15 @@ final class CliAgent {
     }
   }
 
+  /** True for the long-running local server; every other command is one-shot. */
+  static boolean isResident(String[] args) {
+    return "serve".equals(args[0]);
+  }
+
   // ---- commands ------------------------------------------------------------
 
   private static void runList(Map<String, String> opts, Ui ui) throws Exception {
-    try (CertSource source = openSource(opts, ui)) {
+    try (Ui.Session session = ui.openSession(); CertSource source = openSource(opts, ui)) {
       List<Map<String, Object>> certs = source.list();
       System.err.println("Certificates (" + certs.size() + "):");
       for (int i = 0; i < certs.size(); i++) {
@@ -88,9 +93,13 @@ final class CliAgent {
   static Map<String, Object> performSign(Map<String, String> opts, Ui ui) throws Exception {
     String baseUrl = requireOpt(opts, "base-url");
     String recipientToken = requireOpt(opts, "token");
-    assertAllowedOrigin(baseUrl);
+    AllowedOrigins.assertAllowed(baseUrl);
 
-    try (CertSource source = openSource(opts, ui)) {
+    // The session (a live owner window in the GUI) opens BEFORE the key store:
+    // loading Windows-MY already acquires each private key and a smart card CSP
+    // may prompt right there. It closes only after the source is closed (the
+    // resources close in reverse order), so every native prompt has a valid owner.
+    try (Ui.Session session = ui.openSession(); CertSource source = openSource(opts, ui)) {
       List<Map<String, Object>> certs = source.list();
       if (certs.isEmpty()) {
         throw new IllegalStateException("No signing certificates found for the selected source.");
@@ -241,22 +250,6 @@ final class CliAgent {
   }
 
   // ---- guards --------------------------------------------------------------
-
-  /**
-   * SSRF guard: when {@code ICP_ALLOWED_ORIGIN} is set, the target must live on
-   * that origin. A protocol handler is invokable by any web page, so the agent
-   * must refuse to talk to arbitrary hosts.
-   */
-  private static void assertAllowedOrigin(String baseUrl) {
-    String allowed = System.getenv("ICP_ALLOWED_ORIGIN");
-    if (allowed == null || allowed.isBlank()) {
-      System.err.println("WARNING: ICP_ALLOWED_ORIGIN not set — accepting any base URL. Set it in production.");
-      return;
-    }
-    if (!baseUrl.startsWith(allowed)) {
-      throw new SecurityException("Refusing base URL outside allowed origin (" + allowed + "): " + baseUrl);
-    }
-  }
 
   private static String requireOpt(Map<String, String> opts, String key) {
     String value = opts.get(key);

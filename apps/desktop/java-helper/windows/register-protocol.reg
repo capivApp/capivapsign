@@ -8,7 +8,7 @@ Windows Registry Editor Version 5.00
 ; writes the per-machine equivalent for you.
 ;
 ; The web page triggers e.g.:
-;   capivasign-icp://sign?baseUrl=https%3A%2F%2Fapp.capivapp.com.br&token=<RECIPIENT_TOKEN>&source=windows-my
+;   capivasign-icp://sign?baseUrl=https%3A%2F%2Fassina.capivapp.com.br&token=<RECIPIENT_TOKEN>&source=windows-my
 ; Windows passes the full URI as %1 to the agent, which prompts for cert/PIN,
 ; signs, and calls back into CapivaSign via /complete.
 ;
@@ -16,8 +16,9 @@ Windows Registry Editor Version 5.00
 ; CapivaSignCli.exe. The CLI build is a console binary, so using it here makes a
 ; cmd window pop up on every signature request.
 ;
-; SECURITY: also set ICP_ALLOWED_ORIGIN (system env) to your CapivaSign origin so
-; the agent refuses to talk to any other host.
+; SECURITY: the agent only talks to https://*.capivapp.com.br by default. For
+; another host set ICP_ALLOWED_ORIGIN (system env) to a comma-separated list of
+; origins, e.g. https://*.suaempresa.com,https://assina.capivapp.com.br
 
 [HKEY_CURRENT_USER\Software\Classes\capivasign-icp]
 @="URL:CapivaSign ICP-Brasil Signing"

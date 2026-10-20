@@ -16,6 +16,21 @@ import java.util.Map;
  * at signing time, not here.
  */
 interface Ui {
+  /**
+   * A signing session: held from before the first prompt / key store access
+   * until after the key store is closed. The GUI keeps a live, visible owner
+   * window for its whole duration (see {@link OwnerWindow}).
+   */
+  interface Session extends AutoCloseable {
+    @Override
+    void close();
+  }
+
+  /** Console runs have no windows, so their session holds nothing. */
+  default Session openSession() {
+    return () -> {};
+  }
+
   /** Returns the chosen certificate index, or throws if the user cancels. */
   int chooseCertificate(List<Map<String, Object>> certs) throws Exception;
 

@@ -57,6 +57,11 @@ public final class Main {
         Feedback.failure("Falha ao assinar:\n" + message);
         System.exit(1);
       }
+      // The GUI owner window is never disposed (see OwnerWindow), so AWT would
+      // keep a finished one-shot run (deep link, sign, list) alive forever.
+      if (!CliAgent.isResident(args)) {
+        System.exit(0);
+      }
       return;
     }
 

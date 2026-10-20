@@ -4,22 +4,23 @@
 ;   1. installs the jpackage app-image (bundled JRE — no Java needed on the box);
 ;   2. registers the `capivasign-icp://` deep link (per-machine);
 ;   3. auto-starts the agent at every user logon, straight into the system tray;
-;   4. sets ICP_ALLOWED_ORIGIN so the agent refuses any other host.
+;   4. sets ICP_ALLOWED_ORIGIN so the agent refuses any other host (default:
+;      any https://*.capivapp.com.br subdomain, e.g. assina.capivapp.com.br).
 ;
 ; NO CONSOLE WINDOW, ANYWHERE: every entry point below (logon, Start menu, deep
 ; link, post-install run) invokes CapivaSign.exe, which package-windows.bat
 ; builds WITHOUT --win-console. The separate CapivaSignCli.exe is the only
 ; console binary and is never wired to an automatic trigger.
 ;
-; Build:  windows\build-installer.bat [https://your.host]
-; or directly:  ISCC /DAllowedOrigin=https://your.host windows\installer.iss
+; Build:  windows\build-installer.bat [origins]
+; or directly:  ISCC "/DAllowedOrigin=https://*.your.host" windows\installer.iss
 ;
 ; Prereqs: the app-image must already exist at dist\CapivaSign (run
 ; windows\package-windows.bat first; build-installer.bat does this for you), and
 ; Inno Setup 6 (ISCC.exe) must be installed.
 
 #define AppName "CapivaSign - Assinador ICP-Brasil"
-#define AppVersion "1.0.0"
+#define AppVersion "1.0.2"
 #define AppPublisher "CapivApp"
 ; Windowed launcher (GUI subsystem). Used for EVERY automatic entry point so no
 ; cmd window is ever created; it defaults to `serve --no-gui` and lands in the tray.
@@ -28,10 +29,13 @@
 #define CliExeName "CapivaSignCli.exe"
 #define Protocol "capivasign-icp"
 
-; Origin the agent is allowed to talk to. Override at compile time:
-;   ISCC /DAllowedOrigin=https://app.suaempresa.com installer.iss
+; Origins the agent is allowed to talk to: a comma-separated list of exact
+; origins (https://assina.capivapp.com.br) and/or wildcard origins
+; (https://*.capivapp.com.br = the domain and any subdomain). Override at
+; compile time:
+;   ISCC "/DAllowedOrigin=https://*.suaempresa.com" installer.iss
 #ifndef AllowedOrigin
-  #define AllowedOrigin "https://app.capivapp.com.br"
+  #define AllowedOrigin "https://*.capivapp.com.br"
 #endif
 
 [Setup]
@@ -75,7 +79,10 @@ Root: HKLM; Subkey: "Software\Classes\{#Protocol}"; ValueType: string; ValueName
 Root: HKLM; Subkey: "Software\Classes\{#Protocol}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#AppExeName},0"
 Root: HKLM; Subkey: "Software\Classes\{#Protocol}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" ""%1"""
 
-; --- SSRF guard: only this origin is accepted (system env) -------------------
+; --- SSRF guard: only these origins are accepted (system env) ---------------
+; No `createvalueifdoesntexist` flag ON PURPOSE: an upgrade must OVERWRITE the
+; value an older installer wrote (e.g. the old https://app.capivapp.com.br,
+; which refused https://assina.capivapp.com.br).
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "ICP_ALLOWED_ORIGIN"; ValueData: "{#AllowedOrigin}"; Flags: preservestringtype uninsdeletevalue
 
 ; --- auto-start the tray agent at every user logon --------------------------
@@ -97,3 +104,17 @@ Filename: "{app}\{#AppExeName}"; Description: "Iniciar o assinador agora"; Flags
 ; Stop a running agent before files are removed (both launchers).
 Filename: "{sys}\taskkill.exe"; Parameters: "/f /im {#AppExeName}"; Flags: runhidden; RunOnceId: "StopAgent"
 Filename: "{sys}\taskkill.exe"; Parameters: "/f /im {#CliExeName}"; Flags: runhidden; RunOnceId: "StopCli"
+
+[Code]
+// The agent started by [Run] inherits Setup's OWN environment, which still has
+// the ICP_ALLOWED_ORIGIN value from before this install (the system env change
+// only reaches processes started after the broadcast). Update Setup's copy so
+// the freshly started tray agent already enforces the new allow list.
+function SetEnvironmentVariable(lpName: String; lpValue: String): Boolean;
+  external 'SetEnvironmentVariableW@kernel32.dll stdcall';
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+    SetEnvironmentVariable('ICP_ALLOWED_ORIGIN', '{#AllowedOrigin}');
+end;

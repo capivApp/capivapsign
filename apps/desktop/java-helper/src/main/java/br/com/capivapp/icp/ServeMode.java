@@ -248,7 +248,7 @@ final class ServeMode {
    * The CapivaSign mark, loaded from the jar. Falls back to a drawn glyph so a
    * packaging slip degrades to a plain icon instead of no tray icon at all.
    */
-  private static Image trayImage() {
+  static Image trayImage() {
     try (InputStream stream = ServeMode.class.getResourceAsStream("/br/com/capivapp/icp/tray-icon.png")) {
       if (stream != null) {
         BufferedImage image = ImageIO.read(stream);
@@ -318,10 +318,7 @@ final class ServeMode {
     if (GraphicsEnvironment.isHeadless()) {
       return;
     }
-    String allowed = System.getenv("ICP_ALLOWED_ORIGIN");
-    String originLine = allowed == null || allowed.isBlank()
-        ? "<p style='color:#b45309;'>⚠ Aceitando qualquer site (ICP_ALLOWED_ORIGIN não definido).</p>"
-        : "<p>Site autorizado: <b>" + escapeHtml(allowed) + "</b></p>";
+    String originLine = "<p>Sites autorizados: <b>" + escapeHtml(AllowedOrigins.configured()) + "</b></p>";
 
     SwingUtilities.invokeLater(() -> {
       JFrame frame = new JFrame(Brand.AGENT_NAME);

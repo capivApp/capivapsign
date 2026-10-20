@@ -6,11 +6,12 @@ REM   run.bat                  (tray agent on http://localhost:3231; NO console 
 REM   run.bat serve            (same)
 REM   run.bat serve --no-gui   (same, explicit)
 REM   run.bat list  --source windows-my
-REM   run.bat sign  --base-url https://app.capivapp.com.br --token <TOKEN> --source windows-my
-REM   run.bat sign  --base-url https://app.capivapp.com.br --token <TOKEN> --source p12 --p12 C:\cert.p12
-REM   run.bat sign  --base-url https://app.capivapp.com.br --token <TOKEN> --source pkcs11 --module C:\path\to\token.dll
+REM   run.bat sign  --base-url https://assina.capivapp.com.br --token <TOKEN> --source windows-my
+REM   run.bat sign  --base-url https://assina.capivapp.com.br --token <TOKEN> --source p12 --p12 C:\cert.p12
+REM   run.bat sign  --base-url https://assina.capivapp.com.br --token <TOKEN> --source pkcs11 --module C:\path\to\token.dll
 REM
-REM Tip: set ICP_ALLOWED_ORIGIN=https://app.capivapp.com.br to refuse other hosts.
+REM The agent only talks to https://*.capivapp.com.br unless ICP_ALLOWED_ORIGIN
+REM lists other origins, e.g. set ICP_ALLOWED_ORIGIN=http://localhost:3000
 
 setlocal
 set HERE=%~dp0

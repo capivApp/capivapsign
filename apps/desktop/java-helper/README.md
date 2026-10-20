@@ -31,8 +31,13 @@ normal server-side notifications, so there's no separate callback URL — the we
 page just watches the document status. Auth is by the **recipient token**
 (capability, same trust as the signing link); no device pairing required.
 
-> **Security:** set `ICP_ALLOWED_ORIGIN=https://app.capivapp.com.br` so the agent
-> refuses any other host (a deep link is invokable by any page). Never put a
+> **Security:** the agent only talks to allow-listed origins (a deep link or the
+> loopback server is invokable by any page). `ICP_ALLOWED_ORIGIN` is a
+> comma-separated list of exact origins (`https://assina.capivapp.com.br`,
+> `http://localhost:3000`) and/or wildcard origins (`https://*.capivapp.com.br`
+> = the domain and any subdomain). When unset it defaults to
+> `https://*.capivapp.com.br`. The base URL is matched on its parsed scheme,
+> host and port; userinfo, query strings and fragments are refused. Never put a
 > password/PIN in the URL — secrets are prompted interactively.
 
 ## Certificate backends (A1 + A3)
@@ -49,6 +54,17 @@ A1/PKCS#11 sign via raw RSA cipher over `DigestInfo`; Windows-MY via
 `NONEwithRSA` (non-extractable keys). All produce the same RSASSA-PKCS1-v1_5
 value libpdf embeds.
 
+**Dialog owner window.** Every GUI prompt (certificate picker, PIN, file
+chooser) and any PIN prompt a smart card CSP opens from inside SunMSCAPI is
+parented to ONE process-wide owner window (`OwnerWindow` + `SwingUi`). It is
+shown and raised before the key store is opened, stays up until the source is
+closed, is then hidden and is never disposed; all Swing work runs on the EDT.
+The previous per-dialog throwaway parent, built and disposed on worker threads,
+let Windows create a window against a destroyed owner and fail with
+ERROR_INVALID_WINDOW_HANDLE ("Identificador da janela inválido"), so the
+picker never appeared. Because that window is never disposed, one-shot runs
+(deep link, `sign`, `list`) end with an explicit `System.exit`.
+
 ## Windows installer (.exe)
 
 For an end-user Windows box, ship the one-click installer instead of asking the
@@ -56,7 +72,8 @@ signer to run scripts. On a Windows machine with **JDK 17+** and **[Inno Setup
 6](https://jrsoftware.org/isdl.php)** on PATH:
 
 ```bat
-windows\build-installer.bat https://app.suaempresa.com
+windows\build-installer.bat                              REM origins = https://*.capivapp.com.br
+windows\build-installer.bat "https://*.suaempresa.com"
 REM -> dist\installer\CapivaSign-Setup.exe
 ```
 
@@ -64,8 +81,10 @@ REM -> dist\installer\CapivaSign-Setup.exe
 
 1. installs the agent under `C:\Program Files\CapivaSign`;
 2. registers the **`capivasign-icp://` deep link** per-machine (HKLM);
-3. sets **`ICP_ALLOWED_ORIGIN`** (the origin passed to `build-installer.bat`) as a
-   system env var, so the agent refuses any other host;
+3. sets **`ICP_ALLOWED_ORIGIN`** (the origins passed to `build-installer.bat`,
+   default `https://*.capivapp.com.br`) as a system env var, so the agent
+   refuses any other host. Upgrading overwrites the value an older installer
+   wrote;
 4. **auto-starts the serve agent at every user logon** via the HKLM `Run` key
    as `CapivaSign.exe` — it lives in the **system tray** (no
    "Aguardando…" window), keeps `http://127.0.0.1:3231/ping` answering, and only
@@ -86,6 +105,7 @@ loopback `serve` agent (tray) **or** the `capivasign-icp://` deep link.
 build.bat                       # Windows equivalent
 windows\package-windows.bat     # Windows: self-contained app-image (jlink+jpackage, bundles a JRE)
 windows\build-installer.bat     # Windows: one-click CapivaSign-Setup.exe (protocol + logon auto-start)
+windows/build-installer-wine.sh # Linux: same installer via Wine (needs WIN_JDK + Inno Setup 6 in a Wine prefix; see the script header)
 ```
 
 `package-windows.bat` produces **two** launchers, and which one you wire up
@@ -117,11 +137,19 @@ java -jar build/icp-helper.jar list --source p12 --p12 cert.p12 --password test
 java -jar build/icp-helper.jar list --source windows-my
 
 # sign (full remote flow)
-java -jar build/icp-helper.jar sign --base-url https://app.capivapp.com.br \
+java -jar build/icp-helper.jar sign --base-url https://assina.capivapp.com.br \
      --token <RECIPIENT_TOKEN> --source pkcs11 --module C:\path\token.dll
 ```
 
-## Tests (need `openssl` + network for the RFC3161 TSA)
+## Tests
+
+`./test.sh` compiles `src/main` + `src/test` with plain `javac` and runs every
+`*Test` class (no JUnit). Currently covers the origin allow list
+(`AllowedOriginsTest`), the owner window lifecycle (`OwnerWindowTest`) and that
+the signing flow holds the UI session around every prompt and key store access
+(`SigningSessionTest`).
+
+End-to-end (need `openssl` + network for the RFC3161 TSA):
 
 - `cli-agent.e2e.mjs` — drives the jar in `sign` CLI mode against a mock
   CapivaSign server (real libpdf capture/embed) and verifies the agent's signature with
