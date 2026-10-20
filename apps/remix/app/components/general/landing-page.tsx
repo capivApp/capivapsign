@@ -682,8 +682,7 @@ export const LandingPage = ({ pricingClaims }: LandingPageProps) => {
 
             <h1 className="mt-6 text-balance font-bold text-4xl tracking-tight sm:text-6xl">
               <Trans>
-                Contratos assinados <span className={BRAND_GRADIENT_TEXT}>em minutos</span>, pelo celular ou com
-                certificado
+                Seus documentos assinados <span className={BRAND_GRADIENT_TEXT}>em minutos</span>, de qualquer lugar
               </Trans>
             </h1>
 
