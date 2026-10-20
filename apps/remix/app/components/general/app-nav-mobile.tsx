@@ -1,4 +1,4 @@
-import LogoImage from '@documenso/assets/logo.png';
+import LogoImage from '@documenso/assets/logo-wordmark.png';
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
@@ -81,7 +81,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
       <SheetContent className="flex w-full max-w-[350px] flex-col">
         <Link to="/" onClick={handleMenuItemClick}>
-          <img src={LogoImage} alt="CapivaSign Logo" className="dark:invert" width={170} height={25} />
+          <img src={LogoImage} alt="CapivaSign Logo" width={170} height={25} />
         </Link>
 
         <div className="mt-8 flex w-full flex-col items-start gap-y-4">

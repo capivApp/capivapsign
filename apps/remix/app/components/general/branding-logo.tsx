@@ -1,4 +1,4 @@
-import LogoImage from '@documenso/assets/logo.png';
+import LogoImage from '@documenso/assets/logo-wordmark.png';
 import type { ImgHTMLAttributes } from 'react';
 
 export type LogoProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'> & {
@@ -6,7 +6,9 @@ export type LogoProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'>
 };
 
 /**
- * CapivaSign brand logo, rendered from `packages/assets/logo.png`.
+ * CapivaSign brand logo, rendered from `packages/assets/logo-wordmark.png`
+ * (the full logo cropped to its content and sized for screens; PDFs keep
+ * using the full-resolution `logo.png`).
  *
  * Callers size it by height (e.g. `className="h-6 w-auto"`); `object-contain`
  * preserves the wordmark's aspect ratio. Previously an inline CapivaSign SVG

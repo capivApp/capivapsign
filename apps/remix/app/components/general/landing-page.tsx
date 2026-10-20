@@ -1,21 +1,18 @@
-import LogoIcon from '@documenso/assets/logo_icon.png';
+import LogoIcon from '@documenso/assets/logo-icon-small.png';
+import { SUPPORT_EMAIL } from '@documenso/lib/constants/app';
 import type { TClaimFlags, TClaimPricing } from '@documenso/lib/types/subscription';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans } from '@lingui/react/macro';
 import {
   ArrowRightIcon,
   BadgeCheckIcon,
-  BadgeDollarSignIcon,
   Building2Icon,
   CheckCircle2Icon,
   CheckIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
+  ChevronDownIcon,
   DownloadIcon,
   FileSignatureIcon,
   FingerprintIcon,
-  GaugeIcon,
-  HeadphonesIcon,
   LayersIcon,
   LeafIcon,
   MailIcon,
@@ -23,15 +20,18 @@ import {
   MinusIcon,
   PaletteIcon,
   PlugIcon,
+  QrCodeIcon,
+  ReceiptTextIcon,
+  RefreshCwIcon,
   RocketIcon,
   ScrollTextIcon,
   ShieldCheckIcon,
   SparklesIcon,
   UserIcon,
+  WalletIcon,
   WebhookIcon,
 } from 'lucide-react';
 import type { ComponentType, ReactNode } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 
 import { BrandingLogo } from './branding-logo';
@@ -47,14 +47,21 @@ type LandingPageProps = {
   pricingClaims: PublicPricingClaim[];
 };
 
-// Localized metadata for each metered, per-item billable action. The `key`
-// matches `TClaimPricing` so prices flow straight from the claims catalogue.
+type IconComponent = ComponentType<{ className?: string }>;
+
+// Shared brand accents: indigo (primary) fading into the pink of the logo.
+const BRAND_GRADIENT_TEXT = 'bg-gradient-to-r from-brand-400 to-pink-400 bg-clip-text text-transparent';
+const ICON_TILE = 'flex items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300';
+
+const formatBrl = (cents: number) => (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+// Metered actions, keyed like `TClaimPricing` so prices come straight from the
+// plan catalogue in the database.
 const PRICING_ITEMS: {
   key: keyof TClaimPricing;
-  // Matching free-allowance field; usage up to this amount each month is free.
   quotaKey: keyof TClaimPricing;
   label: ReactNode;
-  icon: ComponentType<{ className?: string }>;
+  icon: IconComponent;
 }[] = [
   {
     key: 'createDocumentCents',
@@ -83,34 +90,37 @@ const PRICING_ITEMS: {
   {
     key: 'recoverFileCents',
     quotaKey: 'recoverFileFreeQuota',
-    label: <Trans>Recuperação de arquivo</Trans>,
+    label: <Trans>Download de arquivo pela API</Trans>,
     icon: DownloadIcon,
   },
   {
     key: 'embedSessionCents',
     quotaKey: 'embedSessionFreeQuota',
-    label: <Trans>Sessão de posicionador (embed)</Trans>,
+    label: <Trans>Sessão de assinatura incorporada</Trans>,
     icon: PlugIcon,
   },
 ];
 
-const formatBrl = (cents: number) => (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+// Capabilities each plan really has, read from the plan flags in the database.
+const FLAG_ROWS: { key: keyof TClaimFlags; icon: IconComponent; label: ReactNode }[] = [
+  { key: 'unlimitedDocuments', icon: FileSignatureIcon, label: <Trans>Documentos ilimitados</Trans> },
+  { key: 'allowCustomBranding', icon: SparklesIcon, label: <Trans>Marca personalizada</Trans> },
+  { key: 'whiteLabelBranding', icon: PaletteIcon, label: <Trans>White label (sua marca)</Trans> },
+  { key: 'embedSigning', icon: PlugIcon, label: <Trans>Assinatura incorporada (embed)</Trans> },
+  { key: 'signingReminders', icon: MailIcon, label: <Trans>Lembretes de assinatura</Trans> },
+  { key: 'cscQesSigning', icon: FingerprintIcon, label: <Trans>Assinatura qualificada em nuvem</Trans> },
+  { key: 'cfr21', icon: BadgeCheckIcon, label: <Trans>Conformidade 21 CFR Part 11</Trans> },
+  { key: 'hipaa', icon: ShieldCheckIcon, label: <Trans>Conformidade HIPAA</Trans> },
+];
 
-// Presentation metadata for the customer-facing plans. Prices flow from the
-// claims catalogue (DB); copy, icons and comparison values live here. Plans are
-// keyed by their lowercased claim `name` and rendered in `PLAN_ORDER` first,
-// then any remaining priced claim is appended with `FALLBACK_PLAN_META` — so a
-// claim added in admin shows up on the page as soon as it has a price, even
-// without a curated entry here. Visibility is controlled by setting a price
-// (see `getPublicPricingClaims`), not by this map.
-type PlanFeatureValue = boolean | ReactNode;
-
+// Copy and icon per plan, keyed by the lowercased plan name. Prices and
+// capabilities always come from the database; a plan priced in admin without an
+// entry here still shows up with the fallback.
 type PlanMeta = {
-  icon: ComponentType<{ className?: string }>;
+  icon: IconComponent;
   tagline: ReactNode;
-  popular?: boolean;
-  cta: { label: ReactNode; to?: string; href?: string; variant: 'default' | 'outline' };
-  features: Record<string, PlanFeatureValue>;
+  highlight?: boolean;
+  cta: { label: ReactNode; to?: string; href?: string };
 };
 
 const PLAN_ORDER = ['free', 'individual', 'early adopter', 'plataforma', 'enterprise'];
@@ -118,792 +128,693 @@ const PLAN_ORDER = ['free', 'individual', 'early adopter', 'plataforma', 'enterp
 const PLAN_META: Record<string, PlanMeta> = {
   free: {
     icon: LeafIcon,
-    tagline: <Trans>Para testes e projetos pessoais</Trans>,
-    cta: { label: <Trans>Começar grátis</Trans>, to: '/signup', variant: 'outline' },
-    features: {
-      apiFull: true,
-      emailSupport: true,
-      webhooks: '10/mês',
-      environments: '1',
-      logs: '7 dias',
-      sla: false,
-      prioritySupport: false,
-      accountManager: false,
-      onboarding: false,
-    },
+    tagline: <Trans>Para conhecer e para projetos pessoais.</Trans>,
+    cta: { label: <Trans>Começar grátis</Trans>, to: '/signup' },
   },
   individual: {
     icon: UserIcon,
-    tagline: <Trans>Perfeito para desenvolvedores individuais</Trans>,
-    cta: { label: <Trans>Assinar plano</Trans>, to: '/signup', variant: 'outline' },
-    features: {
-      apiFull: true,
-      emailSupport: true,
-      webhooks: '50/mês',
-      environments: '2',
-      logs: '14 dias',
-      sla: false,
-      prioritySupport: false,
-      accountManager: false,
-      onboarding: false,
-    },
+    tagline: <Trans>Para profissionais que assinam todo dia.</Trans>,
+    highlight: true,
+    cta: { label: <Trans>Assinar plano</Trans>, to: '/signup' },
   },
   'early adopter': {
     icon: RocketIcon,
-    tagline: <Trans>Para startups e produtos em crescimento</Trans>,
-    popular: true,
-    cta: { label: <Trans>Assinar plano</Trans>, to: '/signup', variant: 'default' },
-    features: {
-      apiFull: true,
-      emailSupport: true,
-      webhooks: '500/mês',
-      environments: '5',
-      logs: '30 dias',
-      sla: '99,5%',
-      prioritySupport: true,
-      accountManager: false,
-      onboarding: false,
-    },
+    tagline: <Trans>Para startups e produtos em crescimento.</Trans>,
+    cta: { label: <Trans>Assinar plano</Trans>, to: '/signup' },
   },
   plataforma: {
     icon: LayersIcon,
-    tagline: <Trans>Para plataformas que assinam em escala</Trans>,
-    cta: { label: <Trans>Assinar plano</Trans>, to: '/signup', variant: 'outline' },
-    features: {
-      apiFull: true,
-      emailSupport: true,
-      webhooks: '2.000/mês',
-      environments: '10',
-      logs: '60 dias',
-      sla: '99,9%',
-      prioritySupport: true,
-      accountManager: true,
-      onboarding: false,
-    },
+    tagline: <Trans>Para plataformas que assinam em escala.</Trans>,
+    cta: { label: <Trans>Assinar plano</Trans>, to: '/signup' },
   },
   enterprise: {
     icon: Building2Icon,
-    tagline: <Trans>Para empresas com alta demanda</Trans>,
-    cta: { label: <Trans>Falar com vendas</Trans>, href: 'mailto:contato@capivapp.com.br', variant: 'outline' },
-    features: {
-      apiFull: true,
-      emailSupport: true,
-      webhooks: <Trans>Ilimitado</Trans>,
-      environments: <Trans>Ilimitado</Trans>,
-      logs: '90 dias',
-      sla: '99,9%',
-      prioritySupport: true,
-      accountManager: true,
-      onboarding: true,
-    },
+    tagline: <Trans>Para alto volume e conformidade.</Trans>,
+    cta: { label: <Trans>Falar com vendas</Trans>, href: `mailto:${SUPPORT_EMAIL}` },
   },
 };
 
-// Used for any priced claim that has no curated `PLAN_META` entry (e.g. a plan
-// freshly added in admin). It still renders a real card from the DB price/flags;
-// it just has no hand-written tagline or marketing-tier comparison values.
 const FALLBACK_PLAN_META: PlanMeta = {
   icon: LayersIcon,
   tagline: null,
-  cta: { label: <Trans>Assinar plano</Trans>, to: '/signup', variant: 'outline' },
-  features: {},
+  cta: { label: <Trans>Assinar plano</Trans>, to: '/signup' },
 };
 
-// Comparison rows backed by the curated `PLAN_META.features` map (marketing
-// tiers that don't live in the DB — webhook quotas, SLA, support level…).
-const COMPARISON_ROWS: { key: string; icon: ComponentType<{ className?: string }>; label: ReactNode }[] = [
-  { key: 'apiFull', icon: PlugIcon, label: <Trans>Acesso à API completa</Trans> },
-  { key: 'emailSupport', icon: MailIcon, label: <Trans>Suporte via e-mail</Trans> },
-  { key: 'webhooks', icon: WebhookIcon, label: <Trans>Webhooks</Trans> },
-  { key: 'environments', icon: LayersIcon, label: <Trans>Ambientes (sandbox/produção)</Trans> },
-  { key: 'logs', icon: ScrollTextIcon, label: <Trans>Logs de requisições</Trans> },
-  { key: 'sla', icon: GaugeIcon, label: <Trans>SLA</Trans> },
-  { key: 'prioritySupport', icon: HeadphonesIcon, label: <Trans>Suporte prioritário</Trans> },
-  { key: 'accountManager', icon: UserIcon, label: <Trans>Gerente de conta dedicado</Trans> },
-  { key: 'onboarding', icon: SparklesIcon, label: <Trans>Customizações e onboarding</Trans> },
+const NAV_LINKS = [
+  { href: '#recursos', label: <Trans>Recursos</Trans> },
+  { href: '#como-funciona', label: <Trans>Como funciona</Trans> },
+  { href: '#precos', label: <Trans>Preços</Trans> },
+  { href: '#duvidas', label: <Trans>Dúvidas</Trans> },
 ];
 
-// Comparison rows backed by the real `claim.flags` returned from the DB. These
-// are capabilities (not metered prices), e.g. white-label, so they're rendered
-// straight from each plan's flags — no price, but still demonstrated.
-const FLAG_COMPARISON_ROWS: {
-  key: keyof TClaimFlags;
-  icon: ComponentType<{ className?: string }>;
-  label: ReactNode;
-}[] = [
-  { key: 'whiteLabelBranding', icon: PaletteIcon, label: <Trans>White label (sua marca)</Trans> },
-  { key: 'allowCustomBranding', icon: SparklesIcon, label: <Trans>Marca personalizada</Trans> },
-  { key: 'unlimitedDocuments', icon: FileSignatureIcon, label: <Trans>Documentos ilimitados</Trans> },
-  { key: 'embedSigning', icon: PlugIcon, label: <Trans>Assinatura incorporada (embed)</Trans> },
-  { key: 'signingReminders', icon: MailIcon, label: <Trans>Lembretes de assinatura</Trans> },
-  { key: 'cscQesSigning', icon: FingerprintIcon, label: <Trans>Assinatura qualificada (QES)</Trans> },
-  { key: 'cfr21', icon: BadgeCheckIcon, label: <Trans>Conformidade 21 CFR Part 11</Trans> },
-  { key: 'hipaa', icon: ShieldCheckIcon, label: <Trans>Conformidade HIPAA</Trans> },
+const HERO_BADGES = [
+  { icon: ShieldCheckIcon, label: <Trans>ICP-Brasil A1 e A3</Trans> },
+  { icon: ScrollTextIcon, label: <Trans>Lei nº 14.063/2020</Trans> },
+  { icon: MessageCircleIcon, label: <Trans>Assinatura por WhatsApp</Trans> },
+  { icon: PlugIcon, label: <Trans>API e webhooks</Trans> },
 ];
 
-const TRUST_HIGHLIGHTS = [
-  {
-    icon: BadgeDollarSignIcon,
-    title: <Trans>Sem taxas escondidas</Trans>,
-    text: <Trans>Você paga apenas pelo que usar.</Trans>,
-  },
-  {
-    icon: LayersIcon,
-    title: <Trans>Escale com facilidade</Trans>,
-    text: <Trans>Troque de plano quando precisar, sem burocracia.</Trans>,
-  },
+const FEATURES: { icon: IconComponent; title: ReactNode; description: ReactNode }[] = [
   {
     icon: ShieldCheckIcon,
-    title: <Trans>Infraestrutura segura</Trans>,
-    text: <Trans>Seus dados protegidos com criptografia e alta disponibilidade.</Trans>,
-  },
-  {
-    icon: HeadphonesIcon,
-    title: <Trans>Suporte que entende</Trans>,
-    text: <Trans>Equipe técnica pronta para te ajudar a qualquer momento.</Trans>,
-  },
-];
-
-const renderFeatureValue = (value: PlanFeatureValue | undefined) => {
-  if (value === true) {
-    return <CheckIcon className="mx-auto h-4 w-4 text-emerald-500" />;
-  }
-
-  if (value === false || value === undefined) {
-    return <MinusIcon className="mx-auto h-4 w-4 text-muted-foreground/40" />;
-  }
-
-  return <span className="font-medium text-sm">{value}</span>;
-};
-
-// Cards shown in the features carousel. Richer than the previous static grid so
-// the carousel has something to scroll through.
-const FEATURES: {
-  icon: ComponentType<{ className?: string }>;
-  titleKey: string;
-  title: ReactNode;
-  description: ReactNode;
-}[] = [
-  {
-    icon: ShieldCheckIcon,
-    titleKey: 'icp',
     title: <Trans>Validade jurídica ICP-Brasil</Trans>,
     description: (
       <Trans>
-        Padrão ICP-Brasil (A1 e A3) e assinatura eletrônica avançada, em conformidade com a Lei nº 14.063/2020 e o
-        eIDAS.
+        Assinatura eletrônica avançada e qualificada com certificado A1 ou A3, conforme a Lei nº 14.063/2020.
       </Trans>
     ),
   },
   {
     icon: MessageCircleIcon,
-    titleKey: 'whatsapp',
-    title: <Trans>Assinaturas por WhatsApp</Trans>,
-    description: (
-      <Trans>Envie o pedido de assinatura direto no WhatsApp do signatário e acompanhe em tempo real.</Trans>
-    ),
+    title: <Trans>Assinatura pelo WhatsApp</Trans>,
+    description: <Trans>O pedido chega no WhatsApp do signatário, que assina pelo celular em poucos toques.</Trans>,
   },
   {
     icon: PaletteIcon,
-    titleKey: 'whitelabel',
-    title: <Trans>White label com a sua marca</Trans>,
-    description: (
-      <Trans>
-        Personalize páginas de assinatura, e-mails e certificados com o seu logotipo e as suas cores — sem a marca
-        CapivaSign.
-      </Trans>
-    ),
+    title: <Trans>A sua marca em tudo</Trans>,
+    description: <Trans>Páginas de assinatura, e-mails e certificados com o seu logotipo e as suas cores.</Trans>,
   },
   {
     icon: PlugIcon,
-    titleKey: 'api',
-    title: <Trans>API e webhooks prontos</Trans>,
+    title: <Trans>API, webhooks e embed</Trans>,
+    description: <Trans>Integre a assinatura ao seu sistema e receba cada evento em tempo real.</Trans>,
+  },
+  {
+    icon: QrCodeIcon,
+    title: <Trans>Verificação pública</Trans>,
     description: (
-      <Trans>
-        Conecte a CapivaSign aos seus sistemas com API completa e webhooks, com cobrança por uso transparente.
-      </Trans>
+      <Trans>Cada documento traz QR Code e hash SHA-256 para qualquer pessoa conferir a autenticidade.</Trans>
     ),
   },
   {
     icon: ScrollTextIcon,
-    titleKey: 'audit',
-    title: <Trans>Trilha de auditoria completa</Trans>,
+    title: <Trans>Trilha de auditoria</Trans>,
     description: (
-      <Trans>Cada documento é selado e auditável, com trilha de evidências detalhada de ponta a ponta.</Trans>
-    ),
-  },
-  {
-    icon: BadgeCheckIcon,
-    titleKey: 'compliance',
-    title: <Trans>Conformidade empresarial</Trans>,
-    description: (
-      <Trans>Recursos para 21 CFR Part 11, HIPAA e assinatura qualificada (QES) para times com alta exigência.</Trans>
+      <Trans>Relatório com IP, dispositivo, data e hora de cada etapa, anexado ao documento assinado.</Trans>
     ),
   },
 ];
 
 const STEPS = [
-  { n: 1, title: <Trans>Envie o documento</Trans>, text: <Trans>Suba o PDF e escolha os signatários.</Trans> },
   {
-    n: 2,
-    title: <Trans>Assine de qualquer lugar</Trans>,
-    text: <Trans>Por link, e-mail ou WhatsApp — com ou sem certificado ICP-Brasil.</Trans>,
+    title: <Trans>Envie o documento</Trans>,
+    text: <Trans>Suba o PDF, posicione os campos e escolha quem assina.</Trans>,
   },
   {
-    n: 3,
-    title: <Trans>Receba com validade jurídica</Trans>,
-    text: <Trans>O documento é selado e auditável, com trilha completa de evidências.</Trans>,
+    title: <Trans>Colete as assinaturas</Trans>,
+    text: <Trans>Por link, e-mail ou WhatsApp, com ou sem certificado ICP-Brasil.</Trans>,
+  },
+  {
+    title: <Trans>Receba o documento selado</Trans>,
+    text: <Trans>Todos recebem o PDF assinado, com relatório de auditoria e verificação pública.</Trans>,
   },
 ];
 
-const HERO_STATS = [
-  { value: 'ICP-Brasil', label: <Trans>A1 e A3 nativos</Trans> },
-  { value: '+ WhatsApp', label: <Trans>Assine por mensagem</Trans> },
-  { value: 'API-first', label: <Trans>Integre em minutos</Trans> },
+const BILLING_HIGHLIGHTS = [
+  {
+    icon: ReceiptTextIcon,
+    title: <Trans>Uma fatura por mês</Trans>,
+    text: <Trans>Mensalidade e uso do mês juntos, detalhados item a item.</Trans>,
+  },
+  {
+    icon: WalletIcon,
+    title: <Trans>Pix, boleto ou cartão</Trans>,
+    text: <Trans>Você escolhe como pagar em cada fatura.</Trans>,
+  },
+  {
+    icon: RefreshCwIcon,
+    title: <Trans>Troque de plano quando quiser</Trans>,
+    text: <Trans>Direto pela página de cobrança, sem falar com ninguém.</Trans>,
+  },
+  {
+    icon: SparklesIcon,
+    title: <Trans>Franquia grátis todo mês</Trans>,
+    text: <Trans>Cada plano inclui uma quantidade de ações sem custo.</Trans>,
+  },
 ];
 
-// Self-contained horizontal carousel (scroll-snap + arrows + dots). No extra
-// dependency — uses native scrolling so it stays smooth and accessible.
-const FeatureCarousel = () => {
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+const FAQ: { question: ReactNode; answer: ReactNode }[] = [
+  {
+    question: <Trans>A assinatura tem validade jurídica?</Trans>,
+    answer: (
+      <Trans>
+        Sim. As assinaturas seguem a Lei nº 14.063/2020. Com certificado ICP-Brasil, a assinatura é qualificada e tem a
+        mesma validade de uma assinatura de próprio punho.
+      </Trans>
+    ),
+  },
+  {
+    question: <Trans>Quem vai assinar precisa criar conta?</Trans>,
+    answer: <Trans>Não. O signatário assina pelo link que recebe por e-mail ou WhatsApp.</Trans>,
+  },
+  {
+    question: <Trans>Preciso de certificado digital?</Trans>,
+    answer: (
+      <Trans>
+        Não para a assinatura eletrônica. Para assinar com ICP-Brasil, use um certificado A1 (arquivo) ou A3 (token ou
+        cartão) com o assinador CapivaSign.
+      </Trans>
+    ),
+  },
+  {
+    question: <Trans>Como funciona a cobrança?</Trans>,
+    answer: (
+      <Trans>
+        Todo dia 1º sai uma fatura com a mensalidade do plano e o uso do mês anterior. Você paga por Pix, boleto ou
+        cartão.
+      </Trans>
+    ),
+  },
+  {
+    question: <Trans>Posso trocar ou cancelar o plano?</Trans>,
+    answer: (
+      <Trans>
+        Sim, na página de cobrança. Um plano maior vale na hora. Um plano menor, ou voltar ao gratuito, vale a partir do
+        mês seguinte.
+      </Trans>
+    ),
+  },
+  {
+    question: <Trans>Consigo integrar com o meu sistema?</Trans>,
+    answer: (
+      <Trans>
+        Sim. Há API completa e webhooks em todos os planos, e assinatura incorporada nos planos que incluem o recurso.
+      </Trans>
+    ),
+  },
+];
 
-  const scrollByCard = useCallback((direction: 1 | -1) => {
-    const scroller = scrollerRef.current;
+const getPlanKey = (claim: PublicPricingClaim) => claim.name.trim().toLowerCase();
 
-    if (!scroller) {
-      return;
-    }
+const getPlanOrder = (key: string) => {
+  const index = PLAN_ORDER.indexOf(key);
 
-    const firstCard = scroller.querySelector<HTMLElement>('[data-carousel-card]');
-    const step = firstCard ? firstCard.offsetWidth + 24 : scroller.clientWidth;
+  return index === -1 ? PLAN_ORDER.length : index;
+};
 
-    scroller.scrollBy({ left: step * direction, behavior: 'smooth' });
-  }, []);
+const SectionHeading = ({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: ReactNode;
+  title: ReactNode;
+  description?: ReactNode;
+}) => (
+  <div className="mx-auto max-w-2xl text-center">
+    <span className="font-semibold text-brand-600 text-sm uppercase tracking-wider dark:text-brand-300">{eyebrow}</span>
+    <h2 className="mt-3 text-balance font-bold text-3xl tracking-tight sm:text-4xl">{title}</h2>
+    {description && <p className="mt-4 text-balance text-lg text-muted-foreground">{description}</p>}
+  </div>
+);
 
-  const scrollToIndex = useCallback((index: number) => {
-    const scroller = scrollerRef.current;
-    const card = scroller?.querySelectorAll<HTMLElement>('[data-carousel-card]')[index];
+const FeatureValue = ({ isEnabled }: { isEnabled: boolean }) =>
+  isEnabled ? (
+    <CheckIcon className="mx-auto h-4 w-4 text-brand-500" />
+  ) : (
+    <MinusIcon className="mx-auto h-4 w-4 text-muted-foreground/40" />
+  );
 
-    card?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-  }, []);
+const UsagePrice = ({ pricing, item }: { pricing: TClaimPricing; item: (typeof PRICING_ITEMS)[number] }) => {
+  const price = pricing[item.key];
+  const quota = pricing[item.quotaKey];
 
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-
-    if (!scroller) {
-      return;
-    }
-
-    const handleScroll = () => {
-      const firstCard = scroller.querySelector<HTMLElement>('[data-carousel-card]');
-      const step = firstCard ? firstCard.offsetWidth + 24 : 1;
-
-      setActiveIndex(Math.round(scroller.scrollLeft / step));
-    };
-
-    scroller.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => scroller.removeEventListener('scroll', handleScroll);
-  }, []);
+  if (typeof price !== 'number') {
+    return <MinusIcon className="mx-auto h-4 w-4 text-muted-foreground/40" />;
+  }
 
   return (
-    <div className="relative">
-      <div
-        ref={scrollerRef}
-        className="-mx-6 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-6 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {FEATURES.map((feature) => (
-          <article
-            key={feature.titleKey}
-            data-carousel-card
-            className="group flex w-[85%] shrink-0 snap-start flex-col rounded-3xl border border-border bg-card p-7 transition-all hover:border-emerald-500/50 hover:shadow-emerald-500/5 hover:shadow-xl sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)]"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 transition-colors group-hover:bg-emerald-500 group-hover:text-white dark:text-emerald-400">
-              <feature.icon className="h-6 w-6" />
-            </div>
-            <h3 className="mt-5 font-semibold text-lg">{feature.title}</h3>
-            <p className="mt-2 text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
-          </article>
-        ))}
-      </div>
-
-      <div className="mt-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {FEATURES.map((feature, index) => (
-            <button
-              key={feature.titleKey}
-              type="button"
-              aria-label={`Ir para o recurso ${index + 1}`}
-              onClick={() => scrollToIndex(index)}
-              className={`h-2 rounded-full transition-all ${
-                activeIndex === index ? 'w-6 bg-emerald-500' : 'w-2 bg-border hover:bg-emerald-500/40'
-              }`}
-            />
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            aria-label="Recurso anterior"
-            onClick={() => scrollByCard(-1)}
-            className="h-10 w-10 rounded-full p-0"
-          >
-            <ChevronLeftIcon className="h-4 w-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            aria-label="Próximo recurso"
-            onClick={() => scrollByCard(1)}
-            className="h-10 w-10 rounded-full p-0"
-          >
-            <ChevronRightIcon className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+    <div className="flex flex-col items-center leading-tight">
+      <span className="font-semibold text-sm tabular-nums">{formatBrl(price)}</span>
+      {typeof quota === 'number' && quota > 0 && (
+        <span className="mt-0.5 whitespace-nowrap text-muted-foreground text-xs tabular-nums">
+          <Trans>{quota} grátis/mês</Trans>
+        </span>
+      )}
     </div>
   );
 };
 
-export const LandingPage = ({ pricingClaims }: LandingPageProps) => {
-  // All priced claims, in display order: curated `PLAN_ORDER` first, then any
-  // remaining claim appended (alphabetical, as returned by the loader). Every
-  // priced claim is shown — curated ones get their rich `PLAN_META`, the rest
-  // fall back to `FALLBACK_PLAN_META`.
-  const claimKey = (claim: PublicPricingClaim) => claim.name.trim().toLowerCase();
-  const orderIndex = (key: string) => {
-    const index = PLAN_ORDER.indexOf(key);
-    return index === -1 ? PLAN_ORDER.length : index;
-  };
+const HeroMockup = () => (
+  <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+    <div
+      aria-hidden
+      className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-gradient-to-tr from-brand-500/20 to-pink-500/20 blur-3xl"
+    />
 
-  const curatedPlans = [...pricingClaims]
-    .sort((a, b) => orderIndex(claimKey(a)) - orderIndex(claimKey(b)))
-    .map((claim) => ({ claim, meta: PLAN_META[claimKey(claim)] ?? FALLBACK_PLAN_META }));
+    <img src={LogoIcon} alt="" className="absolute -top-14 -right-4 z-10 h-28 w-28 drop-shadow-2xl" />
 
-  // Only show flag rows that at least one curated plan actually enables, so the
-  // comparison never lists capabilities nobody offers.
-  const activeFlagRows = FLAG_COMPARISON_ROWS.filter((row) =>
-    curatedPlans.some(({ claim }) => claim.flags[row.key] === true),
+    <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-2xl">
+      <div className="flex items-center gap-1.5 border-border/60 border-b bg-muted/40 px-4 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+        <span className="h-2.5 w-2.5 rounded-full bg-green-400/70" />
+        <span className="ml-3 truncate text-muted-foreground text-xs">contrato-prestacao-de-servicos.pdf</span>
+      </div>
+
+      <div className="space-y-3 p-6">
+        <div className="h-2.5 w-2/3 rounded-full bg-muted" />
+        <div className="h-2 w-full rounded-full bg-muted/70" />
+        <div className="h-2 w-11/12 rounded-full bg-muted/70" />
+        <div className="h-2 w-4/5 rounded-full bg-muted/70" />
+
+        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-border bg-background/60 p-4">
+          <img src={LogoIcon} alt="" className="h-11 w-11 object-contain" />
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] text-muted-foreground">
+              <Trans>Assinado eletronicamente por</Trans>
+            </div>
+            <div className="truncate font-semibold text-sm">Maria Oliveira</div>
+            <div className="text-[11px] text-brand-600 dark:text-brand-300">
+              <Trans>ICP-Brasil · certificado A3</Trans>
+            </div>
+          </div>
+          <CheckCircle2Icon className="h-5 w-5 shrink-0 text-green-500" />
+        </div>
+
+        <ol className="space-y-2 pt-2 text-xs">
+          <li className="flex items-center gap-2 text-muted-foreground">
+            <MessageCircleIcon className="h-3.5 w-3.5 text-brand-500" />
+            <Trans>Pedido enviado por WhatsApp</Trans>
+          </li>
+          <li className="flex items-center gap-2 text-muted-foreground">
+            <FingerprintIcon className="h-3.5 w-3.5 text-brand-500" />
+            <Trans>Assinado com certificado digital</Trans>
+          </li>
+          <li className="flex items-center gap-2 font-medium text-foreground">
+            <QrCodeIcon className="h-3.5 w-3.5 text-brand-500" />
+            <Trans>Documento selado e verificável</Trans>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+);
+
+type CuratedPlan = { claim: PublicPricingClaim; meta: PlanMeta };
+
+const PlanCard = ({ claim, meta }: CuratedPlan) => {
+  const Icon = meta.icon;
+  const planFlags = FLAG_ROWS.filter((row) => claim.flags[row.key] === true);
+  const isHighlighted = meta.highlight ?? false;
+
+  return (
+    <div
+      className={`relative flex h-full flex-col rounded-3xl p-6 ${
+        isHighlighted
+          ? 'border-2 border-brand-500 bg-gradient-to-b from-brand-500/10 to-card shadow-brand-500/10 shadow-xl'
+          : 'border border-border bg-card'
+      }`}
+    >
+      {isHighlighted && (
+        <span className="absolute -top-3 left-6 rounded-full bg-brand-600 px-3 py-1 font-semibold text-[11px] text-white uppercase tracking-wide">
+          <Trans>Recomendado</Trans>
+        </span>
+      )}
+
+      <div className={`${ICON_TILE} h-11 w-11`}>
+        <Icon className="h-5 w-5" />
+      </div>
+
+      <h3 className="mt-4 font-semibold text-xl">{claim.name}</h3>
+      <p className="mt-1 min-h-[2.5rem] text-muted-foreground text-sm leading-snug">{meta.tagline}</p>
+
+      <div className="mt-6 whitespace-nowrap font-bold text-3xl tracking-tight xl:text-4xl">
+        {formatBrl(claim.pricing.monthlyPriceCents ?? 0)}
+      </div>
+      <p className="mt-1 text-muted-foreground text-xs">
+        <Trans>por mês, mais o uso com franquia grátis</Trans>
+      </p>
+
+      <Button variant={isHighlighted ? 'default' : 'outline'} className="mt-6 w-full" asChild>
+        {meta.cta.href ? (
+          <a href={meta.cta.href}>{meta.cta.label}</a>
+        ) : (
+          <Link to={meta.cta.to ?? '/signup'}>{meta.cta.label}</Link>
+        )}
+      </Button>
+
+      <ul className="mt-6 space-y-2.5 border-border/60 border-t pt-6 text-sm">
+        <li className="flex items-start gap-2">
+          <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+          <Trans>Assinatura eletrônica e ICP-Brasil</Trans>
+        </li>
+        <li className="flex items-start gap-2">
+          <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+          <Trans>API, webhooks e WhatsApp</Trans>
+        </li>
+        {planFlags.map((flag) => (
+          <li key={flag.key} className="flex items-start gap-2">
+            <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+            {flag.label}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const PlanComparison = ({ plans }: { plans: CuratedPlan[] }) => {
+  // Only rows at least one plan offers, so nothing is listed that nobody sells.
+  const flagRows = FLAG_ROWS.filter((row) => plans.some(({ claim }) => claim.flags[row.key] === true));
+  const usageRows = PRICING_ITEMS.filter((item) =>
+    plans.some(({ claim }) => typeof claim.pricing[item.key] === 'number'),
+  );
+
+  const groupRow = (label: ReactNode) => (
+    <tr className="bg-muted/40">
+      <th
+        colSpan={plans.length + 1}
+        className="px-5 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide"
+      >
+        {label}
+      </th>
+    </tr>
+  );
+
+  const labelCell = (Icon: IconComponent, label: ReactNode) => (
+    <td className="px-5 py-3">
+      <span className="flex items-center gap-2.5 text-sm">
+        <Icon className="h-4 w-4 shrink-0 text-brand-500" />
+        {label}
+      </span>
+    </td>
   );
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-border/60 border-b bg-background/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <BrandingLogo className="h-16 w-auto" />
+    <div className="mt-16 overflow-x-auto rounded-3xl border border-border bg-card">
+      <table className="w-full min-w-[720px] border-collapse">
+        <thead>
+          <tr className="border-border border-b">
+            <th className="w-1/3 px-5 py-4 text-left font-semibold text-sm">
+              <Trans>Compare os planos</Trans>
+            </th>
+            {plans.map(({ claim }) => (
+              <th key={claim.id} className="px-4 py-4 text-center font-semibold text-sm">
+                {claim.name}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border/60">
+          {flagRows.length > 0 && groupRow(<Trans>Recursos</Trans>)}
+          {flagRows.map((row) => (
+            <tr key={row.key}>
+              {labelCell(row.icon, row.label)}
+              {plans.map(({ claim }) => (
+                <td key={claim.id} className="px-4 py-3 text-center">
+                  <FeatureValue isEnabled={claim.flags[row.key] === true} />
+                </td>
+              ))}
+            </tr>
+          ))}
 
-          <nav className="flex items-center gap-2">
-            <Button variant="ghost" asChild>
-              <Link to="/signin">
+          {usageRows.length > 0 && groupRow(<Trans>Preço por uso</Trans>)}
+          {usageRows.map((item) => (
+            <tr key={item.key}>
+              {labelCell(item.icon, item.label)}
+              {plans.map(({ claim }) => (
+                <td key={claim.id} className="px-4 py-3 text-center">
+                  <UsagePrice pricing={claim.pricing} item={item} />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+const LandingHeader = () => (
+  <header className="sticky top-0 z-40 border-border/60 border-b bg-background/80 backdrop-blur">
+    <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-3">
+      <Link to="/" aria-label="CapivaSign">
+        <BrandingLogo className="h-9 w-auto" />
+      </Link>
+
+      <nav className="hidden items-center gap-1 md:flex">
+        {NAV_LINKS.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            className="rounded-lg px-3 py-2 text-muted-foreground text-sm transition-colors hover:bg-muted hover:text-foreground"
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" asChild>
+          <Link to="/signin">
+            <Trans>Entrar</Trans>
+          </Link>
+        </Button>
+        <Button asChild>
+          <Link to="/signup">
+            <Trans>Criar conta</Trans>
+          </Link>
+        </Button>
+      </div>
+    </div>
+  </header>
+);
+
+const LandingFooter = () => {
+  const year = new Date().getFullYear();
+
+  const linkClass = 'text-muted-foreground text-sm transition-colors hover:text-foreground';
+
+  return (
+    <footer className="border-border/60 border-t">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="sm:col-span-2 lg:col-span-1">
+          <BrandingLogo className="h-9 w-auto" />
+          <p className="mt-4 max-w-xs text-muted-foreground text-sm">
+            <Trans>Assinatura eletrônica e digital ICP-Brasil, por link, e-mail ou WhatsApp.</Trans>
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-sm">
+            <Trans>Produto</Trans>
+          </h3>
+          <ul className="mt-4 space-y-3">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}>
+                <a href={link.href} className={linkClass}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-sm">
+            <Trans>Conta</Trans>
+          </h3>
+          <ul className="mt-4 space-y-3">
+            <li>
+              <Link to="/signin" className={linkClass}>
                 <Trans>Entrar</Trans>
               </Link>
-            </Button>
-            <Button asChild>
-              <Link to="/signup">
+            </li>
+            <li>
+              <Link to="/signup" className={linkClass}>
                 <Trans>Criar conta</Trans>
               </Link>
-            </Button>
-          </nav>
+            </li>
+            <li>
+              <Link to="/signer" className={linkClass}>
+                <Trans>Baixar assinador</Trans>
+              </Link>
+            </li>
+          </ul>
         </div>
-      </header>
+
+        <div>
+          <h3 className="font-semibold text-sm">
+            <Trans>Contato</Trans>
+          </h3>
+          <ul className="mt-4 space-y-3">
+            <li>
+              <a href={`mailto:${SUPPORT_EMAIL}`} className={linkClass}>
+                {SUPPORT_EMAIL}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="border-border/60 border-t">
+        <p className="mx-auto max-w-6xl px-6 py-6 text-muted-foreground text-xs">
+          <Trans>© {year} CapivaSign. Todos os direitos reservados.</Trans>
+        </p>
+      </div>
+    </footer>
+  );
+};
+
+export const LandingPage = ({ pricingClaims }: LandingPageProps) => {
+  const plans: CuratedPlan[] = [...pricingClaims]
+    .sort((a, b) => getPlanOrder(getPlanKey(a)) - getPlanOrder(getPlanKey(b)))
+    .map((claim) => ({ claim, meta: PLAN_META[getPlanKey(claim)] ?? FALLBACK_PLAN_META }));
+
+  return (
+    <div className="min-h-screen scroll-smooth bg-background text-foreground">
+      <LandingHeader />
 
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-emerald-50 via-background to-background dark:from-emerald-950/30"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-32 left-1/2 -z-10 h-80 w-[42rem] -translate-x-1/2 rounded-full bg-emerald-400/20 blur-3xl"
+          className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[28rem] w-[56rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-brand-500/25 to-pink-500/20 blur-3xl"
         />
 
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 pt-16 pb-20 sm:pt-24 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 pt-16 pb-24 sm:pt-24 lg:grid-cols-[1.1fr_1fr]">
           <div className="text-center lg:text-left">
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-medium text-emerald-700 text-xs dark:text-emerald-300">
+            <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 font-medium text-brand-700 text-xs dark:text-brand-200">
               <ShieldCheckIcon className="h-3.5 w-3.5" />
-              <Trans>Assinatura digital ICP-Brasil</Trans>
+              <Trans>Assinatura digital com validade jurídica</Trans>
             </span>
 
             <h1 className="mt-6 text-balance font-bold text-4xl tracking-tight sm:text-6xl">
-              <Trans>Assine documentos com segurança e validade jurídica</Trans>
+              <Trans>
+                Contratos assinados <span className={BRAND_GRADIENT_TEXT}>em minutos</span>, pelo celular ou com
+                certificado
+              </Trans>
             </h1>
 
             <p className="mx-auto mt-6 max-w-xl text-balance text-lg text-muted-foreground lg:mx-0">
               <Trans>
-                A CapivaSign reúne assinatura eletrônica, ICP-Brasil e WhatsApp em uma plataforma simples, rápida e
-                pronta para integrar com os seus sistemas.
+                Envie por link, e-mail ou WhatsApp. Quem assina não precisa de conta, e você recebe o documento selado,
+                com trilha de auditoria e verificação pública.
               </Trans>
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
               <Button size="lg" asChild>
                 <Link to="/signup">
-                  <Trans>Começar agora</Trans>
+                  <Trans>Criar conta grátis</Trans>
                   <ArrowRightIcon className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link to="/signin">
-                  <Trans>Entrar</Trans>
-                </Link>
+                <a href="#precos">
+                  <Trans>Ver preços</Trans>
+                </a>
               </Button>
             </div>
 
-            <p className="mt-6 flex items-center justify-center gap-2 text-muted-foreground text-sm lg:justify-start">
-              <CheckCircle2Icon className="h-4 w-4 text-emerald-500" />
-              <Trans>Recebeu um link para assinar? Você não precisa de conta.</Trans>
-            </p>
-
-            <dl className="mt-10 grid max-w-md grid-cols-3 gap-4 border-border/60 border-t pt-6">
-              {HERO_STATS.map((stat, index) => (
-                <div key={index} className="text-center lg:text-left">
-                  <dt className="font-bold text-emerald-600 text-lg dark:text-emerald-400">{stat.value}</dt>
-                  <dd className="mt-0.5 text-muted-foreground text-xs">{stat.label}</dd>
-                </div>
+            <ul className="mt-10 flex flex-wrap justify-center gap-2 lg:justify-start">
+              {HERO_BADGES.map((badge, index) => (
+                <li
+                  key={index}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-muted-foreground text-xs"
+                >
+                  <badge.icon className="h-3.5 w-3.5 text-brand-500" />
+                  {badge.label}
+                </li>
               ))}
-            </dl>
+            </ul>
           </div>
 
-          {/* Product mockup */}
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div aria-hidden className="absolute -top-6 -right-6 h-24 w-24 rounded-2xl bg-emerald-400/20 blur-2xl" />
-
-            {/* Brand mascot peeking over the mockup */}
-            <img
-              src={LogoIcon}
-              alt="CapivaSign"
-              className="absolute -top-12 -right-5 z-10 h-24 w-24 drop-shadow-xl sm:h-28 sm:w-28"
-            />
-
-            <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-2xl shadow-emerald-500/5">
-              <div className="flex items-center gap-1.5 border-border/60 border-b bg-muted/40 px-4 py-3">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
-                <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
-                <span className="ml-3 text-muted-foreground text-xs">contrato-prestacao-servico.pdf</span>
-              </div>
-
-              <div className="space-y-3 p-6">
-                <div className="h-2.5 w-2/3 rounded-full bg-muted" />
-                <div className="h-2 w-full rounded-full bg-muted/70" />
-                <div className="h-2 w-11/12 rounded-full bg-muted/70" />
-                <div className="h-2 w-4/5 rounded-full bg-muted/70" />
-
-                <div className="mt-6 rounded-2xl border border-emerald-500/30 border-dashed bg-emerald-500/5 p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-emerald-500/10 ring-1 ring-emerald-500/30">
-                      <img src={LogoIcon} alt="" className="h-8 w-8 object-contain" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-sm">
-                        <Trans>Assinatura coletada</Trans>
-                      </div>
-                      <div className="text-muted-foreground text-xs">
-                        <Trans>via WhatsApp · agora mesmo</Trans>
-                      </div>
-                    </div>
-                    <CheckCircle2Icon className="h-5 w-5 text-emerald-500" />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between rounded-xl bg-muted/40 px-4 py-3">
-                  <span className="flex items-center gap-2 text-muted-foreground text-xs">
-                    <ShieldCheckIcon className="h-4 w-4 text-emerald-500" />
-                    <Trans>Selado com validade jurídica</Trans>
-                  </span>
-                  <span className="font-medium text-emerald-600 text-xs dark:text-emerald-400">
-                    <Trans>ICP-Brasil</Trans>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <HeroMockup />
         </div>
       </section>
 
-      {/* Features carousel */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-medium text-emerald-700 text-xs uppercase tracking-wide dark:text-emerald-300">
-              <SparklesIcon className="h-3.5 w-3.5" />
-              <Trans>Recursos</Trans>
-            </span>
-            <h2 className="mt-4 text-balance font-bold text-3xl tracking-tight sm:text-4xl">
-              <Trans>Tudo que você precisa para assinar com confiança</Trans>
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              <Trans>Arraste para explorar os recursos que tornam a CapivaSign pronta para o seu negócio.</Trans>
-            </p>
-          </div>
-        </div>
+      {/* Features */}
+      <section id="recursos" className="scroll-mt-20 border-border/60 border-t bg-muted/20">
+        <div className="mx-auto max-w-6xl px-6 py-24">
+          <SectionHeading
+            eyebrow={<Trans>Recursos</Trans>}
+            title={<Trans>Tudo o que você precisa para assinar com segurança</Trans>}
+          />
 
-        <div className="mt-10">
-          <FeatureCarousel />
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="border-border/60 border-y bg-muted/30">
-        <div className="mx-auto max-w-5xl px-6 py-20">
-          <h2 className="text-center font-bold text-3xl tracking-tight">
-            <Trans>Como funciona</Trans>
-          </h2>
-          <div className="relative mt-14 grid gap-10 sm:grid-cols-3">
-            <div
-              aria-hidden
-              className="absolute top-6 right-[16%] left-[16%] hidden border-emerald-500/20 border-t-2 border-dashed sm:block"
-            />
-            {STEPS.map((step) => (
-              <div key={step.n} className="relative text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 font-bold text-lg text-white shadow-emerald-500/30 shadow-lg ring-4 ring-background">
-                  {step.n}
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((feature, index) => (
+              <article
+                key={index}
+                className="rounded-3xl border border-border bg-card p-7 transition-colors hover:border-brand-500/50"
+              >
+                <div className={`${ICON_TILE} h-12 w-12`}>
+                  <feature.icon className="h-6 w-6" />
                 </div>
-                <h3 className="mt-5 font-semibold text-lg">{step.title}</h3>
-                <p className="mt-2 text-muted-foreground text-sm">{step.text}</p>
-              </div>
+                <h3 className="mt-5 font-semibold text-lg">{feature.title}</h3>
+                <p className="mt-2 text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
+      {/* How it works */}
+      <section id="como-funciona" className="scroll-mt-20 border-border/60 border-t">
+        <div className="mx-auto max-w-5xl px-6 py-24">
+          <SectionHeading eyebrow={<Trans>Como funciona</Trans>} title={<Trans>Do PDF ao documento selado</Trans>} />
+
+          <div className="relative mt-14">
+            <div
+              aria-hidden
+              className="absolute top-6 right-[16%] left-[16%] hidden border-brand-500/30 border-t-2 border-dashed sm:block"
+            />
+            <ol className="relative grid gap-10 sm:grid-cols-3">
+              {STEPS.map((step, index) => (
+                <li key={index} className="relative text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-600 font-bold text-lg text-white shadow-brand-500/30 shadow-lg ring-4 ring-background">
+                    {index + 1}
+                  </div>
+                  <h3 className="mt-5 font-semibold text-lg">{step.title}</h3>
+                  <p className="mt-2 text-muted-foreground text-sm">{step.text}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
-      {curatedPlans.length > 0 && (
-        <section id="precos" className="relative overflow-hidden border-border/60 border-b">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 -top-32 -z-10 mx-auto h-72 w-[42rem] rounded-full bg-emerald-400/10 blur-3xl"
-          />
-
+      {plans.length > 0 && (
+        <section id="precos" className="scroll-mt-20 border-border/60 border-t bg-muted/20">
           <div className="mx-auto max-w-6xl px-6 py-24">
-            <div className="mx-auto max-w-2xl text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-medium text-emerald-700 text-xs uppercase tracking-wide dark:text-emerald-300">
-                <SparklesIcon className="h-3.5 w-3.5" />
-                <Trans>Preços simples e transparentes</Trans>
-              </span>
-
-              <h2 className="mt-6 text-balance font-bold text-4xl tracking-tight sm:text-5xl">
+            <SectionHeading
+              eyebrow={<Trans>Preços</Trans>}
+              title={
                 <Trans>
-                  Escolha o{' '}
-                  <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                    plano ideal
-                  </span>{' '}
-                  para o seu projeto
+                  Pague a mensalidade do plano e <span className={BRAND_GRADIENT_TEXT}>só o que usar</span>
                 </Trans>
-              </h2>
-
-              <p className="mt-4 text-balance text-lg text-muted-foreground">
-                <Trans>
-                  Pague apenas pelo que usar. Veja o custo detalhado de cada ação cobrada — de webhooks a envios de
-                  mensagem.
-                </Trans>
-              </p>
-            </div>
+              }
+              description={<Trans>Todos os planos incluem uma franquia grátis de uso por mês.</Trans>}
+            />
 
             <div
-              className={`mt-14 grid items-stretch gap-6 sm:grid-cols-2 ${
-                curatedPlans.length >= 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'
+              className={`mt-16 grid items-stretch gap-6 sm:grid-cols-2 ${
+                plans.length >= 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'
               }`}
             >
-              {curatedPlans.map(({ claim, meta }) => {
-                const items = PRICING_ITEMS.filter((item) => typeof claim.pricing[item.key] === 'number');
-                // Capabilities (non-metered flags) this plan unlocks, e.g.
-                // white-label. Sourced from the real DB flags.
-                const planFlags = FLAG_COMPARISON_ROWS.filter((row) => claim.flags[row.key] === true);
-                const Icon = meta.icon;
-                const isPopular = meta.popular ?? false;
-
-                return (
-                  <div
-                    key={claim.id}
-                    className={`relative flex flex-col rounded-3xl p-6 transition-all ${
-                      isPopular
-                        ? 'border-2 border-emerald-500/70 bg-gradient-to-b from-emerald-500/10 to-card shadow-emerald-500/10 shadow-xl lg:-mt-4 lg:mb-4'
-                        : 'border border-border bg-card hover:border-emerald-500/40 hover:shadow-lg'
-                    }`}
-                  >
-                    {isPopular && (
-                      <span className="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-emerald-500 px-3 py-1 font-semibold text-[11px] text-white uppercase tracking-wide shadow">
-                        <SparklesIcon className="h-3 w-3" />
-                        <Trans>Mais popular</Trans>
-                      </span>
-                    )}
-
-                    <div
-                      className={`flex h-11 w-11 items-center justify-center rounded-xl ${
-                        isPopular
-                          ? 'bg-emerald-500 text-white'
-                          : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                      }`}
-                    >
-                      <Icon className="h-6 w-6" />
-                    </div>
-
-                    <h3 className="mt-4 font-semibold text-xl">{claim.name}</h3>
-                    <p className="mt-1 min-h-[2.5rem] text-muted-foreground text-sm leading-snug">{meta.tagline}</p>
-
-                    <div className="mt-5">
-                      <span className="font-bold text-3xl tracking-tight">
-                        {formatBrl(claim.pricing.monthlyPriceCents ?? 0)}
-                      </span>
-                      <span className="text-muted-foreground text-sm">
-                        {' '}
-                        <Trans>/mês</Trans>
-                      </span>
-                      <p className="mt-0.5 text-muted-foreground text-xs">
-                        <Trans>+ consumo de API</Trans>
-                      </p>
-                    </div>
-
-                    <Button variant={meta.cta.variant} className="mt-6 w-full" asChild>
-                      {meta.cta.href ? (
-                        <a href={meta.cta.href}>{meta.cta.label}</a>
-                      ) : (
-                        <Link to={meta.cta.to ?? '/signup'}>{meta.cta.label}</Link>
-                      )}
-                    </Button>
-
-                    {planFlags.length > 0 && (
-                      <>
-                        <p className="mt-6 font-medium text-[11px] text-muted-foreground uppercase tracking-wide">
-                          <Trans>Recursos inclusos</Trans>
-                        </p>
-                        <ul className="mt-2 space-y-2">
-                          {planFlags.map((flag) => (
-                            <li key={flag.key} className="flex items-center gap-2 text-[13px]">
-                              <CheckIcon className="h-4 w-4 shrink-0 text-emerald-500" />
-                              <span>{flag.label}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </>
-                    )}
-
-                    {items.length > 0 && (
-                      <p className="mt-6 font-medium text-[11px] text-muted-foreground uppercase tracking-wide">
-                        <Trans>Consumo por ação</Trans>
-                      </p>
-                    )}
-
-                    <ul className="mt-2 divide-y divide-border/60">
-                      {items.map((item) => {
-                        const quota = claim.pricing[item.quotaKey];
-                        const freeQuota = typeof quota === 'number' && quota > 0 ? quota : null;
-
-                        return (
-                          <li key={item.key} className="flex items-start justify-between gap-3 py-2.5">
-                            <span className="flex items-center gap-2 text-[13px] text-muted-foreground">
-                              <item.icon className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                              {item.label}
-                            </span>
-                            <span className="flex flex-col items-end">
-                              <span className="font-semibold text-[13px] tabular-nums">
-                                {formatBrl(claim.pricing[item.key] as number)}
-                              </span>
-                              {freeQuota !== null && (
-                                <span className="font-medium text-[11px] text-emerald-600 tabular-nums dark:text-emerald-400">
-                                  <Trans>{freeQuota} grátis/mês</Trans>
-                                </span>
-                              )}
-                            </span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                );
-              })}
+              {plans.map((plan) => (
+                <PlanCard key={plan.claim.id} {...plan} />
+              ))}
             </div>
 
-            {/* Feature comparison */}
-            <div className="mt-24 text-center">
-              <h3 className="font-bold text-2xl tracking-tight sm:text-3xl">
-                <Trans>Recursos incluídos em cada plano</Trans>
-              </h3>
-              <p className="mt-3 text-muted-foreground">
-                <Trans>Compare os principais recursos disponíveis em cada plano.</Trans>
-              </p>
-            </div>
+            <PlanComparison plans={plans} />
 
-            <div className="mt-10 overflow-x-auto rounded-3xl border border-border bg-card">
-              <table className="w-full min-w-[640px] border-collapse text-left">
-                <thead>
-                  <tr className="border-border border-b">
-                    <th className="px-5 py-4 font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                      <Trans>Recursos</Trans>
-                    </th>
-                    {curatedPlans.map(({ claim, meta }) => (
-                      <th
-                        key={claim.id}
-                        className={`px-4 py-4 text-center font-semibold text-xs uppercase tracking-wide ${
-                          meta.popular ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'
-                        }`}
-                      >
-                        {claim.name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {COMPARISON_ROWS.map((row) => (
-                    <tr key={row.key} className="border-border/50 border-b">
-                      <td className="px-5 py-3.5">
-                        <span className="flex items-center gap-2.5 text-muted-foreground text-sm">
-                          <row.icon className="h-4 w-4 shrink-0 text-emerald-500" />
-                          {row.label}
-                        </span>
-                      </td>
-                      {curatedPlans.map(({ claim, meta }) => (
-                        <td
-                          key={claim.id}
-                          className={`px-4 py-3.5 text-center ${meta.popular ? 'bg-emerald-500/[0.04]' : ''}`}
-                        >
-                          {renderFeatureValue(meta.features[row.key])}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-
-                  {activeFlagRows.map((row) => (
-                    <tr key={row.key} className="border-border/50 border-b last:border-0">
-                      <td className="px-5 py-3.5">
-                        <span className="flex items-center gap-2.5 text-muted-foreground text-sm">
-                          <row.icon className="h-4 w-4 shrink-0 text-emerald-500" />
-                          {row.label}
-                        </span>
-                      </td>
-                      {curatedPlans.map(({ claim, meta }) => (
-                        <td
-                          key={claim.id}
-                          className={`px-4 py-3.5 text-center ${meta.popular ? 'bg-emerald-500/[0.04]' : ''}`}
-                        >
-                          {renderFeatureValue(claim.flags[row.key] === true)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <p className="mt-6 text-center text-muted-foreground text-xs">
+            <p className="mt-4 text-center text-muted-foreground text-xs">
               <Trans>Valores por ação, em reais. Ações não listadas não são cobradas.</Trans>
             </p>
 
-            {/* Trust highlights */}
-            <div className="mt-20 grid gap-px overflow-hidden rounded-3xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
-              {TRUST_HIGHLIGHTS.map((highlight, index) => (
-                <div key={index} className="bg-card p-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {BILLING_HIGHLIGHTS.map((highlight, index) => (
+                <div key={index} className="flex gap-4">
+                  <div className={`${ICON_TILE} h-10 w-10 shrink-0`}>
                     <highlight.icon className="h-5 w-5" />
                   </div>
-                  <h4 className="mt-4 font-semibold text-sm">{highlight.title}</h4>
-                  <p className="mt-1 text-muted-foreground text-sm leading-relaxed">{highlight.text}</p>
+                  <div>
+                    <h3 className="font-semibold text-sm">{highlight.title}</h3>
+                    <p className="mt-1 text-muted-foreground text-sm leading-relaxed">{highlight.text}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -911,40 +822,57 @@ export const LandingPage = ({ pricingClaims }: LandingPageProps) => {
         </section>
       )}
 
+      {/* FAQ */}
+      <section id="duvidas" className="scroll-mt-20 border-border/60 border-t">
+        <div className="mx-auto max-w-3xl px-6 py-24">
+          <SectionHeading eyebrow={<Trans>Dúvidas</Trans>} title={<Trans>Perguntas frequentes</Trans>} />
+
+          <div className="mt-12 divide-y divide-border rounded-3xl border border-border bg-card">
+            {FAQ.map((item, index) => (
+              <details key={index} className="group px-6 py-5 [&_summary::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
+                  {item.question}
+                  <ChevronDownIcon className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
+                </summary>
+                <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{item.answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
-      <section className="mx-auto max-w-5xl px-6 py-24">
-        <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-card to-card p-10 text-center sm:p-16">
-          <div
+      <section className="mx-auto max-w-5xl px-6 pb-24">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 via-brand-600 to-pink-600 p-10 text-center text-white sm:p-16">
+          <img
+            src={LogoIcon}
+            alt=""
             aria-hidden
-            className="pointer-events-none absolute -top-24 left-1/2 h-56 w-[36rem] -translate-x-1/2 rounded-full bg-emerald-400/20 blur-3xl"
+            className="pointer-events-none absolute -right-6 -bottom-8 h-40 w-40 opacity-20 sm:h-56 sm:w-56"
           />
-          <FileSignatureIcon className="mx-auto h-10 w-10 text-emerald-500" />
-          <h2 className="mt-6 font-bold text-3xl tracking-tight sm:text-4xl">
-            <Trans>Pronto para assinar com a CapivaSign?</Trans>
+          <h2 className="font-bold text-3xl tracking-tight sm:text-4xl">
+            <Trans>Envie o seu primeiro documento hoje</Trans>
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            <Trans>Crie sua conta gratuitamente e envie seu primeiro documento em minutos.</Trans>
+          <p className="mx-auto mt-4 max-w-xl text-white/80">
+            <Trans>Crie a conta grátis em menos de um minuto. Sem cartão de crédito.</Trans>
           </p>
-          <div className="mt-8">
-            <Button size="lg" asChild>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button size="lg" variant="secondary" asChild>
               <Link to="/signup">
-                <Trans>Criar conta gratuita</Trans>
+                <Trans>Criar conta grátis</Trans>
                 <ArrowRightIcon className="ml-2 h-4 w-4" />
               </Link>
+            </Button>
+            <Button size="lg" variant="ghost" className="text-white hover:bg-white/10 hover:text-white" asChild>
+              <a href={`mailto:${SUPPORT_EMAIL}`}>
+                <Trans>Falar com vendas</Trans>
+              </a>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-border/60 border-t">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row">
-          <BrandingLogo className="h-9 w-auto" />
-          <p className="text-muted-foreground text-xs">
-            <Trans>© CapivaSign. Todos os direitos reservados.</Trans>
-          </p>
-        </div>
-      </footer>
+      <LandingFooter />
     </div>
   );
 };

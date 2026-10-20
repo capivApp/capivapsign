@@ -1,4 +1,4 @@
-import LogoIcon from '@documenso/assets/logo_icon.png';
+import LogoIcon from '@documenso/assets/logo-icon-small.png';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -52,13 +52,7 @@ export default function PublicProfileLayout() {
             >
               <BrandingLogo className="hidden h-6 w-auto sm:block" />
 
-              <img
-                src={LogoIcon}
-                alt="CapivaSign Logo"
-                width={48}
-                height={48}
-                className="h-10 w-auto sm:hidden dark:invert"
-              />
+              <img src={LogoIcon} alt="CapivaSign Logo" width={48} height={48} className="h-10 w-auto sm:hidden" />
             </Link>
 
             <div className="flex flex-row items-center justify-center">

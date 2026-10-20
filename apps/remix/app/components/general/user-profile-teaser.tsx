@@ -1,4 +1,4 @@
-import LogoIcon from '@documenso/assets/logo_icon.png';
+import LogoIcon from '@documenso/assets/logo-icon-small.png';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { VerifiedIcon } from '@documenso/ui/icons/verified';
 import { cn } from '@documenso/ui/lib/utils';
