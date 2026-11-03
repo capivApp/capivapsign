@@ -81,7 +81,7 @@ export const DocumentSigningPageViewV2 = () => {
   }, [recipientFieldsRemaining, selectedAssistantRecipientFields, currentEnvelopeItem]);
 
   return (
-    <div className="h-[98dvh] w-[99dvh] bg-gray-50 dark:bg-background">
+    <div className="h-[98dvh] w-[99dvw] bg-gray-50 dark:bg-background">
       <SignFieldEmailDialog.Root />
       <SignFieldTextDialog.Root />
       <SignFieldNumberDialog.Root />
