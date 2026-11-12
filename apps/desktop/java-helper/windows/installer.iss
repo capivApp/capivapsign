@@ -20,7 +20,7 @@
 ; Inno Setup 6 (ISCC.exe) must be installed.
 
 #define AppName "CapivaSign - Assinador ICP-Brasil"
-#define AppVersion "1.0.3"
+#define AppVersion "1.0.4"
 #define AppPublisher "CapivApp"
 ; Windowed launcher (GUI subsystem). Used for EVERY automatic entry point so no
 ; cmd window is ever created; it defaults to `serve --no-gui` and lands in the tray.
@@ -60,6 +60,13 @@ ArchitecturesInstallIn64BitMode=x64compatible
 ; Broadcast the env-var change so already-open shells pick up ICP_ALLOWED_ORIGIN.
 ChangesEnvironment=yes
 UninstallDisplayIcon={app}\{#AppExeName}
+; NO Restart Manager on upgrade: PrepareToInstall force-kills the running agent
+; instead. The jpackage launcher of CapivaSign.exe re-launches itself and waits
+; in a GetMessage loop bound to a hidden message-only window. Restart Manager's
+; graceful close sends that window WM_CLOSE, which destroys it, and the launcher
+; then pops "GetMessage() failed. System error [1400]" and hangs on that dialog,
+; still holding CapivaSign.exe open, until the machine reboots.
+CloseApplications=no
 
 [Languages]
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
@@ -117,4 +124,25 @@ procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then
     SetEnvironmentVariable('ICP_ALLOWED_ORIGIN', '{#AllowedOrigin}');
+end;
+
+// Stop every running agent (all users) BEFORE files are replaced, with a hard
+// TerminateProcess (/f) and never a WM_CLOSE (see CloseApplications above).
+// The launcher's child JVM is the same CapivaSign.exe image and also dies with
+// the launcher's job object, so both are gone either way.
+procedure StopRunningAgent(ExeName: String);
+var
+  ResultCode: Integer;
+begin
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /t /im ' + ExeName, '', SW_HIDE,
+    ewWaitUntilTerminated, ResultCode);
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  StopRunningAgent('{#AppExeName}');
+  StopRunningAgent('{#CliExeName}');
+  // Let Windows release the killed processes' file handles before the copy.
+  Sleep(1000);
+  Result := '';
 end;
