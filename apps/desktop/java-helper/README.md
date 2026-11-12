@@ -91,7 +91,7 @@ REM -> dist\installer\CapivaSign-Setup.exe
    refuses any other host. Upgrading overwrites the value an older installer
    wrote;
 4. **auto-starts the serve agent at every user logon** via the HKLM `Run` key
-   as `CapivaSign.exe` — it lives in the **system tray** (no
+   as `runtime\bin\CapivaSignAgent.exe` (see below) — it lives in the **system tray** (no
    "Aguardando…" window), keeps `http://127.0.0.1:3231/ping` answering, and only
    pops the **certificate/PIN selector** when a sign request actually arrives.
 
@@ -120,6 +120,17 @@ matters:
 | ------------------- | --------- | ---------------- | ----------------------------------------------------- |
 | `CapivaSign.exe`    | windowed  | `serve --no-gui` | everything user-facing — logon, Start menu, deep link |
 | `CapivaSignCli.exe` | console   | none             | support/debugging (`list`, `sign`)                    |
+
+**The installer does NOT wire `CapivaSign.exe` to anything.** Every entry
+point (logon `Run` key, Start menu, `capivasign-icp://`, post-install run)
+starts `runtime\bin\CapivaSignAgent.exe`, a renamed copy of the bundled
+runtime's `javaw.exe`, with `-cp app\icp-helper.jar br.com.capivapp.icp.Main`.
+The jpackage launcher re-launches itself whenever `PATH` lacks its app dir
+(always) and waits for the child in a `GetMessage` loop bound to a hidden
+message-only window; when that window goes away it pops "GetMessage() failed.
+System error [1400]", which signers hit after every upgrade until a reboot.
+`javaw.exe` runs the JVM in-process, with no relaunch and no message loop.
+`CapivaSign.exe` stays in the image only as the icon source.
 
 **The main launcher is windowed on purpose.** jpackage's `--win-console` builds a
 console-subsystem binary, so Windows allocates and shows a cmd window on *every*

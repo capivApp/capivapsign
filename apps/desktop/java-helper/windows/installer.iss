@@ -8,9 +8,17 @@
 ;      any https://*.capivapp.com.br subdomain, e.g. assina.capivapp.com.br).
 ;
 ; NO CONSOLE WINDOW, ANYWHERE: every entry point below (logon, Start menu, deep
-; link, post-install run) invokes CapivaSign.exe, which package-windows.bat
-; builds WITHOUT --win-console. The separate CapivaSignCli.exe is the only
-; console binary and is never wired to an automatic trigger.
+; link, post-install run) invokes CapivaSignAgent.exe, a renamed copy of the
+; bundled runtime's javaw.exe (GUI subsystem). The separate CapivaSignCli.exe is
+; the only console binary and is never wired to an automatic trigger.
+;
+; NOT THE JPACKAGE LAUNCHER: CapivaSign.exe re-launches itself whenever PATH
+; lacks its app dir (always) and waits for the child in a GetMessage loop bound
+; to a hidden message-only window. When that window goes away the launcher pops
+; "GetMessage() failed. System error [1400]" (WinLauncher.cpp, the launcher's
+; only GetMessage call), which signers hit after every upgrade until a reboot.
+; javaw.exe starts the JVM in-process: no relaunch, no message loop. The
+; jpackage exe stays in the image only as the icon source.
 ;
 ; Build:  windows\build-installer.bat [origins]
 ; or directly:  ISCC "/DAllowedOrigin=https://*.your.host" windows\installer.iss
@@ -20,11 +28,18 @@
 ; Inno Setup 6 (ISCC.exe) must be installed.
 
 #define AppName "CapivaSign - Assinador ICP-Brasil"
-#define AppVersion "1.0.4"
+#define AppVersion "1.0.5"
 #define AppPublisher "CapivApp"
-; Windowed launcher (GUI subsystem). Used for EVERY automatic entry point so no
-; cmd window is ever created; it defaults to `serve --no-gui` and lands in the tray.
+; jpackage launcher: kept only as the icon source (see the header).
 #define AppExeName "CapivaSign.exe"
+; Windowed agent: the runtime's javaw.exe under our name, so Task Manager and
+; taskkill /im see "CapivaSignAgent.exe" and never touch another Java app.
+#define AgentExeName "CapivaSignAgent.exe"
+; Everything before the agent's own arguments, ready for a registry command.
+#define AgentCmd '""{app}\runtime\bin\' + AgentExeName + '"" -cp ""{app}\app\icp-helper.jar"" br.com.capivapp.icp.Main'
+; The same, split for [Icons]/[Run] (Filename + Parameters).
+#define AgentFile "{app}\runtime\bin\" + AgentExeName
+#define AgentParams '-cp ""{app}\app\icp-helper.jar"" br.com.capivapp.icp.Main serve --no-gui'
 ; Console launcher, shipped for support/debugging only.
 #define CliExeName "CapivaSignCli.exe"
 #define Protocol "capivasign-icp"
@@ -60,12 +75,8 @@ ArchitecturesInstallIn64BitMode=x64compatible
 ; Broadcast the env-var change so already-open shells pick up ICP_ALLOWED_ORIGIN.
 ChangesEnvironment=yes
 UninstallDisplayIcon={app}\{#AppExeName}
-; NO Restart Manager on upgrade: PrepareToInstall force-kills the running agent
-; instead. The jpackage launcher of CapivaSign.exe re-launches itself and waits
-; in a GetMessage loop bound to a hidden message-only window. Restart Manager's
-; graceful close sends that window WM_CLOSE, which destroys it, and the launcher
-; then pops "GetMessage() failed. System error [1400]" and hangs on that dialog,
-; still holding CapivaSign.exe open, until the machine reboots.
+; No Restart Manager on upgrade: PrepareToInstall force-kills the running agent
+; (old CapivaSign.exe processes included) before the files are replaced.
 CloseApplications=no
 
 [Languages]
@@ -75,16 +86,17 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Files]
 ; The whole jpackage app-image (both launchers + bundled runtime + app jar).
 Source: "..\dist\CapivaSign\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
+; The windowed agent every entry point runs (see the header).
+Source: "..\dist\CapivaSign\runtime\bin\javaw.exe"; DestDir: "{app}\runtime\bin"; DestName: "{#AgentExeName}"; Flags: ignoreversion
 
 [Registry]
 ; --- capivasign-icp:// deep link (per-machine) ------------------------------
-; Points at the WINDOWED exe: a deep link fired by the browser must not flash a
-; console. Windows appends the URI as %1, which overrides the launcher's
-; default `serve --no-gui` arguments and runs the signing flow instead.
+; Points at the WINDOWED agent: a deep link fired by the browser must not flash
+; a console. Windows passes the URI as %1, which runs the signing flow.
 Root: HKLM; Subkey: "Software\Classes\{#Protocol}"; ValueType: string; ValueName: ""; ValueData: "URL:CapivaSign ICP-Brasil Signing"; Flags: uninsdeletekey
 Root: HKLM; Subkey: "Software\Classes\{#Protocol}"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
 Root: HKLM; Subkey: "Software\Classes\{#Protocol}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#AppExeName},0"
-Root: HKLM; Subkey: "Software\Classes\{#Protocol}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" ""%1"""
+Root: HKLM; Subkey: "Software\Classes\{#Protocol}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: "{#AgentCmd} ""%1"""
 
 ; --- SSRF guard: only these origins are accepted (system env) ---------------
 ; No `createvalueifdoesntexist` flag ON PURPOSE: an upgrade must OVERWRITE the
@@ -93,22 +105,23 @@ Root: HKLM; Subkey: "Software\Classes\{#Protocol}\shell\open\command"; ValueType
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "ICP_ALLOWED_ORIGIN"; ValueData: "{#AllowedOrigin}"; Flags: preservestringtype uninsdeletevalue
 
 ; --- auto-start the tray agent at every user logon --------------------------
-; No arguments: the launcher's built-in default (`serve --no-gui`) takes over,
-; so the agent goes straight to the system tray with no window and no console.
-Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "CapivaSignIcpAgent"; ValueData: """{app}\{#AppExeName}"""; Flags: uninsdeletevalue
+; `serve --no-gui`: straight to the system tray, no window and no console.
+; Overwrites the value older installers pointed at CapivaSign.exe.
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "CapivaSignIcpAgent"; ValueData: "{#AgentCmd} serve --no-gui"; Flags: uninsdeletevalue
 
 [Icons]
-Name: "{group}\CapivaSign (assinador)"; Filename: "{app}\{#AppExeName}"
+Name: "{group}\CapivaSign (assinador)"; Filename: "{#AgentFile}"; Parameters: "{#AgentParams}"; IconFilename: "{app}\{#AppExeName}"
 Name: "{group}\Listar certificados"; Filename: "{app}\{#CliExeName}"; Parameters: "list --source windows-my"
 Name: "{group}\Desinstalar {#AppName}"; Filename: "{uninstallexe}"
 
 [Run]
 ; Start it now so signing works immediately (no logoff/reboot needed). Windowed
-; launcher with no args -> tray, no console.
-Filename: "{app}\{#AppExeName}"; Description: "Iniciar o assinador agora"; Flags: nowait postinstall skipifsilent
+; agent -> tray, no console.
+Filename: "{#AgentFile}"; Parameters: "{#AgentParams}"; Description: "Iniciar o assinador agora"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-; Stop a running agent before files are removed (both launchers).
+; Stop a running agent before files are removed (every launcher).
+Filename: "{sys}\taskkill.exe"; Parameters: "/f /im {#AgentExeName}"; Flags: runhidden; RunOnceId: "StopWindowedAgent"
 Filename: "{sys}\taskkill.exe"; Parameters: "/f /im {#AppExeName}"; Flags: runhidden; RunOnceId: "StopAgent"
 Filename: "{sys}\taskkill.exe"; Parameters: "/f /im {#CliExeName}"; Flags: runhidden; RunOnceId: "StopCli"
 
@@ -128,8 +141,7 @@ end;
 
 // Stop every running agent (all users) BEFORE files are replaced, with a hard
 // TerminateProcess (/f) and never a WM_CLOSE (see CloseApplications above).
-// The launcher's child JVM is the same CapivaSign.exe image and also dies with
-// the launcher's job object, so both are gone either way.
+// CapivaSign.exe covers agents started by older installers.
 procedure StopRunningAgent(ExeName: String);
 var
   ResultCode: Integer;
@@ -140,6 +152,7 @@ end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
+  StopRunningAgent('{#AgentExeName}');
   StopRunningAgent('{#AppExeName}');
   StopRunningAgent('{#CliExeName}');
   // Let Windows release the killed processes' file handles before the copy.
