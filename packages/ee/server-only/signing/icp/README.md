@@ -16,12 +16,13 @@ desktop ──▶ POST /api/icp/sign/prepare  ──▶ prepare-recipient-signin
               certChainB64 + certType         · validate ICP cert (icp-cert-policy)
                                               · captureItemDigest per item  (digest-signing)
                                               · pin bytes + persist IcpSignSession
-            ◀── { sessionId, items:[{digestB64}], policy }
+            ◀── { sessionId, items:[{digestB64, signedAttrsB64}], policy }
 
 desktop signs each digest locally (Java helper, A1/A3)
 
 desktop ──▶ POST /api/icp/sign/complete ──▶ complete-recipient-signing.ts
               { sessionId, items:[{signatureB64}] }  · re-capture digest, assert == prep hash
+                                                      · verify signature vs leaf key (assert-signature-matches-key)
                                                       · embedItemSignature B-T (real TSA)
                                                       · flip recipient SIGNED, audit, evidence
                                                       · schedule seal when all signed

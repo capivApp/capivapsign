@@ -10,7 +10,8 @@ import java.security.Security;
  *
  * The store is unlocked by the OS (no PIN passed here; CryptoAPI prompts as
  * needed). Keys are non-extractable handles, so signing goes through
- * {@code NONEwithRSA} on the SunMSCAPI provider rather than the raw cipher.
+ * a hashing {@code SHA256withRSA} over the {@code signedAttrs} on the SunMSCAPI
+ * provider rather than the raw cipher (see {@link RawDigestSigner#jcaSignature}).
  *
  * Windows-only: SunMSCAPI is absent on other platforms, so this throws at
  * construction off-Windows. Validate on the target Windows box.
@@ -42,6 +43,6 @@ final class WindowsMyCertSource extends KeyStoreCertSource {
 
   @Override
   protected RawDigestSigner signerFor(PrivateKey key) {
-    return RawDigestSigner.noneWithRsa(key, provider);
+    return RawDigestSigner.jcaSignature(key, provider);
   }
 }

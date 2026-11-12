@@ -6,23 +6,24 @@ import javax.crypto.Cipher;
 import java.security.Signature;
 
 /**
- * Strategy: turn a pre-computed {@code signedAttrs} digest into a raw signature.
- * The desktop agent never sees the document — only the digest — so the entire
- * signing surface is "hash in, signature out", matching {@code CscFifoSigner}.
+ * Strategy: turn one {@link SignInput} (the captured {@code signedAttrs} digest,
+ * plus the {@code signedAttrs} bytes when the server sends them) into a raw
+ * signature. The desktop agent never sees the document, so the entire signing
+ * surface is "signedAttrs in, signature out", matching {@code CscFifoSigner}.
  *
  * Two RSA strategies, picked by the credential backend:
  *
- *   - {@link #cipher} — apply the RSA private-key operation over
+ *   - {@link #cipher}: apply the RSA private-key operation over
  *     {@code DigestInfo(digest)} via {@code Cipher RSA/ECB/PKCS1Padding}.
  *     Works for A1 keystores and most PKCS#11 tokens (raw RSA / CKM_RSA_PKCS).
- *   - {@link #noneWithRsa} — sign {@code DigestInfo(digest)} via
- *     {@code Signature NONEwithRSA}. Used for the Windows certificate store
+ *   - {@link #jcaSignature}: hash and sign the {@code signedAttrs} bytes via
+ *     {@code SHA256withRSA}. Used for the Windows certificate store
  *     (SunMSCAPI), whose non-extractable keys reject the raw cipher path.
  *
- * Both produce the identical RSASSA-PKCS1-v1_5 signature value libpdf verifies.
+ * Both produce the identical RSASSA-PKCS1-v1_5 signature value libpdf embeds.
  */
 interface RawDigestSigner {
-  byte[] sign(byte[] digest, String digestAlgo) throws Exception;
+  byte[] sign(SignInput input) throws Exception;
 
   default String signatureAlgorithm() {
     return "RSASSA-PKCS1-v1_5";
@@ -37,38 +38,41 @@ interface RawDigestSigner {
   /** A1 / PKCS#11 path: RSA private-key op over DigestInfo via Cipher. */
   static RawDigestSigner cipher(PrivateKey key, Provider provider) {
     assertRsa(key);
-    return (digest, digestAlgo) -> {
+    return (input) -> {
       Cipher c = provider == null
           ? Cipher.getInstance("RSA/ECB/PKCS1Padding")
           : Cipher.getInstance("RSA/ECB/PKCS1Padding", provider);
       c.init(Cipher.ENCRYPT_MODE, key);
-      return c.doFinal(DigestInfo.wrap(digestAlgo, digest));
+      return c.doFinal(DigestInfo.wrap(input.digestAlgo(), input.digest()));
     };
   }
 
   /**
-   * Windows-MY path: sign the RAW digest via NONEwithRSA.
+   * Windows-MY path: hash and sign the {@code signedAttrs} with a hashing
+   * {@code SHA256withRSA}.
    *
-   * SunMSCAPI's {@code NONEwithRSA} is not a generic "sign these bytes verbatim"
-   * primitive: it takes the bare hash, infers the digest algorithm from its
-   * length (20/32/48/64 → SHA-1/256/384/512) and builds the {@code DigestInfo}
-   * plus PKCS#1 v1.5 padding itself inside CryptoAPI. Handing it an already
-   * wrapped {@code DigestInfo} makes it see an unrecognised length and fail with
-   * "Message digest length is not supported", so we must pass {@code digest}
-   * straight through — NOT {@link DigestInfo#wrap}. The resulting signature is
-   * the identical RSASSA-PKCS1-v1_5 value the cipher path produces.
+   * Signing the pre-computed digest is NOT possible on SunMSCAPI. Its
+   * {@code NONEwithRSA} signs with {@code CRYPT_NOHASHOID}: the PKCS#1 block
+   * carries the bare hash, with no {@code DigestInfo}, which is not an
+   * RSASSA-PKCS1-v1_5 signature (the ITI validator reports "Cifra assimétrica:
+   * Reprovada"). Handing it a wrapped {@code DigestInfo} fails its length check
+   * ("Message digest length is not supported"). Only the hashing signatures
+   * embed the algorithm OID, so this strategy needs the {@code signedAttrs}
+   * bytes, and refuses a digest-only request instead of signing it wrong.
    */
-  static RawDigestSigner noneWithRsa(PrivateKey key, Provider provider) {
+  static RawDigestSigner jcaSignature(PrivateKey key, Provider provider) {
     assertRsa(key);
-    return (digest, digestAlgo) -> {
-      // Reject digests we don't support up front, so an unknown algo fails the
-      // same way the cipher path does instead of producing a wrong signature.
-      DigestInfo.jcaName(digestAlgo);
+    return (input) -> {
+      if (!input.hasSignedAttrs()) {
+        throw new IllegalStateException(
+            "This certificate store needs the signedAttrs bytes, which the server did not send. Update the CapivaSign server.");
+      }
+      String algorithm = DigestInfo.jcaRsaSignatureName(input.digestAlgo());
       Signature s = provider == null
-          ? Signature.getInstance("NONEwithRSA")
-          : Signature.getInstance("NONEwithRSA", provider);
+          ? Signature.getInstance(algorithm)
+          : Signature.getInstance(algorithm, provider);
       s.initSign(key);
-      s.update(digest);
+      s.update(input.signedAttrs());
       return s.sign();
     };
   }

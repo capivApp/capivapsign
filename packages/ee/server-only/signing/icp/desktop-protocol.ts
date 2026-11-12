@@ -1,6 +1,5 @@
-import { z } from 'zod';
-
 import { ZIcpCertTypeSchema } from '@documenso/lib/types/icp-sign-session';
+import { z } from 'zod';
 
 /**
  * Wire contracts between the ICP-Brasil desktop agent and the Documenso server.
@@ -34,6 +33,8 @@ export const ZHelperSignRequestSchema = z.object({
   source: ZHelperCertSourceSchema,
   alias: z.string().optional(),
   digestB64: z.string(),
+  /** DER signedAttrs behind `digestB64`. Required by the WINDOWS_MY source. */
+  signedAttrsB64: z.string().optional(),
   digestAlgo: z.enum(['SHA-256', 'SHA-384', 'SHA-512']).default('SHA-256'),
 });
 
@@ -82,6 +83,12 @@ export const ZIcpPrepareRequestSchema = z.object({
 export const ZIcpPrepareItemSchema = z.object({
   envelopeItemId: z.string(),
   digestB64: z.string(),
+  /**
+   * DER `signedAttrs` behind `digestB64` (document hash, signing time, cert
+   * reference; never the document). The Windows certificate store can only
+   * produce a standard signature by hashing these itself.
+   */
+  signedAttrsB64: z.string(),
 });
 
 export const ZIcpPrepareResponseSchema = z.object({

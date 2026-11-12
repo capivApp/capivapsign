@@ -50,9 +50,14 @@ page just watches the document status. Auth is by the **recipient token**
 | `pkcs11` | A3 token / smartcard (SunPKCS11) | `--module token.dll [--slot N] [--pin P]` |
 | `windows-my` | A3 Windows store (SunMSCAPI) | no args; OS handles auth |
 
-A1/PKCS#11 sign via raw RSA cipher over `DigestInfo`; Windows-MY via
-`NONEwithRSA` (non-extractable keys). All produce the same RSASSA-PKCS1-v1_5
-value libpdf embeds.
+A1/PKCS#11 sign via raw RSA cipher over `DigestInfo`; Windows-MY via a hashing
+`SHA256withRSA` over the `signedAttrsB64` bytes the server sends with each
+digest (non-extractable keys). All produce the same RSASSA-PKCS1-v1_5 value
+libpdf embeds.
+
+Do NOT sign the bare digest with SunMSCAPI `NONEwithRSA`: it signs with
+`CRYPT_NOHASHOID`, so the PKCS#1 block has no `DigestInfo` and the ITI validator
+reports "Cifra assimétrica: Reprovada" (the hash itself still matches).
 
 **Dialog owner window.** Every GUI prompt (certificate picker, PIN, file
 chooser) and any PIN prompt a smart card CSP opens from inside SunMSCAPI is
@@ -164,5 +169,6 @@ End-to-end (need `openssl` + network for the RFC3161 TSA):
 A1 is fully tested here. **A3 (PKCS#11 + Windows-MY) is implemented and compiles;
 validate on a Windows box with a real token/store** — this environment has no
 token and SunMSCAPI is Windows-only, so only the construction/error paths run
-here. The Windows-MY signing path may need a `NONEwithRSA` vs cipher tweak per
-token driver; flagged in `WindowsMyCertSource`.
+here. The server's `complete` step verifies every returned signature against
+the leaf certificate before embedding, so a wrong signature fails the sign
+instead of producing an invalid PDF.

@@ -66,14 +66,20 @@ export type CaptureItemDigestOptions = {
   signingTime: Date;
 };
 
+export type CapturedItemDigest = {
+  digest: Uint8Array;
+  /** DER `signedAttrs` behind `digest`: what a hash-and-sign agent signs. */
+  signedAttrs: Uint8Array;
+};
+
 /**
  * Prep pass: drive `pdf.sign` with {@link CscCaptureSigner} to derive the
- * `signedAttrs` digest libpdf would otherwise sign for `anchorName`. The signed
- * PDF is discarded — only the digest matters. Captured at B-B; the eventual
+ * `signedAttrs` (and their digest) libpdf would otherwise sign for
+ * `anchorName`. The signed PDF is discarded — only the capture matters. Captured at B-B; the eventual
  * embed is B-T (the TSA-attested signature timestamp is a CMS *unsigned*
  * attribute, so B-B and B-T produce byte-identical signed-attrs).
  */
-export const captureItemDigest = async (opts: CaptureItemDigestOptions): Promise<Uint8Array> => {
+export const captureItemDigest = async (opts: CaptureItemDigestOptions): Promise<CapturedItemDigest> => {
   const pdfDoc = await PDF.load(opts.pdfBytes);
 
   const captureSigner = new CscCaptureSigner({
@@ -91,13 +97,13 @@ export const captureItemDigest = async (opts: CaptureItemDigestOptions): Promise
     estimatedSize: ICP_SIGNATURE_ESTIMATED_SIZE,
   });
 
-  if (captureSigner.capturedDigest === null) {
+  if (captureSigner.capturedDigest === null || captureSigner.capturedSignedAttrs === null) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'ICP capture signer was not invoked by pdf.sign.',
     });
   }
 
-  return captureSigner.capturedDigest;
+  return { digest: captureSigner.capturedDigest, signedAttrs: captureSigner.capturedSignedAttrs };
 };
 
 export type EmbedItemSignatureOptions = {

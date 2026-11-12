@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -21,7 +20,8 @@ import java.util.Map;
  *   -> {"cmd":"list","source":{"type":"P12","path":"...","password":"..."}}
  *   <- {"ok":true,"certs":[{alias,subject,commonName,cpfCnpj,issuer,notAfter,type}]}
  *
- *   -> {"cmd":"sign","source":{...},"alias":"...","digestB64":"...","digestAlgo":"SHA-256"}
+ *   -> {"cmd":"sign","source":{...},"alias":"...","digestB64":"...","signedAttrsB64":"...","digestAlgo":"SHA-256"}
+ *      (signedAttrsB64 is optional for P12/PKCS11 and required for WINDOWS_MY)
  *   <- {"ok":true,"signatureB64":"...","signatureAlgorithm":"RSASSA-PKCS1-v1_5","certChainB64":[...]}
  *
  *   <- {"ok":false,"error":"..."}   on any failure
@@ -107,10 +107,10 @@ public final class Main {
       throw new IllegalArgumentException("Missing 'digestB64'");
     }
     String digestAlgo = orDefault(Json.str(request, "digestAlgo"), "SHA-256");
-    byte[] digest = Base64.getDecoder().decode(digestB64);
+    SignInput input = CliAgent.readSignInput(request, digestAlgo);
 
     try (CertSource source = CertSourceFactory.from(Json.asObject(request.get("source")))) {
-      return source.sign(Json.str(request, "alias"), digest, digestAlgo);
+      return source.sign(Json.str(request, "alias"), input);
     }
   }
 

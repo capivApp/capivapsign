@@ -103,6 +103,8 @@ export const prepareIcpRecipientSigning = async (
 
   const algo = deriveSignerAlgo(certInfo);
   const items: TIcpSignSessionItems = [];
+  // signedAttrs are not persisted: `complete` re-derives them from the pinned bytes.
+  const responseItems: TIcpPrepareResponse['items'] = [];
 
   for (const envelopeItem of envelope.envelopeItems) {
     // Persist the current bytes (anchors already materialised at send time) as
@@ -217,7 +219,7 @@ export const prepareIcpRecipientSigning = async (
       envelopeItem.documentData.initialData ?? undefined,
     );
 
-    const digest = await captureItemDigest({
+    const captured = await captureItemDigest({
       pdfBytes: pinnedBytes,
       certificate: leafDer,
       certificateChain: [],
@@ -226,10 +228,18 @@ export const prepareIcpRecipientSigning = async (
       signingTime,
     });
 
+    const hashB64 = Buffer.from(captured.digest).toString('base64');
+
+    responseItems.push({
+      envelopeItemId: envelopeItem.id,
+      digestB64: hashB64,
+      signedAttrsB64: Buffer.from(captured.signedAttrs).toString('base64'),
+    });
+
     items.push({
       envelopeItemId: envelopeItem.id,
       documentDataId: pinnedUpload.documentData.id,
-      hashB64: Buffer.from(digest).toString('base64'),
+      hashB64,
       ordinal: items.length,
     });
   }
@@ -264,7 +274,7 @@ export const prepareIcpRecipientSigning = async (
 
   return {
     sessionId: session.id,
-    items: items.map((item) => ({ envelopeItemId: item.envelopeItemId, digestB64: item.hashB64 })),
+    items: responseItems,
     policy: {
       digestAlgo: algo.digestAlgorithm,
       signAlgo: algo.signatureAlgorithm,

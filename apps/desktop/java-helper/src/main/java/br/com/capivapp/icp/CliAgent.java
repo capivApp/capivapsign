@@ -131,8 +131,7 @@ final class CliAgent {
       List<Object> signedItems = new ArrayList<>();
       for (Object itemObj : items) {
         Map<String, Object> item = (Map<String, Object>) itemObj;
-        byte[] digest = Base64.getDecoder().decode(String.valueOf(item.get("digestB64")));
-        Map<String, Object> signed = source.sign(alias, digest, digestAlgo);
+        Map<String, Object> signed = source.sign(alias, readSignInput(item, digestAlgo));
 
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("envelopeItemId", item.get("envelopeItemId"));
@@ -149,6 +148,15 @@ final class CliAgent {
       response.put("outcome", result.getOrDefault("outcome", "signed"));
       return response;
     }
+  }
+
+  /** The digest plus, from servers that send them, the {@code signedAttrs} bytes. */
+  static SignInput readSignInput(Map<String, Object> item, String digestAlgo) throws Exception {
+    Object signedAttrsB64 = item.get("signedAttrsB64");
+    return SignInput.of(
+        Base64.getDecoder().decode(String.valueOf(item.get("digestB64"))),
+        signedAttrsB64 == null ? null : Base64.getDecoder().decode(String.valueOf(signedAttrsB64)),
+        digestAlgo);
   }
 
   /** Build the internal flag map for a sign request originating from the HTTP server. */

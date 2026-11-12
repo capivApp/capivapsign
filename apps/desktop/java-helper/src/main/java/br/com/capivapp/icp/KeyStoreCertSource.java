@@ -54,7 +54,7 @@ abstract class KeyStoreCertSource implements CertSource {
   }
 
   @Override
-  public Map<String, Object> sign(String alias, byte[] digest, String digestAlgo) throws Exception {
+  public Map<String, Object> sign(String alias, SignInput input) throws Exception {
     String resolved = resolveAlias(alias);
     Key key = keyStore.getKey(resolved, auth);
     if (!(key instanceof PrivateKey privateKey)) {
@@ -62,7 +62,7 @@ abstract class KeyStoreCertSource implements CertSource {
     }
 
     RawDigestSigner signer = signerFor(privateKey);
-    byte[] signature = signer.sign(digest, digestAlgo);
+    byte[] signature = signer.sign(input);
 
     Map<String, Object> result = new LinkedHashMap<>();
     result.put("signatureB64", Base64.getEncoder().encodeToString(signature));

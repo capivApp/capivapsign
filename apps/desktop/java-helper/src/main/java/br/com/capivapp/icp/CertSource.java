@@ -20,11 +20,11 @@ interface CertSource extends AutoCloseable {
   List<Map<String, Object>> list() throws Exception;
 
   /**
-   * Signs {@code digest} (the captured {@code signedAttrs} hash) with the key
-   * for {@code alias}, returning {@code {signatureB64, certChainB64[],
-   * signatureAlgorithm}}.
+   * Signs {@code input} (the captured {@code signedAttrs} digest, plus the
+   * {@code signedAttrs} bytes when sent) with the key for {@code alias},
+   * returning {@code {signatureB64, certChainB64[], signatureAlgorithm}}.
    */
-  Map<String, Object> sign(String alias, byte[] digest, String digestAlgo) throws Exception;
+  Map<String, Object> sign(String alias, SignInput input) throws Exception;
 
   @Override
   default void close() throws Exception {}

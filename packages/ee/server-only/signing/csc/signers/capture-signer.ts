@@ -46,6 +46,12 @@ export class CscCaptureSigner implements Signer {
   /** Populated by `sign()`. `null` until libpdf calls into the signer. */
   capturedDigest: Uint8Array | null = null;
 
+  /**
+   * The DER `signedAttrs` bytes behind `capturedDigest`. A signer that can only
+   * hash-and-sign (the Windows certificate store) needs these, not the digest.
+   */
+  capturedSignedAttrs: Uint8Array | null = null;
+
   constructor(options: CscCaptureSignerOptions) {
     this.certificate = options.certificate;
     this.certificateChain = options.certificateChain;
@@ -71,6 +77,7 @@ export class CscCaptureSigner implements Signer {
     }
 
     this.capturedDigest = hashData(data, algorithm);
+    this.capturedSignedAttrs = new Uint8Array(data);
 
     return new Uint8Array(placeholderSize(this.algo));
   }

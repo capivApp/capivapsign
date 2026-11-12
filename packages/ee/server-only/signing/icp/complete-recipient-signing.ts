@@ -1,3 +1,5 @@
+import { X509Certificate } from 'node:crypto';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
 import { sendPendingEmail } from '@documenso/lib/server-only/document/send-pending-email';
@@ -14,6 +16,7 @@ import { prisma } from '@documenso/prisma';
 import { RecipientRole, SendStatus, SigningStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { buildTspAnchorName } from '../csc/pdf-names';
+import { assertSignatureMatchesKey } from './assert-signature-matches-key';
 import type { TIcpCompleteRequest, TIcpCompleteResponse } from './desktop-protocol';
 import { captureItemDigest, deriveSignerAlgo, embedItemSignature } from './digest-signing';
 import { parseIcpCertificate } from './icp-cert-policy';
@@ -67,6 +70,7 @@ export const completeIcpRecipientSigning = async (
   const chain = session.certChain.map((b64) => new Uint8Array(Buffer.from(b64, 'base64')));
   const certInfo = parseIcpCertificate(chain[0]);
   const algo = deriveSignerAlgo(certInfo);
+  const leafPublicKey = new X509Certificate(chain[0]).publicKey;
 
   // Timestamping is admin-toggleable: when off, no TSA is contacted and the
   // signature is embedded at B-B (certificate only). See `getIsSigningTimestampEnabled`.
@@ -121,11 +125,20 @@ export const completeIcpRecipientSigning = async (
       signingTime: session.signingTime,
     });
 
-    if (Buffer.from(recaptured).toString('base64') !== sessionItem.hashB64) {
+    if (Buffer.from(recaptured.digest).toString('base64') !== sessionItem.hashB64) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: `Re-derived ICP digest diverged from prep-time hash for envelope item "${envelopeItem.id}".`,
       });
     }
+
+    const signature = new Uint8Array(Buffer.from(signatureB64, 'base64'));
+
+    assertSignatureMatchesKey({
+      publicKey: leafPublicKey,
+      signedAttrs: recaptured.signedAttrs,
+      signature,
+      digestAlgo: algo.digestAlgorithm,
+    });
 
     const signedBytes = await embedItemSignature({
       pdfBytes: pinnedBytes,
@@ -134,7 +147,7 @@ export const completeIcpRecipientSigning = async (
       algo,
       anchorName,
       signingTime: session.signingTime,
-      signature: new Uint8Array(Buffer.from(signatureB64, 'base64')),
+      signature,
       timestampAuthority,
     });
 

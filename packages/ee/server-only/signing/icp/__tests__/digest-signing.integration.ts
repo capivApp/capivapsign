@@ -19,10 +19,10 @@
  */
 
 import { execFileSync, spawn } from 'node:child_process';
-import { createInterface } from 'node:readline';
-import { mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
 import { HttpTimestampAuthority } from '@libpdf/core';
@@ -41,15 +41,52 @@ const b64ToU8 = (s: string) => new Uint8Array(Buffer.from(s, 'base64'));
 let failures = 0;
 const ok = (cond: boolean, msg: string) => {
   console.log(`  ${cond ? '✓' : '✗ FAIL:'} ${msg}`);
-  if (!cond) failures++;
+  if (!cond) {
+    failures++;
+  }
 };
 
 // ---- test fixtures (self-contained) ----------------------------------------
 const setupFixtures = () => {
   const dir = mkdtempSync(join(tmpdir(), 'icp-it-'));
   const mint = (n: number, subject: string) => {
-    execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-keyout', join(dir, `k${n}.pem`), '-out', join(dir, `c${n}.pem`), '-days', '730', '-nodes', '-subj', `/C=BR/O=ICP-Brasil Test/OU=AC Teste/CN=${subject}`], { stdio: 'ignore' });
-    execFileSync('openssl', ['pkcs12', '-export', '-inkey', join(dir, `k${n}.pem`), '-in', join(dir, `c${n}.pem`), '-out', join(dir, `c${n}.p12`), '-passout', 'pass:test', '-name', `signer${n}`], { stdio: 'ignore' });
+    execFileSync(
+      'openssl',
+      [
+        'req',
+        '-x509',
+        '-newkey',
+        'rsa:2048',
+        '-keyout',
+        join(dir, `k${n}.pem`),
+        '-out',
+        join(dir, `c${n}.pem`),
+        '-days',
+        '730',
+        '-nodes',
+        '-subj',
+        `/C=BR/O=ICP-Brasil Test/OU=AC Teste/CN=${subject}`,
+      ],
+      { stdio: 'ignore' },
+    );
+    execFileSync(
+      'openssl',
+      [
+        'pkcs12',
+        '-export',
+        '-inkey',
+        join(dir, `k${n}.pem`),
+        '-in',
+        join(dir, `c${n}.pem`),
+        '-out',
+        join(dir, `c${n}.p12`),
+        '-passout',
+        'pass:test',
+        '-name',
+        `signer${n}`,
+      ],
+      { stdio: 'ignore' },
+    );
   };
   mint(1, 'ALICE SILVA:11144477735');
   mint(2, 'BRUNO COSTA:52998224725');
@@ -86,13 +123,37 @@ const verifyRecipientSignatures = (pdfBytes: Uint8Array): number => {
   let verified = 0;
   while ((m = re.exec(latin)) !== null) {
     const [a, b, c, d] = m.slice(1, 5).map(Number);
-    if (latin.slice(Math.max(0, m.index - 300), m.index).includes('ETSI.RFC3161')) continue; // DocTimeStamp
-    const hex = buf.subarray(a + b, c).toString('latin1').match(/<([0-9A-Fa-f]+)>/)?.[1];
-    if (!hex) continue;
+    if (latin.slice(Math.max(0, m.index - 300), m.index).includes('ETSI.RFC3161')) {
+      continue; // DocTimeStamp
+    }
+    const hex = buf
+      .subarray(a + b, c)
+      .toString('latin1')
+      .match(/<([0-9A-Fa-f]+)>/)?.[1];
+    if (!hex) {
+      continue;
+    }
     const dir = mkdtempSync(join(tmpdir(), 'icp-v-'));
     writeFileSync(join(dir, 'c.bin'), Buffer.concat([buf.subarray(a, a + b), buf.subarray(c, c + d)]));
     writeFileSync(join(dir, 's.der'), Buffer.from(hex.replace(/(00)+$/, ''), 'hex'));
-    execFileSync('openssl', ['cms', '-verify', '-binary', '-inform', 'DER', '-in', join(dir, 's.der'), '-content', join(dir, 'c.bin'), '-noverify', '-out', '/dev/null'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    execFileSync(
+      'openssl',
+      [
+        'cms',
+        '-verify',
+        '-binary',
+        '-inform',
+        'DER',
+        '-in',
+        join(dir, 's.der'),
+        '-content',
+        join(dir, 'c.bin'),
+        '-noverify',
+        '-out',
+        '/dev/null',
+      ],
+      { stdio: ['ignore', 'pipe', 'pipe'] },
+    );
     verified++;
   }
   return verified;
@@ -142,7 +203,7 @@ const main = async () => {
     ok(info.cpfCnpj === expectCpf, `parsed ICP identity ${info.commonName} / CPF ${info.cpfCnpj}`);
     const algo = deriveSignerAlgo(info);
 
-    const digest = await captureItemDigest({
+    const captured = await captureItemDigest({
       pdfBytes: bytes,
       certificate: leaf,
       certificateChain: [],
@@ -151,9 +212,18 @@ const main = async () => {
       signingTime,
     });
 
-    // desktop agent signs ONLY the digest.
-    const signed = await agent.request({ cmd: 'sign', source: source(n), digestB64: Buffer.from(digest).toString('base64'), digestAlgo: algo.digestAlgorithm });
-    ok(signed.ok && signed.signatureAlgorithm === 'RSASSA-PKCS1-v1_5', `Java helper signed digest (${signed.signatureAlgorithm})`);
+    // desktop agent signs ONLY the signedAttrs digest (never the document).
+    const signed = await agent.request({
+      cmd: 'sign',
+      source: source(n),
+      digestB64: Buffer.from(captured.digest).toString('base64'),
+      signedAttrsB64: Buffer.from(captured.signedAttrs).toString('base64'),
+      digestAlgo: algo.digestAlgorithm,
+    });
+    ok(
+      signed.ok && signed.signatureAlgorithm === 'RSASSA-PKCS1-v1_5',
+      `Java helper signed digest (${signed.signatureAlgorithm})`,
+    );
     const chain = (signed.certChainB64 as string[]).map(b64ToU8);
 
     // complete: embed B-T.
@@ -171,7 +241,10 @@ const main = async () => {
 
   agent.close();
 
-  ok(verifyRecipientSignatures(bytes) === 2, 'openssl verifies BOTH recipient signatures (B-T) after sequential signing');
+  ok(
+    verifyRecipientSignatures(bytes) === 2,
+    'openssl verifies BOTH recipient signatures (B-T) after sequential signing',
+  );
 
   // finalize: B-LTA seal.
   const sealed = await sealArchival({ pdfBytes: bytes, timestampAuthority: tsa });
@@ -180,7 +253,9 @@ const main = async () => {
   ok(verifyRecipientSignatures(sealed.bytes) === 2, 'both recipient signatures still verify after B-LTA seal');
   console.log(`  final sealed PDF: ${sealed.bytes.length} bytes, LTV for ${sealed.signatureCount} signature(s)`);
 
-  console.log(`\n${failures ? `✗ FAILED (${failures})` : '✓ PASSED — production icp/ modules sign via the Java helper end to end'}`);
+  console.log(
+    `\n${failures ? `✗ FAILED (${failures})` : '✓ PASSED — production icp/ modules sign via the Java helper end to end'}`,
+  );
   process.exit(failures ? 1 : 0);
 };
 

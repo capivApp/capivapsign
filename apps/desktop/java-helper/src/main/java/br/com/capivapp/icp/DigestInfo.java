@@ -45,6 +45,16 @@ final class DigestInfo {
     };
   }
 
+  /** Maps our digest-algorithm token to the JCA hashing RSA {@code Signature} name. */
+  static String jcaRsaSignatureName(String digestAlgo) {
+    return switch (digestAlgo) {
+      case "SHA-256" -> "SHA256withRSA";
+      case "SHA-384" -> "SHA384withRSA";
+      case "SHA-512" -> "SHA512withRSA";
+      default -> throw new IllegalArgumentException("Unsupported digest algorithm: " + digestAlgo);
+    };
+  }
+
   private static byte[] hex(String s) {
     return HexFormat.of().parseHex(s);
   }

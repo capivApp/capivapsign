@@ -33,11 +33,13 @@ const b64ToU8 = (s) => new Uint8Array(Buffer.from(s, 'base64'));
 // minimal capture/embed (same contract as the production icp module).
 class Capture {
   capturedDigest = null;
+  capturedSignedAttrs = null;
   constructor(b) {
     Object.assign(this, b);
   }
   async sign(d) {
     this.capturedDigest = sha256(d);
+    this.capturedSignedAttrs = new Uint8Array(d);
     return new Uint8Array(256);
   }
 }
@@ -97,7 +99,13 @@ const server = createServer(async (req, res) => {
       res.end(
         JSON.stringify({
           sessionId,
-          items: [{ envelopeItemId: 'item_0', digestB64: Buffer.from(cap.capturedDigest).toString('base64') }],
+          items: [
+            {
+              envelopeItemId: 'item_0',
+              digestB64: Buffer.from(cap.capturedDigest).toString('base64'),
+              signedAttrsB64: Buffer.from(cap.capturedSignedAttrs).toString('base64'),
+            },
+          ],
           policy: { digestAlgo: 'SHA-256', signAlgo: 'RSASSA-PKCS1-v1_5' },
         }),
       );
