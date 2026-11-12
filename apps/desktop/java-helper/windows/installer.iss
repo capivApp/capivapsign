@@ -20,7 +20,7 @@
 ; Inno Setup 6 (ISCC.exe) must be installed.
 
 #define AppName "CapivaSign - Assinador ICP-Brasil"
-#define AppVersion "1.0.2"
+#define AppVersion "1.0.3"
 #define AppPublisher "CapivApp"
 ; Windowed launcher (GUI subsystem). Used for EVERY automatic entry point so no
 ; cmd window is ever created; it defaults to `serve --no-gui` and lands in the tray.
