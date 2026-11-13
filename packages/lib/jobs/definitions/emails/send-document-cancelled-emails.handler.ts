@@ -9,6 +9,7 @@ import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
+import { buildWhatsappMessage, resolveSenderName } from '../../../server-only/whatsapp/build-whatsapp-message';
 import { sendWhatsappNotification } from '../../../server-only/whatsapp/send-whatsapp-notification';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
@@ -164,8 +165,13 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCancelledEmai
             'signer.name': recipient.name,
             'signer.email': recipient.email,
             'document.name': envelope.title,
+            'sender.name': resolveSenderName(documentOwner.name, envelope.team.name),
           },
-          fallbackBody: `O documento "${envelope.title}" foi cancelado.`,
+          fallbackBody: buildWhatsappMessage('DOCUMENT_CANCELLED', {
+            signerName: recipient.name,
+            senderName: resolveSenderName(documentOwner.name, envelope.team.name),
+            documentName: envelope.title,
+          }),
         });
       }),
     );

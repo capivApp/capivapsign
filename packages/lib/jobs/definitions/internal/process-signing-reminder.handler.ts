@@ -19,8 +19,9 @@ import { buildEnvelopeEmailHeaders } from '../../../server-only/email/build-enve
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
-import { sendWhatsappNotification } from '../../../server-only/whatsapp/send-whatsapp-notification';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
+import { buildWhatsappMessage, resolveSenderName } from '../../../server-only/whatsapp/build-whatsapp-message';
+import { sendWhatsappNotification } from '../../../server-only/whatsapp/send-whatsapp-notification';
 import { DOCUMENT_AUDIT_LOG_TYPE, DOCUMENT_EMAIL_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../../types/webhook-payload';
@@ -231,9 +232,16 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
         'signer.name': recipient.name,
         'signer.email': recipient.email,
         'document.name': envelope.title,
+        'sender.name': resolveSenderName(envelope.user.name, envelope.team.name),
         link: signDocumentLink,
       },
-      fallbackBody: `Lembrete: ${recipientActionVerb} o documento "${envelope.title}". Acesse: ${signDocumentLink}`,
+      fallbackBody: buildWhatsappMessage('SIGNING_REMINDER', {
+        signerName: recipient.name,
+        senderName: resolveSenderName(envelope.user.name, envelope.team.name),
+        documentName: envelope.title,
+        link: signDocumentLink,
+        actionVerb: recipientActionVerb,
+      }),
     });
 
     await prisma.documentAuditLog.create({

@@ -31,4 +31,5 @@ export const MESSAGE_TEMPLATE_CHANNELS: {
 ];
 
 /** Placeholder variables available in all templates. */
-export const MESSAGE_TEMPLATE_PLACEHOLDERS = '{signer.name}, {signer.email}, {document.name}, {team.name}, {link}';
+export const MESSAGE_TEMPLATE_PLACEHOLDERS =
+  '{signer.name}, {signer.email}, {sender.name}, {document.name}, {team.name}, {link}';

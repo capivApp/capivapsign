@@ -1,9 +1,8 @@
 import { BillableEventType, type MessageTemplateEvent } from '@prisma/client';
-
+import { logger } from '../../utils/logger';
+import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { recordUsage } from '../billing/record-usage';
 import { resolveMessageTemplate } from '../messaging/resolve-message-template';
-import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
-import { logger } from '../../utils/logger';
 import { getWhatsappContext } from './get-whatsapp-context';
 
 export type WhatsappNotificationVars = {
@@ -11,6 +10,7 @@ export type WhatsappNotificationVars = {
   'signer.email'?: string;
   'document.name'?: string;
   'team.name'?: string;
+  'sender.name'?: string;
   link?: string;
 };
 

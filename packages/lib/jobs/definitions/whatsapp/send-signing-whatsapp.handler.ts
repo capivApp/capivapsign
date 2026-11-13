@@ -1,3 +1,4 @@
+import { prisma } from '@documenso/prisma';
 import {
   BillableEventType,
   DocumentStatus,
@@ -7,20 +8,17 @@ import {
   RecipientRole,
   SendStatus,
 } from '@prisma/client';
-
-import { prisma } from '@documenso/prisma';
-
-import { recordUsage } from '../../../server-only/billing/record-usage';
-import { resolveMessageTemplate } from '../../../server-only/messaging/resolve-message-template';
-import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
+import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
-import { getI18nInstance } from '../../../client-only/providers/i18n-server';
+import { recordUsage } from '../../../server-only/billing/record-usage';
+import { resolveMessageTemplate } from '../../../server-only/messaging/resolve-message-template';
+import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
+import { buildWhatsappMessage, resolveSenderName } from '../../../server-only/whatsapp/build-whatsapp-message';
 import { getWhatsappContext } from '../../../server-only/whatsapp/get-whatsapp-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
-import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
-import { msg } from '@lingui/core/macro';
+import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningWhatsappJobDefinition } from './send-signing-whatsapp';
 
@@ -31,13 +29,7 @@ import type { TSendSigningWhatsappJobDefinition } from './send-signing-whatsapp'
  * transport (with CapivaApp env fallback). Message templating is inline here;
  * org-managed templates arrive in a later phase.
  */
-export const run = async ({
-  payload,
-  io,
-}: {
-  payload: TSendSigningWhatsappJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ payload, io }: { payload: TSendSigningWhatsappJobDefinition; io: JobRunIO }) => {
   const { documentId, recipientId, source } = payload;
 
   const [envelope, recipient] = await Promise.all([
@@ -48,7 +40,7 @@ export const run = async ({
       },
       include: {
         documentMeta: true,
-        user: { select: { disabled: true } },
+        user: { select: { disabled: true, name: true } },
         team: { select: { id: true, name: true } },
       },
     }),
@@ -59,9 +51,7 @@ export const run = async ({
     return;
   }
 
-  const signingRequestEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).recipientSigningRequest;
+  const signingRequestEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).recipientSigningRequest;
 
   if (!signingRequestEnabled || envelope.user.disabled) {
     return;
@@ -92,6 +82,7 @@ export const run = async ({
   const i18n = await getI18nInstance(envelope.documentMeta?.language ?? undefined);
   const actionVerb = i18n._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb).toLowerCase();
   const signLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
+  const senderName = resolveSenderName(envelope.user.name, envelope.team.name);
 
   // Org-managed WhatsApp template (if any), else the built-in default message.
   const template = await resolveMessageTemplate({
@@ -106,11 +97,16 @@ export const run = async ({
         'signer.email': recipient.email,
         'document.name': envelope.title,
         'team.name': envelope.team.name,
+        'sender.name': senderName,
         link: signLink,
       })
-    : i18n._(
-        msg`${whatsapp.fromName}: ${envelope.team.name} convidou você a ${actionVerb} o documento "${envelope.title}". Acesse: ${signLink}`,
-      );
+    : buildWhatsappMessage('SIGNING_REQUEST', {
+        signerName: recipient.name,
+        senderName,
+        documentName: envelope.title,
+        link: signLink,
+        actionVerb,
+      });
 
   await io.runTask('send-signing-whatsapp', async () => {
     const result = await whatsapp.adapter.sendMessage({ to: recipient.phone!, body });

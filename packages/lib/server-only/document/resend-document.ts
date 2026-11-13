@@ -34,6 +34,7 @@ import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisat
 import { updateRecipientNextReminder } from '../recipient/update-recipient-next-reminder';
 import { assertUserNotDisabled } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { resolveSenderName } from '../whatsapp/build-whatsapp-message';
 import { remindRecipientsOnWhatsapp } from './remind-recipients-on-whatsapp';
 
 export type ResendDocumentOptions = {
@@ -73,6 +74,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     include: {
       recipients: true,
       documentMeta: true,
+      user: { select: { name: true } },
       team: {
         select: {
           teamEmail: true,
@@ -174,6 +176,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
   await remindRecipientsOnWhatsapp({
     teamId: envelope.teamId,
     documentTitle: envelope.title,
+    senderName: resolveSenderName(envelope.user.name, envelope.team.name),
     recipients: recipientsToRemind,
     buildSigningLink: (token) => `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${token}`,
     getActionVerb: (role) => documentI18n._(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase(),

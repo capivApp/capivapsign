@@ -8,6 +8,8 @@ import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
+import { buildWhatsappMessage, resolveSenderName } from '../../../server-only/whatsapp/build-whatsapp-message';
+import { sendWhatsappNotification } from '../../../server-only/whatsapp/send-whatsapp-notification';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
@@ -17,7 +19,6 @@ import { isRecipientEmailValidForSending } from '../../../utils/recipients';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../../utils/teams';
-import { sendWhatsappNotification } from '../../../server-only/whatsapp/send-whatsapp-notification';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendDocumentCompletedEmailsJobDefinition } from './send-document-completed-emails';
 
@@ -52,6 +53,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
         select: {
           id: true,
           url: true,
+          name: true,
         },
       },
     },
@@ -264,9 +266,15 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
           'signer.name': recipient.name,
           'signer.email': recipient.email,
           'document.name': envelope.title,
+          'sender.name': resolveSenderName(owner.name, envelope.team.name),
           link: downloadLink,
         },
-        fallbackBody: `Documento "${envelope.title}" concluído. Acesse: ${downloadLink}`,
+        fallbackBody: buildWhatsappMessage('DOCUMENT_COMPLETED', {
+          signerName: recipient.name,
+          senderName: resolveSenderName(owner.name, envelope.team.name),
+          documentName: envelope.title,
+          link: downloadLink,
+        }),
       });
 
       await prisma.documentAuditLog.create({

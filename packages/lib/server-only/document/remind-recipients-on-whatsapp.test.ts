@@ -23,6 +23,7 @@ const remind = (recipients: ReturnType<typeof buildRecipient>[]) =>
   remindRecipientsOnWhatsapp({
     teamId: 7,
     documentTitle: 'Contrato de Prestação de Serviços',
+    senderName: 'Mateus Seiboth',
     recipients,
     buildSigningLink: (token) => `https://assina.exemplo/sign/${token}`,
     getActionVerb: () => 'assinar',
@@ -44,10 +45,19 @@ describe('remindRecipientsOnWhatsapp', () => {
         'signer.name': 'Ana Exemplo',
         'signer.email': 'ana@exemplo.com',
         'document.name': 'Contrato de Prestação de Serviços',
+        'sender.name': 'Mateus Seiboth',
         link: 'https://assina.exemplo/sign/token-da-ana',
       },
-      fallbackBody:
-        'Lembrete: assinar o documento "Contrato de Prestação de Serviços". Acesse: https://assina.exemplo/sign/token-da-ana',
+      fallbackBody: [
+        '⏰ *CapivaSign* · Lembrete',
+        '',
+        'Olá, Ana!',
+        '',
+        'O documento *Contrato de Prestação de Serviços*, enviado por *Mateus Seiboth*, ainda está esperando por você.',
+        '',
+        'Acesse para assinar:',
+        'https://assina.exemplo/sign/token-da-ana',
+      ].join('\n'),
     });
   });
 

@@ -1,5 +1,6 @@
 import { RecipientRole } from '@prisma/client';
 
+import { buildWhatsappMessage } from '../whatsapp/build-whatsapp-message';
 import { sendWhatsappNotification } from '../whatsapp/send-whatsapp-notification';
 
 export type WhatsappReminderRecipient = {
@@ -13,6 +14,8 @@ export type WhatsappReminderRecipient = {
 export type RemindRecipientsOnWhatsappOptions = {
   teamId: number;
   documentTitle: string;
+  /** Who sent the document (see `resolveSenderName`). */
+  senderName: string;
   recipients: WhatsappReminderRecipient[];
   buildSigningLink: (token: string) => string;
   /** Translated, lower-case action verb for the recipient role (e.g. "assinar"). */
@@ -30,6 +33,7 @@ const isReachableOnWhatsapp = (recipient: WhatsappReminderRecipient): boolean =>
 export const remindRecipientsOnWhatsapp = async ({
   teamId,
   documentTitle,
+  senderName,
   recipients,
   buildSigningLink,
   getActionVerb,
@@ -47,9 +51,16 @@ export const remindRecipientsOnWhatsapp = async ({
           'signer.name': recipient.name,
           'signer.email': recipient.email,
           'document.name': documentTitle,
+          'sender.name': senderName,
           link,
         },
-        fallbackBody: `Lembrete: ${actionVerb} o documento "${documentTitle}". Acesse: ${link}`,
+        fallbackBody: buildWhatsappMessage('SIGNING_REMINDER', {
+          signerName: recipient.name,
+          senderName,
+          documentName: documentTitle,
+          link,
+          actionVerb,
+        }),
       });
     }),
   );
