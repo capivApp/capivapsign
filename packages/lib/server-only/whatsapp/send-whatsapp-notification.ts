@@ -3,6 +3,7 @@ import { logger } from '../../utils/logger';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { recordUsage } from '../billing/record-usage';
 import { resolveMessageTemplate } from '../messaging/resolve-message-template';
+import { withAutomaticMessageFooter } from './automatic-message-footer';
 import { getWhatsappContext } from './get-whatsapp-context';
 
 export type WhatsappNotificationVars = {
@@ -55,7 +56,10 @@ export const sendWhatsappNotification = async (options: {
     const vars = options.vars as Record<string, string>;
     const body = renderCustomEmailTemplate(template?.body ?? options.fallbackBody, vars);
 
-    await whatsapp.adapter.sendMessage({ to: options.to, body });
+    await whatsapp.adapter.sendMessage({
+      to: options.to,
+      body: withAutomaticMessageFooter(body, whatsapp.kind),
+    });
 
     await recordUsage({
       type: BillableEventType.WHATSAPP_MESSAGE,

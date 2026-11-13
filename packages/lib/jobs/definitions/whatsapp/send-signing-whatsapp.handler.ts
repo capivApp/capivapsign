@@ -14,6 +14,7 @@ import { RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles'
 import { recordUsage } from '../../../server-only/billing/record-usage';
 import { resolveMessageTemplate } from '../../../server-only/messaging/resolve-message-template';
 import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
+import { withAutomaticMessageFooter } from '../../../server-only/whatsapp/automatic-message-footer';
 import { buildWhatsappMessage, resolveSenderName } from '../../../server-only/whatsapp/build-whatsapp-message';
 import { getWhatsappContext } from '../../../server-only/whatsapp/get-whatsapp-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
@@ -109,7 +110,10 @@ export const run = async ({ payload, io }: { payload: TSendSigningWhatsappJobDef
       });
 
   await io.runTask('send-signing-whatsapp', async () => {
-    const result = await whatsapp.adapter.sendMessage({ to: recipient.phone!, body });
+    const result = await whatsapp.adapter.sendMessage({
+      to: recipient.phone!,
+      body: withAutomaticMessageFooter(body, whatsapp.kind),
+    });
 
     io.logger.info({
       msg: 'WhatsApp signing request sent',

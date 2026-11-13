@@ -7,6 +7,9 @@ import type { WhatsappAdapter } from './adapters/whatsapp-adapter';
 import { createZapiAdapter } from './adapters/zapi-adapter';
 import { resolveDefaultWhatsappTransport, resolveWhatsappTransport } from './resolve-whatsapp-transport';
 
+/** `own`: the organisation's own transport; `capiva`: CapivaSign's default (env) transport. */
+export type WhatsappContextKind = 'own' | 'capiva';
+
 export type WhatsappContext = {
   organisationId: string;
   adapter: WhatsappAdapter;
@@ -17,7 +20,7 @@ export type WhatsappContext = {
    *  - `own`    → the organisation's own configured transport
    *  - `capiva` → CapivaSign's default (env) transport
    */
-  kind: 'own' | 'capiva';
+  kind: WhatsappContextKind;
   /**
    * False when neither a per-plan transport nor the CapivaApp env default is
    * configured — the caller must skip sending instead of throwing.
@@ -27,9 +30,7 @@ export type WhatsappContext = {
 
 const DEFAULT_FROM_NAME = 'CapivaSign';
 
-type GetWhatsappContextOptions =
-  | { type: 'organisation'; organisationId: string }
-  | { type: 'team'; teamId: number };
+type GetWhatsappContextOptions = { type: 'organisation'; organisationId: string } | { type: 'team'; teamId: number };
 
 /**
  * Resolves the WhatsApp sending context for an organisation/team: the per-plan
@@ -37,9 +38,7 @@ type GetWhatsappContextOptions =
  * transport from env. Mirrors the email transport resolution in
  * `get-email-context.ts` (best-effort fallback, alertable log on misconfig).
  */
-export const getWhatsappContext = async (
-  options: GetWhatsappContextOptions,
-): Promise<WhatsappContext> => {
+export const getWhatsappContext = async (options: GetWhatsappContextOptions): Promise<WhatsappContext> => {
   const organisation =
     options.type === 'organisation'
       ? await prisma.organisation.findFirst({
