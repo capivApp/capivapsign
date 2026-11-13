@@ -7,18 +7,15 @@ import { ZTeamUrlSchema } from '@documenso/trpc/server/team-router/schema';
 import { redirect } from 'react-router';
 
 import { LandingPage } from '~/components/general/landing-page';
+import { linkPreviewTags } from '~/utils/meta';
 
 import type { Route } from './+types/_index';
 
 export function meta() {
-  return [
-    { title: 'CapivaSign — Assinatura digital com validade jurídica' },
-    {
-      name: 'description',
-      content:
-        'Assinatura eletrônica e ICP-Brasil com WhatsApp e API. Simples, rápida e com validade jurídica.',
-    },
-  ];
+  const title = 'CapivaSign: assinatura digital com validade jurídica';
+  const description = 'Assinatura eletrônica e ICP-Brasil com WhatsApp e API. Simples, rápida e com validade jurídica.';
+
+  return [{ title }, { name: 'description', content: description }, ...linkPreviewTags({ title, description })];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {

@@ -10,6 +10,7 @@
     "start": "npm run with:env -- cross-env NODE_ENV=production node build/server/main.js",
     "clean": "rimraf .react-router && rimraf node_modules",
     "typecheck": "react-router typegen && tsc",
+    "test": "vitest run",
     "with:env": "dotenv -e ../../.env -e ../../.env.local --"
   },
   "dependencies": {

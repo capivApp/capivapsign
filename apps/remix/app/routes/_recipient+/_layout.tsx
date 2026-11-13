@@ -8,13 +8,11 @@ import { ChevronLeft } from 'lucide-react';
 import { isRouteErrorResponse, Link, Outlet } from 'react-router';
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { recipientMetaTags } from '~/utils/meta';
 import type { Route } from './+types/_layout';
 
 export function meta() {
-  return [
-    { title: i18n._(msg`Sign Document - CapivaSign`) },
-    { name: 'robots', content: 'noindex, nofollow, noarchive, nosnippet, noimageindex' },
-  ];
+  return recipientMetaTags(i18n._(msg`Sign Document - CapivaSign`));
 }
 
 /**
