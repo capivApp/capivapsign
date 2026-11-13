@@ -34,6 +34,7 @@ import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisat
 import { updateRecipientNextReminder } from '../recipient/update-recipient-next-reminder';
 import { assertUserNotDisabled } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { remindRecipientsOnWhatsapp } from './remind-recipients-on-whatsapp';
 
 export type ResendDocumentOptions = {
   id: EnvelopeIdOptions;
@@ -165,6 +166,18 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
   if (!isRecipientSigningRequestEmailEnabled) {
     return envelope;
   }
+
+  // WhatsApp does not depend on the org email settings below: recipients with a
+  // phone get the same reminder the automatic reminder job sends.
+  const documentI18n = await getI18nInstance(envelope.documentMeta?.language ?? undefined);
+
+  await remindRecipientsOnWhatsapp({
+    teamId: envelope.teamId,
+    documentTitle: envelope.title,
+    recipients: recipientsToRemind,
+    buildSigningLink: (token) => `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${token}`,
+    getActionVerb: (role) => documentI18n._(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase(),
+  });
 
   const {
     branding,

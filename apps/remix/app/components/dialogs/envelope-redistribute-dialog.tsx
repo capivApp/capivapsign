@@ -23,6 +23,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
+import { MessageCircleIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
@@ -155,7 +156,15 @@ export const EnvelopeRedistributeDialog = ({ envelope, envelopeType, trigger }: 
                               type={getRecipientType(recipient)}
                               fallbackText={recipientAbbreviation(recipient)}
                             />
-                            {recipient.email}
+                            <span className="flex flex-col">
+                              <span>{recipient.email || recipient.name}</span>
+                              {recipient.phone && (
+                                <span className="flex items-center gap-1 text-muted-foreground text-xs">
+                                  <MessageCircleIcon className="h-3 w-3" aria-hidden="true" />
+                                  {recipient.phone}
+                                </span>
+                              )}
+                            </span>
                           </FormLabel>
 
                           <FormControl>
