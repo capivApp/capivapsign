@@ -9,7 +9,7 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 ## Supported Email Transports
 
-CapivaSign supports four email transport methods:
+CapivaSign supports five email transport methods:
 
 | Transport      | Use Case                              | Configuration Complexity |
 | -------------- | ------------------------------------- | ------------------------ |
@@ -17,6 +17,7 @@ CapivaSign supports four email transport methods:
 | `smtp-api`     | SMTP with API key authentication      | Low                      |
 | `resend`       | Resend.com email API                  | Low                      |
 | `mailchannels` | MailChannels API (Cloudflare Workers) | Medium                   |
+| `mail-send`    | CapivApp mail-send service            | Low                      |
 
 Select a transport by setting the `NEXT_PRIVATE_SMTP_TRANSPORT` environment variable. The default is `smtp-auth`.
 
@@ -239,6 +240,34 @@ NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...
 NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@yourdomain.com"
 NEXT_PRIVATE_SMTP_FROM_NAME="CapivaSign"
 ```
+
+## mail-send Configuration
+
+`mail-send` is the CapivApp email service. CapivaSign posts each email to it with the app's
+token; the service queues it, retries on failure and delivers it through Resend.
+
+**Environment Variables:**
+
+| Variable                       | Description                         | Default                       |
+| ------------------------------ | ----------------------------------- | ----------------------------- |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`  | Set to `mail-send`                  |                               |
+| `NEXT_PRIVATE_MAIL_SEND_TOKEN` | Token of this app in mail-send      |                               |
+| `NEXT_PRIVATE_MAIL_SEND_URL`   | Base URL of the mail-send service   | `https://mail.capivapp.com.br` |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`  | Sender name shown to the recipients | `CapivaSign`                  |
+
+**Example Configuration:**
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="mail-send"
+NEXT_PRIVATE_MAIL_SEND_TOKEN="your-app-token"
+NEXT_PRIVATE_SMTP_FROM_NAME="CapivaSign"
+```
+
+<Callout type="info">
+  mail-send always sends from `noreply@capivapp.com.br`, so `NEXT_PRIVATE_SMTP_FROM_ADDRESS` and
+  custom sender addresses are ignored with this transport. Recipient display names are dropped;
+  only the addresses are sent. A successful send means the email was queued by mail-send.
+</Callout>
 
 ## Email Templates
 

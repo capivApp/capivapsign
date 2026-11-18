@@ -14,6 +14,8 @@
   "scripts": {
     "dev": "react-router dev --config preview/vite.config.ts",
     "preview:build": "react-router build --config preview/vite.config.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "rimraf node_modules"
   },
   "dependencies": {
@@ -44,6 +46,7 @@
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",
-    "@types/nodemailer": "^8.0.0"
+    "@types/nodemailer": "^8.0.0",
+    "vitest": "^4.0.18"
   }
 }

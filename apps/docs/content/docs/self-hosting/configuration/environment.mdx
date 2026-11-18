@@ -96,7 +96,7 @@ CapivaSign supports multiple email transports for sending notifications.
 
 | Variable                      | Description                                                           | Default     |
 | ----------------------------- | --------------------------------------------------------------------- | ----------- |
-| `NEXT_PRIVATE_SMTP_TRANSPORT` | Email transport: `smtp-auth`, `smtp-api`, `resend`, or `mailchannels` | `smtp-auth` |
+| `NEXT_PRIVATE_SMTP_TRANSPORT` | Email transport: `smtp-auth`, `smtp-api`, `resend`, `mailchannels`, or `mail-send` | `smtp-auth` |
 
 ### SMTP Authentication (smtp-auth)
 
@@ -134,6 +134,13 @@ CapivaSign supports multiple email transports for sending notifications.
 | `NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN`      | Domain for DKIM signing           | -                                         |
 | `NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR`    | DKIM selector                     | -                                         |
 | `NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY` | DKIM private key                  | -                                         |
+
+### mail-send
+
+| Variable                       | Description                    | Default                        |
+| ------------------------------ | ------------------------------ | ------------------------------ |
+| `NEXT_PRIVATE_MAIL_SEND_TOKEN` | Token of this app in mail-send | -                              |
+| `NEXT_PRIVATE_MAIL_SEND_URL`   | Base URL of mail-send          | `https://mail.capivapp.com.br` |
 
 ### Sender Configuration
 

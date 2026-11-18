@@ -221,6 +221,7 @@ Sends transactional emails.
 | SMTP API     | SMTP with API key              | `smtp-api`     |
 | Resend       | Resend API                     | `resend`       |
 | MailChannels | MailChannels API               | `mailchannels` |
+| mail-send    | CapivApp mail-send service     | `mail-send`    |
 
 **Config**: `NEXT_PRIVATE_SMTP_TRANSPORT`
 
@@ -352,7 +353,7 @@ npm run test:e2e
 | -------------------------------- | ---------------- | ------------------------------------------------- |
 | `NEXT_PUBLIC_UPLOAD_TRANSPORT`   | Storage provider | `database`, `s3`                                  |
 | `NEXT_PRIVATE_SIGNING_TRANSPORT` | Signing provider | `local`, `gcloud-hsm`                             |
-| `NEXT_PRIVATE_SMTP_TRANSPORT`    | Email provider   | `smtp-auth`, `smtp-api`, `resend`, `mailchannels` |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`    | Email provider   | `smtp-auth`, `smtp-api`, `resend`, `mailchannels`, `mail-send` |
 | `NEXT_PRIVATE_JOBS_PROVIDER`     | Jobs provider    | `local`, `inngest`                                |
 
 See `.env.example` for the complete list of configuration options.

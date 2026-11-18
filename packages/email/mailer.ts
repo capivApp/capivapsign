@@ -1,8 +1,10 @@
+import { FROM_NAME } from '@documenso/lib/constants/email';
 import { env } from '@documenso/lib/utils/env';
 import { ResendTransport } from '@documenso/nodemailer-resend';
 import type { Transporter } from 'nodemailer';
 import { createTransport } from 'nodemailer';
 
+import { createMailSendTransport } from './transports/mail-send';
 import { MailChannelsTransport } from './transports/mailchannels';
 
 /**
@@ -18,6 +20,11 @@ import { MailChannelsTransport } from './transports/mailchannels';
  * - **mailchannels**: Uses MailChannelsTransport, requiring:
  *   - `NEXT_PRIVATE_MAILCHANNELS_API_KEY`: API key for MailChannels
  *   - `NEXT_PRIVATE_MAILCHANNELS_ENDPOINT`: Endpoint for MailChannels (optional)
+ * - **mail-send**: Uses the CapivApp mail-send service, requiring:
+ *   - `NEXT_PRIVATE_MAIL_SEND_TOKEN`: Bearer token of this app in mail-send
+ *   - `NEXT_PRIVATE_MAIL_SEND_URL`: Base URL of mail-send (default: 'https://mail.capivapp.com.br')
+ *   The sender name comes from `NEXT_PRIVATE_SMTP_FROM_NAME`; the address is always
+ *   noreply@capivapp.com.br (set by the service).
  * - **resend**: Uses ResendTransport, requiring:
  *   - `NEXT_PRIVATE_RESEND_API_KEY`: API key for Resend
  * - **smtp-api**: Uses a custom SMTP API configuration, requiring:
@@ -58,6 +65,22 @@ const getTransport = (): Transporter => {
       MailChannelsTransport.makeTransport({
         apiKey: env('NEXT_PRIVATE_MAILCHANNELS_API_KEY'),
         endpoint: env('NEXT_PRIVATE_MAILCHANNELS_ENDPOINT'),
+      }),
+    );
+  }
+
+  if (transport === 'mail-send') {
+    const token = env('NEXT_PRIVATE_MAIL_SEND_TOKEN');
+
+    if (!token) {
+      throw new Error('mail-send transport requires NEXT_PRIVATE_MAIL_SEND_TOKEN');
+    }
+
+    return createTransport(
+      createMailSendTransport({
+        endpoint: env('NEXT_PRIVATE_MAIL_SEND_URL'),
+        token,
+        fromName: FROM_NAME,
       }),
     );
   }

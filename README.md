@@ -187,11 +187,30 @@ journalctl -u capivasign -f
 
 A cada atualização: `git pull && ./scripts/build.sh && sudo systemctl restart capivasign`.
 
+### E-mail pelo mail-send
+
+Em produção o CapivaSign manda todo e-mail pelo serviço de e-mail da CapivApp
+(`mail-send`), que enfileira, tenta de novo quando falha e entrega pelo Resend.
+No `.env` do servidor:
+
+```sh
+NEXT_PRIVATE_SMTP_TRANSPORT="mail-send"
+NEXT_PRIVATE_MAIL_SEND_TOKEN="<token do CapivaSign no mail-send>"
+NEXT_PRIVATE_MAIL_SEND_URL="https://mail.capivapp.com.br"   # opcional, este é o padrão
+NEXT_PRIVATE_SMTP_FROM_NAME="CapivaSign"                     # nome do remetente
+```
+
+O endereço é sempre `noreply@capivapp.com.br` (o serviço impõe), então
+`NEXT_PRIVATE_SMTP_FROM_ADDRESS` não vale com esse transporte. Transportes de
+e-mail cadastrados no banco (padrão global ou por organização) continuam tendo
+precedência sobre o `.env`.
+
 ## Testes
 
 ```sh
 npm run lint                      # Biome
 npm run --workspace @documenso/lib test   # unitários
+npm run --workspace @documenso/email test # transporte do mail-send
 npx turbo run test:e2e            # Playwright (requer app rodando)
 ```
 
